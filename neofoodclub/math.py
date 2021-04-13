@@ -2,8 +2,8 @@ import functools
 import itertools
 from string import ascii_lowercase, ascii_uppercase
 from typing import Tuple, Dict, Optional, List
-
 from numba import njit
+from .types import ValidOdds
 
 # at least for now, we won't be exposing the numba methods.
 __all__ = (
@@ -17,7 +17,9 @@ __all__ = (
     "bet_string_to_bets_amount",
     "bet_string_to_bets",
     "bet_url_value",
+    "make_probabilities",
 )
+
 
 BET_AMOUNT_MIN = 50
 
@@ -121,7 +123,7 @@ def bet_string_to_bet_amounts(bet_string: str) -> Tuple[Optional[int], ...]:
 
 @functools.lru_cache(maxsize=256)
 def bet_string_to_bet_indices(bet_string: str) -> Tuple[Tuple[int, ...], ...]:
-    # TODO: look into numba-fying
+    # TODO: look into numba-fying (tried once now, it was about 3x slower to get the same result uncached)
     indices = [ord(letter) - 97 for letter in bet_string]
     s = itertools.chain.from_iterable((e // 5, e % 5) for e in indices)
     # https://docs.python.org/3/library/itertools.html#itertools-recipes (see "grouper" recipe)
@@ -153,3 +155,111 @@ def bet_url_value(bet_indices: Dict) -> str:
         ascii_lowercase[multiplier * 5 + adder]
         for multiplier, adder in itertools.zip_longest(*[iter(flat)] * 2, fillvalue=0)
     )
+
+
+def make_probabilities(opening_odds: List[List[ValidOdds]]):
+    # TODO: look into numba-fying, so far any attempts have been *SLOWER*
+
+    _min = [
+        [1.0, 0.0, 0.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0, 0.0, 0.0],
+    ]
+
+    _std = [
+        [1.0, 0.0, 0.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0, 0.0, 0.0],
+    ]
+
+    _max = [
+        [1.0, 0.0, 0.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0, 0.0, 0.0],
+    ]
+
+    _used = [
+        [1.0, 0.0, 0.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0, 0.0, 0.0],
+    ]
+
+    for e in range(5):
+
+        min_prob = 0.0
+        max_prob = 0.0
+        for r in range(1, 5):
+            pirate_odd = opening_odds[e][r]
+            if pirate_odd == 13:
+                _min[e][r] = 0
+                _max[e][r] = 1 / 13
+            elif pirate_odd == 2:
+                _min[e][r] = 1 / 3
+                _max[e][r] = 1
+            else:
+                _min[e][r] = 1 / (1 + pirate_odd)
+                _max[e][r] = 1 / pirate_odd
+            min_prob += _min[e][r]
+            max_prob += _max[e][r]
+
+        for r in range(1, 5):
+            min_original = _min[e][r]
+            max_original = _max[e][r]
+
+            _min[e][r] = max(min_original, 1 + max_original - max_prob)
+            _max[e][r] = min(max_original, 1 + min_original - min_prob)
+            _std[e][r] = (
+                0.05 if opening_odds[e][r] == 13 else (_min[e][r] + _max[e][r]) / 2
+            )
+
+        for rectify_level in range(2, 13):
+            rectify_count = 0
+            std_total = 0.0
+            rectify_value = 0.0
+            max_rectify_value = 1.0
+            for r in range(1, 5):
+                std_total += _std[e][r]
+                if opening_odds[e][r] <= rectify_level:
+                    rectify_count += 1
+                    rectify_value += _std[e][r] - _min[e][r]
+                    max_rectify_value = min(
+                        [
+                            max_rectify_value,
+                            _max[e][r] - _min[e][r],
+                        ]
+                    )
+
+            if std_total == 1:
+                break
+
+            if not any(
+                [
+                    std_total - rectify_value > 1,
+                    rectify_count == 0,
+                    max_rectify_value * rectify_count < rectify_value + 1 - std_total,
+                ]
+            ):
+                rectify_value += 1 - std_total
+                rectify_value /= rectify_count
+                for r in range(1, 5):
+                    if opening_odds[e][r] <= rectify_level:
+                        _std[e][r] = _min[e][r] + rectify_value
+                break
+
+        return_sum = 0.0
+        for r in range(1, 5):
+            _used[e][r] = _std[e][r]
+            return_sum += _used[e][r]
+
+        for r in range(1, 5):
+            _used[e][r] /= return_sum
+
+    return dict(min=_min, max=_max, std=_std, used=_used)
