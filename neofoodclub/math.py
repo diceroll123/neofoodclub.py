@@ -1,9 +1,11 @@
 import functools
 import itertools
+from collections import defaultdict
 from string import ascii_lowercase, ascii_uppercase
 from typing import Tuple, Dict, Optional, List
+
 from numba import njit
-from .types import ValidOdds
+from .types import ValidOdds, ValidIndex, BetOdds
 
 # at least for now, we won't be exposing the numba methods.
 __all__ = (
@@ -18,6 +20,7 @@ __all__ = (
     "bet_string_to_bets",
     "bet_url_value",
     "make_probabilities",
+    "get_bet_odds_from_bets",
 )
 
 
@@ -263,3 +266,109 @@ def make_probabilities(opening_odds: List[List[ValidOdds]]):
             _used[e][r] /= return_sum
 
     return dict(min=_min, max=_max, std=_std, used=_used)
+
+
+def get_bet_odds_from_bets(
+    bets: List[List[ValidIndex]],
+    bet_odds: List[ValidOdds],
+    probabilities: List[List[float]],
+) -> List[BetOdds]:
+    # TODO: look into numba-fying
+
+    # ib is a binary format to represent bets.
+    # It works on 20 bits (because there are 20 pirates).
+    # Each of the bits of an ib represents whether it accepts some pirate. (whether the bet can win if this pirate wins)
+    # From most significant to least significant bits, the pirates are in the usual arena-by-arena order.
+    # This binary format allows some easy operations:
+    # ib1&ib2 accepts the pirates that both ib1 and ib2 accepts. The winning combinations of ib1&ib2 is the intersection of the winning combinations of ib1 and ib2.
+    # ib1|ib2 accepts the pirates that ib1 or ib2 accepts. The winning combinations of ib1&ib2 is BIGGER or equal to the union of the winning combinations of ib1 and ib2.
+
+    # bit_masks[i] will accept pirates from arena i and only them. bit_masks[4] == 0b1111, bit_masks[3] == 0b11110000, etc...
+
+    # all_ib will accept all pirates. all_ib = 0b11111111111111111111 (20 '1's)
+    all_ib = 0xFFFFF
+
+    # pir_ib[i] will accept pirates of index i (from 0 to 3) pir_ib[0] = 0b10001000100010001000, pir_ib[1] = 0b01000100010001000100, pir_ib[2] = 0b00100010001000100010, pir_ib[3] = 0b00010001000100010001
+    pir_ib = [0x88888, 0x44444, 0x22222, 0x11111]
+
+    bit_masks = (0xF0000, 0xF000, 0xF00, 0xF0, 0xF)
+
+    # checks if there are possible winning combinations for ib
+    def ib_doable(_ib) -> bool:
+        return (
+            _ib & bit_masks[0]
+            and _ib & bit_masks[1]
+            and _ib & bit_masks[2]
+            and _ib & bit_masks[3]
+            and _ib & bit_masks[4]
+        )
+
+    # expand_ib_object takes an ibObj and returns an ibObj.
+    # The returned bet set "res" satisfies the following properties:
+    # - for all possible winning combination it has the same value as the old set
+    # - two different bets in "res" will have 0 common accepted winning combinations
+    # - all winning combinations are accepted by a bet in "res" (giving the value 0 to combinations that busts)
+    # It's done so that the probability distribution becomes easy to compute.
+    def expand_ib_object(ib_obj) -> Dict[int, int]:
+        res = {all_ib: 0}
+        for ib_bet, winnings in sorted(ib_obj.items()):
+            for ib_key in list(res.keys()):
+                com = ib_bet & ib_key
+                if ib_doable(com):
+                    val_key = res.pop(ib_key)
+                    res[com] = winnings + val_key
+                    for _ar in bit_masks:
+                        tst = ib_key ^ (com & _ar)
+                        if ib_doable(tst):
+                            res[tst] = val_key
+                            ib_key = (ib_key & ~_ar) | (com & _ar)
+        return res
+
+    # computes the probability that the winning combination is accepted by ib
+    def ib_prob(_ib: int) -> float:
+        total_prob = 1.0
+        for _i in range(5):
+            ar_prob = 0.0
+            for _j in range(4):
+                if _ib & bit_masks[_i] & pir_ib[_j]:
+                    ar_prob += probabilities[_i][_j + 1]
+            total_prob *= ar_prob
+        return total_prob
+
+    # Takes a bet set in ibObj satisfying the following condition:
+    # - two different bets in the bet set will have 0 common accepted winning combinations
+    # and computes its win table.
+    def compute_win_table(ib_exp_obj: Dict[int, int]) -> List[BetOdds]:
+        win_table: Dict[int, float] = defaultdict(float)
+        # win_table: Dict[int, float] = defaultdict(float)
+        for k, v in ib_exp_obj.items():
+            win_table[v] += ib_prob(k)
+
+        sorted_e: List[BetOdds] = sorted(
+            [
+                {"value": value, "probability": probability}
+                for value, probability in win_table.items()
+            ],
+            key=lambda ee: ee["value"],
+        )
+
+        cumulative = 0.0
+        tail = 1.0
+        for _a in range(len(sorted_e)):
+            cumulative += sorted_e[_a]["probability"]
+            sorted_e[_a]["cumulative"] = cumulative
+            sorted_e[_a]["tail"] = tail
+            tail -= sorted_e[_a]["probability"]
+
+        return sorted_e
+
+    convert_pir_ib = [all_ib] + pir_ib
+    bets_to_ib: Dict[int, int] = defaultdict(int)
+    for key, bet_value in enumerate(bets):
+        ib = 0
+        for _x in range(5):
+            # this adds pirates meant by bet[i] to the pirates accepted by ib.
+            ib |= convert_pir_ib[bet_value[_x]] & bit_masks[_x]
+        bets_to_ib[ib] += bet_odds[key]
+
+    return compute_win_table(expand_ib_object(bets_to_ib))

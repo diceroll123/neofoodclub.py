@@ -26,3 +26,10 @@ class RoundData(TypedDict):
     lastChange: Optional[str]
     winners: Optional[List[ValidIndex]]
     foods: Optional[List[List[FoodID]]]
+
+
+class BetOdds(TypedDict):
+    value: int
+    probability: float
+    cumulative: float
+    tail: float
