@@ -160,18 +160,10 @@ def bet_url_value(bet_indices: Dict) -> str:
     )
 
 
-def make_probabilities(opening_odds: List[List[ValidOdds]]):
+def make_probabilities(opening_odds: List[List[ValidOdds]]) -> List[List[float]]:
     # TODO: look into numba-fying, so far any attempts have been *SLOWER*
 
     _min = [
-        [1.0, 0.0, 0.0, 0.0, 0.0],
-        [1.0, 0.0, 0.0, 0.0, 0.0],
-        [1.0, 0.0, 0.0, 0.0, 0.0],
-        [1.0, 0.0, 0.0, 0.0, 0.0],
-        [1.0, 0.0, 0.0, 0.0, 0.0],
-    ]
-
-    _std = [
         [1.0, 0.0, 0.0, 0.0, 0.0],
         [1.0, 0.0, 0.0, 0.0, 0.0],
         [1.0, 0.0, 0.0, 0.0, 0.0],
@@ -187,13 +179,23 @@ def make_probabilities(opening_odds: List[List[ValidOdds]]):
         [1.0, 0.0, 0.0, 0.0, 0.0],
     ]
 
-    _used = [
+    _std = [
         [1.0, 0.0, 0.0, 0.0, 0.0],
         [1.0, 0.0, 0.0, 0.0, 0.0],
         [1.0, 0.0, 0.0, 0.0, 0.0],
         [1.0, 0.0, 0.0, 0.0, 0.0],
         [1.0, 0.0, 0.0, 0.0, 0.0],
     ]
+
+    # turns out we only use _std values in the python implementation of NFC
+    # keeping the _used math to avoid confusion between NFC impls
+    # _used = [
+    #     [1.0, 0.0, 0.0, 0.0, 0.0],
+    #     [1.0, 0.0, 0.0, 0.0, 0.0],
+    #     [1.0, 0.0, 0.0, 0.0, 0.0],
+    #     [1.0, 0.0, 0.0, 0.0, 0.0],
+    #     [1.0, 0.0, 0.0, 0.0, 0.0],
+    # ]
 
     for e in range(5):
 
@@ -257,15 +259,17 @@ def make_probabilities(opening_odds: List[List[ValidOdds]]):
                         _std[e][r] = _min[e][r] + rectify_value
                 break
 
-        return_sum = 0.0
-        for r in range(1, 5):
-            _used[e][r] = _std[e][r]
-            return_sum += _used[e][r]
+    #     return_sum = 0.0
+    #     for r in range(1, 5):
+    #         _used[e][r] = _std[e][r]
+    #         return_sum += _used[e][r]
+    #
+    #     for r in range(1, 5):
+    #         _used[e][r] /= return_sum
+    #
+    # return dict(min=_min, max=_max, std=_std, used=_used)
 
-        for r in range(1, 5):
-            _used[e][r] /= return_sum
-
-    return dict(min=_min, max=_max, std=_std, used=_used)
+    return _std
 
 
 def get_bet_odds_from_bets(
@@ -340,7 +344,6 @@ def get_bet_odds_from_bets(
     # and computes its win table.
     def compute_win_table(ib_exp_obj: Dict[int, int]) -> List[BetOdds]:
         win_table: Dict[int, float] = defaultdict(float)
-        # win_table: Dict[int, float] = defaultdict(float)
         for k, v in ib_exp_obj.items():
             win_table[v] += ib_prob(k)
 
