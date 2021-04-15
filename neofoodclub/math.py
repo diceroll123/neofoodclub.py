@@ -245,12 +245,10 @@ def make_probabilities(opening_odds: List[List[ValidOdds]]) -> List[List[float]]
             if std_total == 1:
                 break
 
-            if not any(
-                [
-                    std_total - rectify_value > 1,
-                    rectify_count == 0,
-                    max_rectify_value * rectify_count < rectify_value + 1 - std_total,
-                ]
+            if not (
+                std_total - rectify_value > 1
+                or rectify_count == 0
+                or max_rectify_value * rectify_count < rectify_value + 1 - std_total
             ):
                 rectify_value += 1 - std_total
                 rectify_value /= rectify_count
