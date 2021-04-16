@@ -12,7 +12,7 @@ from dateutil.tz import UTC, tzutc
 from dateutil.parser import parse
 
 from neofoodclub.food_adjustments import NEGATIVE_FOOD, POSITIVE_FOOD
-from neofoodclub.types import RoundData, FoodID, ValidOdds, ValidIndex
+from neofoodclub.types import RoundData, FoodID, ValidOdds, ValidIndex, PirateID
 
 ARENA_NAMES = ["Shipwreck", "Lagoon", "Treasure", "Hidden", "Harpoon"]
 
@@ -70,7 +70,7 @@ class Arena:
 
     @property
     def name(self) -> Optional[str]:
-        if self._pirates:
+        if self._odds:
             return ARENA_NAMES[self._id]
         return None
 
@@ -149,8 +149,8 @@ class Arenas:
                     index=i,
                     odds=nfc._data[odds_key][idx][i],
                     opening_odds=nfc._data["openingOdds"][idx][i],
-                    nfc=nfc,
                     std=self._stds[idx][i],
+                    nfc=nfc,
                 )
                 arena.add(p)
                 self._all_pirates[pirate_id] = p
@@ -287,7 +287,7 @@ class Modifier:
     def __init__(
         self,
         flags: int = 0,
-        custom_odds=None,
+        custom_odds: Optional[Dict[PirateID, ValidOdds]] = None,
         custom_time: Optional[datetime.time] = None,
     ):
         self.value = flags
@@ -324,12 +324,12 @@ class Modifier:
             self._nfc.reset()
 
     @property
-    def custom_odds(self):
+    def custom_odds(self) -> Dict[PirateID, ValidOdds]:
         # custom_odds is a Dict[int, int] of {pirate_id: odds}
         return self._custom_odds
 
     @custom_odds.setter
-    def custom_odds(self, val: Dict):
+    def custom_odds(self, val: Dict[PirateID, ValidOdds]):
         self._custom_odds = val
         if self._nfc:
             self._nfc.reset()
@@ -552,4 +552,4 @@ class NeoFoodClub:
         return list(sorted(changed, key=lambda oc: oc.timestamp))
 
     def __repr__(self):
-        return f"<NeoFoodClub round={self.round} timestamp={self.timestamp!r}>"
+        return f"<NeoFoodClub round={self.round} timestamp={self.timestamp!r} is_over={self.is_over}>"

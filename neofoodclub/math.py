@@ -45,14 +45,16 @@ def precompile():
                         binary_to_indices(bet_binary)
 
 
-@functools.lru_cache(maxsize=25)
+@functools.lru_cache(maxsize=None)
 def pirate_binary(index: int, arena: int) -> int:
     # binary position of the pirate in its arena, it's just a 1 with 19 zeros surrounding it
     # this assumes the index is actually index+1 because of odds etc starting with a 1 in the 0th index
+    if index == 0:
+        return 0
     return 1 << (19 - (index - 1 + arena * 4))
 
 
-@functools.lru_cache(maxsize=3125)
+@functools.lru_cache(maxsize=None)
 def pirates_binary(bet_indices: Tuple[int, ...]) -> int:
     # the inverse of binary_to_indices
     # turns (1, 2, 3, 4, 2) (for example) into 0b10000100001000010100, a bet-binary compatible number
