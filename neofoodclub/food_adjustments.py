@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Dict
 
 
 # this is just a convoluted way of pre-allocating food adjustment values
@@ -20,7 +20,7 @@ class FA(defaultdict):
 
 
 # the keys are the pirate IDs
-POSITIVE_FOOD = {
+POSITIVE_FOOD: Dict[int, Dict[int, int]] = {
     1: FA(one=(4, 6, 7, 8, 10, 25), two=(1, 12, 33)),
     2: FA(one=(1, 4, 5, 6, 7, 8, 10, 12, 13, 33, 35, 36)),
     3: FA(one=(14, 15, 16, 17, 18, 19, 20, 21, 22, 28, 32, 34, 37, 40)),
@@ -43,7 +43,7 @@ POSITIVE_FOOD = {
     20: FA(one=(2, 18, 26, 27, 30, 34)),
 }
 
-NEGATIVE_FOOD = {
+NEGATIVE_FOOD: Dict[int, Dict[int, int]] = {
     1: FA(one=(14, 15, 16, 28, 32)),
     2: FA(one=(3, 11, 17, 25, 28, 39, 40)),
     3: FA(one=(11, 19, 23, 24, 29)),
