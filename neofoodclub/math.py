@@ -347,7 +347,12 @@ def get_bet_odds_from_bets(
 
         sorted_e: List[BetOdds] = sorted(
             [
-                {"value": value, "probability": probability}
+                {
+                    "value": value,
+                    "probability": probability,
+                    "cumulative": 0.0,
+                    "tail": 1.0,
+                }
                 for value, probability in win_table.items()
             ],
             key=lambda ee: ee["value"],

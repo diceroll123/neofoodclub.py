@@ -1,10 +1,22 @@
 from typing import TypedDict, List, Literal, Optional
 
+# fmt: off
+FoodID = Literal[
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+    11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+    21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+    31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+]
 
-FoodID = Literal[tuple(range(1, 41))]
-PirateID = Literal[tuple(range(1, 21))]
-ValidOdds = Literal[tuple(range(1, 14))]
-ValidIndex = Literal[tuple(range(5))]
+PirateID = Literal[
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+    11, 12, 13, 14, 15, 16, 17, 18, 19, 20
+]
+
+ValidOdds = Literal[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+
+ValidIndex = Literal[0, 1, 2, 3, 4]
+# fmt: on
 
 
 class OddsChange(TypedDict):
@@ -15,10 +27,11 @@ class OddsChange(TypedDict):
     t: str
 
 
-class RoundData(TypedDict):
+class RoundData(TypedDict, total=False):
     pirates: List[List[PirateID]]
     openingOdds: List[List[ValidOdds]]
     currentOdds: List[List[ValidOdds]]
+    customOdds: List[List[ValidOdds]]  # this is used internally ONLY
     changes: List[OddsChange]
     round: int
     start: str
