@@ -1,209 +1,34 @@
 from collections import namedtuple
 import datetime
 import json
+
+import numpy as np
+
 import neofoodclub.math as NFCMath
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple, Set
 
 import dateutil
 from dateutil.tz import UTC, tzutc
 
-
 from dateutil.parser import parse
 
-from neofoodclub.food_adjustments import NEGATIVE_FOOD, POSITIVE_FOOD
-from neofoodclub.types import RoundData, FoodID, ValidOdds, ValidIndex, PirateID
+from neofoodclub.types import (
+    RoundData,
+    FoodID,
+    ValidOdds,
+    ValidIndex,
+    PirateID,
+)
 
 ARENA_NAMES = ["Shipwreck", "Lagoon", "Treasure", "Hidden", "Harpoon"]
 
 PartialPirate = namedtuple("PartialPirate", ["id"])
 
-
 __all__ = ("NeoFoodClub",)
 
 
-@dataclass
-class Pirate:
-    id: int
-    arena: int
-    index: int
-    nfc: "NeoFoodClub"
-    std: float
-    odds: int
-    opening_odds: int
-    er: float = field(init=False)
-    bin: int = field(init=False)
-
-    def __post_init__(self):
-        self.er = self.std * self.odds
-        self.bin = NFCMath.pirate_binary(self.index, self.arena)
-
-    @property
-    def fa(self) -> int:
-        foods = self.nfc.data["foods"]
-        if foods:
-            return sum(
-                -NEGATIVE_FOOD[self.id][f] + POSITIVE_FOOD[self.id][f]
-                for f in foods[self.arena]
-            )
-
-        return 0
-
-    def __int__(self):
-        return self.bin
-
-    def __hash__(self):
-        return hash(self.bin)
-
-
-class Arena:
-    __slots__ = (
-        "_id",
-        "_pirates",
-        "_odds",
-    )
-
-    def __init__(self, arena_id: int):
-        self._id = arena_id
-        self._pirates: List[Pirate] = []
-        self._odds = 0
-
-    @property
-    def name(self) -> Optional[str]:
-        if self._odds:
-            return ARENA_NAMES[self._id]
-        return None
-
-    def add(self, pirate):
-        self._pirates.append(pirate)
-        self._odds += 1 / pirate.odds
-
-    @property
-    def best(self) -> List[Pirate]:
-        return sorted(self._pirates, key=lambda a: a.odds)
-
-    @property
-    def ids(self) -> List[int]:
-        return [p.id for p in self._pirates]
-
-    @property
-    def odds(self) -> float:
-        return self._odds
-
-    @property
-    def ratio(self) -> float:
-        return 1 / self._odds - 1
-
-    @property
-    def pirates(self) -> List[Pirate]:
-        return self._pirates
-
-    @property
-    def positive(self) -> bool:
-        return self._odds < 1
-
-    @property
-    def negative(self) -> bool:
-        return not self.positive
-
-    def __getitem__(self, item) -> Optional[Pirate]:
-        try:
-            return self._pirates[item]
-        except KeyError:
-            return None
-
-    def __iter__(self):
-        return self._pirates.__iter__()
-
-    def __repr__(self):
-        return f"<Arena name={self.name} odds={self._odds} pirates={self.pirates}>"
-
-
-class Arenas:
-    __slots__ = (
-        "_data",
-        "_stds",
-        "_arenas",
-        "_all_pirates",
-        "_ids",
-        "_positives",
-    )
-
-    def __init__(self, nfc):
-        self._data = nfc.data
-        self._stds = NFCMath.make_probabilities(self._data["openingOdds"])
-
-        self._arenas: List[Arena] = []
-        self._all_pirates: Dict[int, Pirate] = {}
-
-        odds_key = "customOdds" if nfc._modifier else "currentOdds"
-
-        for idx, a in enumerate(self._data.get("pirates")):
-            arena = Arena(arena_id=idx)
-
-            for i, pirate_id in enumerate(a):
-                i += 1
-                p = Pirate(
-                    id=pirate_id,
-                    arena=idx,
-                    index=i,
-                    odds=nfc._data[odds_key][idx][i],
-                    opening_odds=nfc._data["openingOdds"][idx][i],
-                    std=self._stds[idx][i],
-                    nfc=nfc,
-                )
-                arena.add(p)
-                self._all_pirates[pirate_id] = p
-
-            self._arenas.append(arena)
-
-        self._ids: List[List[int]] = [a.ids for a in self._arenas]
-        self._positives: List[Arena] = sorted(
-            [a for a in self._arenas if a.positive], key=lambda _a: _a.odds
-        )
-
-    def get_pirate_by_id(self, pirate_id: int) -> Pirate:
-        return self._all_pirates[pirate_id]
-
-    def get_pirates_by_id(self, pirate_ids: List[int]) -> List[Pirate]:
-        return [self._all_pirates[num] for num in pirate_ids]
-
-    @property
-    def all_pirates(self) -> List[Pirate]:
-        return list(self._all_pirates.values())
-
-    @property
-    def pirates(self) -> List[List[Pirate]]:
-        return [arena.pirates for arena in self._arenas]
-
-    @property
-    def best(self) -> List[Arena]:
-        return sorted(self._arenas, key=lambda a: a.odds)
-
-    @property
-    def ids(self) -> List[List[int]]:  # pirate ids
-        return self._ids
-
-    @property
-    def positives(self) -> List[Arena]:
-        return self._positives
-
-    @property
-    def probability_list(self) -> List[List[float]]:
-        return self._stds
-
-    def __getitem__(self, item):
-        try:
-            return self._arenas[item]
-        except KeyError:
-            return None
-
-    def __iter__(self):
-        return self._arenas.__iter__()
-
-
 class OddsChange:
-
     __slots__ = (
         "_index",
         "_data",
@@ -371,7 +196,172 @@ class Modifier:
         self._nfc = value
 
 
-class NeoFoodClub:
+@dataclass
+class Odd:
+    value: int
+    probability: float
+    cumulative: float
+    tail: float
+
+
+class Odds:
+    def __init__(self, bets: "Bets"):
+        odds = NFCMath.get_bet_odds_from_bets(
+            bets.indices, bets.nfc._data_dict["odds"][bets._indices], bets.nfc._stds
+        )
+        self._odds = [Odd(**odd) for odd in odds]
+        self.best = self._odds[-1]  # highest odds
+        self.bust = self._odds[0] if self._odds[0].value == 0 else None  # lowest odds
+        self.most_likely_winner = max(
+            self._odds[1 if self.bust else 0 :], key=lambda o: o.probability
+        )
+
+        amount_of_bets = max(0, min(len(bets), 15))
+
+        self.partial_rate = sum(
+            o.probability for o in self._odds if 0 < int(o.value) < amount_of_bets
+        )
+
+    def __repr__(self):
+        attrs = [
+            ("best", self.best),
+            ("bust", self.bust),
+            ("most_likely_winner", self.most_likely_winner),
+            ("partial_rate", self.partial_rate),
+        ]
+        joined = " ".join("%s=%r" % t for t in attrs)
+        return f"<Odds {joined}>"
+
+
+class Bets:
+
+    __slots__ = (
+        "_indices",
+        "nfc",
+    )
+
+    def __init__(self, *, nfc: "NeoFoodClub", indices: np.ndarray):
+        # TODO: custom bet amounts
+        self.nfc = nfc
+        self._indices = indices
+
+    @property
+    def net_expected(self) -> float:
+        if self.nfc._net_expected_cache is not None:
+            return np.sum(self.nfc._net_expected_cache[self._indices])
+        return 0.0
+
+    @property
+    def er(self) -> float:
+        return np.sum(self.nfc._data_dict["ers"][self._indices])
+
+    @property
+    def bet_amounts(self) -> np.ndarray:
+        # TODO: custom bet amounts
+        return self.nfc._maxbet_odds_cache[self._indices].astype(int)
+
+    @property
+    def indices(self) -> Tuple[Tuple[int, ...], ...]:
+        return tuple(
+            NFCMath.binary_to_indices(binary)
+            for binary in self.nfc._data_dict["bins"][self._indices].astype(int)
+        )
+
+    @property
+    def url_hash(self) -> str:
+        return NFCMath.bet_url_value(self.indices)
+
+    @property
+    def amounts_hash(self) -> str:
+        return NFCMath.bet_amounts_to_string(
+            dict(zip(range(len(self.bet_amounts)), self.bet_amounts))
+        )
+
+    def __repr__(self):
+        attrs = [
+            ("ne", self.net_expected),
+            ("er", self.er),
+            ("bet_hash", self.url_hash),
+            ("amount_hash", self.amounts_hash),
+            ("bet_amounts", self.bet_amounts),
+        ]
+        joined = " ".join("%s=%r" % t for t in attrs)
+        return f"<Bets {joined}>"
+
+    @classmethod
+    def _from_generator(cls, *, nfc: "NeoFoodClub", indices: np.ndarray):
+        # here is where we will take indices and sort as needed
+        # to avoid confusion with "manually" making bets
+        if not nfc._modifier.reverse:
+            indices = indices[::-1]
+
+        indices = indices[: nfc.max_amount_of_bets]
+        return cls(nfc=nfc, indices=indices)
+
+    @classmethod
+    def from_binary(cls, nfc: "NeoFoodClub", *bins: int):
+        # TODO: raise duplicate errors
+        # TODO: maintain order of bins
+        int_bins = nfc._data_dict["bins"].astype(int)
+        intersection = np.where(np.isin(int_bins, bins))[0]
+
+        if intersection.size == 0:
+            raise ValueError(
+                "Bets class requires at least one valid index (an integer from 0-3124 inclusive)"
+            )
+
+        return cls(nfc=nfc, indices=intersection)
+
+    def __len__(self):
+        return self._indices.size
+
+    @property
+    def odds(self) -> Odds:
+        return Odds(self)
+
+
+class BetMixin:
+    @property
+    def max_amount_of_bets(self) -> int:
+        # if self._modifier.cc_perk:
+        #     return 15
+        return 10
+
+    def _max_ter_indices(self) -> np.ndarray:
+        # use net expected if we've got it
+        return np.argsort(
+            self._net_expected_cache
+            if self._net_expected_cache is not None
+            else self._data_dict["ers"]
+        )
+
+    def make_max_ter_set(self) -> Bets:
+        return Bets._from_generator(nfc=self, indices=self._max_ter_indices())
+
+    def _crazy_bets_indices(self) -> np.ndarray:
+        return np.random.choice(
+            NFCMath.FULL_BETS, size=self.max_amount_of_bets, replace=False
+        )
+
+    def make_crazy_bets(self) -> Bets:
+        return Bets._from_generator(nfc=self, indices=self._crazy_bets_indices())
+
+    def _random_indices(self) -> np.ndarray:
+        return np.random.choice(3124, size=self.max_amount_of_bets, replace=False)
+
+    def make_random_bets(self) -> Bets:
+        return Bets._from_generator(nfc=self, indices=self._random_indices())
+
+
+class NeoFoodClub(BetMixin):
+    __slots__ = (
+        "_data",
+        "_modifier",
+        "_bet_amount",
+        "_stds",
+        "_data_dict",
+    )
+
     def __init__(
         self,
         data: RoundData,
@@ -381,9 +371,13 @@ class NeoFoodClub:
     ):
         # so it's not changing old cache data around, have a deep copy (safety precaution for custom odds)
         self._data = json.loads(json.dumps(data))
-        self.bet_amount = bet_amount
+        self._bet_amount = bet_amount
+        self._data_dict = None
+        self._maxbet_odds_cache = None
+        self._net_expected_cache = None
+        self._stds = NFCMath.make_probabilities(self._data["openingOdds"])
 
-        self._arenas: Arenas
+        # self._arenas: Arenas
 
         if modifier is None:
             modifier = Modifier()
@@ -400,9 +394,6 @@ class NeoFoodClub:
                     self._data["customOdds"][k1][k2 + 1] = self._modifier.custom_odds[p]
 
     def _do_snapshot(self):
-        if not self._modifier.time:
-            return
-
         dt = self.get_round_time(self._modifier.time)
         if dt is None:
             return
@@ -415,16 +406,48 @@ class NeoFoodClub:
 
     def reset(self):
         # start with the desired odds
-        if self._modifier.opening_odds:
-            self._data["customOdds"] = json.loads(json.dumps(self._data["openingOdds"]))
-        else:
-            self._data["customOdds"] = json.loads(json.dumps(self._data["currentOdds"]))
+        key = "openingOdds" if self._modifier.opening_odds else "currentOdds"
+        self._data["customOdds"] = json.loads(json.dumps(self._data[key]))
 
-        self._do_snapshot()
+        if self._modifier.time:
+            self._do_snapshot()
 
         self._add_custom_odds()
 
-        self._arenas = Arenas(self)
+        # self._arenas = Arenas(self)
+
+        self._cache_dicts()
+
+    def _cache_bet_amount_dicts(self):
+        # cache maxbets, we'll need these a lot later,
+        # but only if we need them at all
+        bet_amount = self._bet_amount
+        if bet_amount and not self._modifier.general:
+            mb_copy = self._data_dict["maxbets"].copy()
+            mb_copy[mb_copy > bet_amount] = bet_amount
+            self._maxbet_odds_cache = mb_copy
+
+            # for making maxter faster...
+            self._net_expected_cache = mb_copy * self._data_dict["ers"] - mb_copy
+
+    def _cache_dicts(self):
+        # most of the binary/odds/std data sits here
+        self._data_dict = NFCMath.make_round_dicts(
+            tuple(tuple(row) for row in self._stds),
+            tuple(tuple(row) for row in self._data["customOdds"]),
+        )
+
+        self._cache_bet_amount_dicts()
+
+    @property
+    def bet_amount(self) -> Optional[int]:
+        return self._bet_amount
+
+    @bet_amount.setter
+    def bet_amount(self, val: Optional[int]):
+        if val != self._bet_amount:
+            self._bet_amount = val
+            self._cache_maxbets()
 
     @property
     def modifier(self):
@@ -449,19 +472,6 @@ class NeoFoodClub:
     @property
     def modified(self) -> bool:
         return bool(self._modifier)
-
-    @property
-    def arenas(self) -> Arenas:
-        return self._arenas
-
-    @property
-    def winners_pirates(self) -> Optional[Tuple[Pirate, ...]]:
-        # TODO: turn into a Bet object
-        if self.is_over:
-            return tuple(
-                self.arenas[idx][p_idx - 1] for idx, p_idx in enumerate(self.winners)
-            )
-        return None
 
     def with_modifier(self, modifier: Optional[Modifier] = None):
         if modifier is None:
