@@ -352,20 +352,39 @@ class BetMixin:
     def make_random_bets(self) -> Bets:
         return Bets._from_generator(nfc=self, indices=self._random_indices())
 
-    def _gambit_indices(self, five_bet: int) -> np.ndarray:
-        bins = self._data_dict["bins"].astype(int)
-        possible_indices = np.where(bins & five_bet == bins)[0]
+    def _gambit_indices(
+        self, *, five_bet: Optional[int] = None, random: bool = False
+    ) -> np.ndarray:
+        if five_bet is not None:
+            bins = self._data_dict["bins"].astype(int)
+            possible_indices = np.where(bins & five_bet == bins)[0]
 
-        odds = (  # this gives us the highest ER bets first
-            self._data_dict["odds"][possible_indices]
-            + self._data_dict["std"][possible_indices]
+            odds = (
+                self._data_dict["odds"][possible_indices]
+                + self._data_dict["std"][possible_indices]
+                # this gives us the highest ER bets first
+            )
+            sorted_odds = np.argsort(odds, kind="mergesort", axis=0)
+
+            return possible_indices[sorted_odds]
+
+        # these are lazy but they get the job done well enough
+        if random:
+            random_five_bet = np.random.choice(NFCMath.FULL_BETS, size=1)
+            return self._gambit_indices(five_bet=random_five_bet)
+
+        # get highest ER pirates
+        ers = self._data_dict["ers"][NFCMath.FULL_BETS]
+        highest_er = np.argsort(ers, kind="mergesort", axis=0)[::-1][0]
+        pirate_bin = self._data_dict["bins"][NFCMath.FULL_BETS[highest_er]]
+        return self._gambit_indices(five_bet=pirate_bin.astype(int))
+
+    def make_gambit_bets(
+        self, *, five_bet: Optional[int] = None, random: bool = False
+    ) -> Bets:
+        return Bets._from_generator(
+            nfc=self, indices=self._gambit_indices(five_bet=five_bet, random=random)
         )
-        sorted_odds = np.argsort(odds, kind="mergesort", axis=0)
-
-        return possible_indices[sorted_odds]
-
-    def make_gambit_bets(self, five_bet: int) -> Bets:
-        return Bets._from_generator(nfc=self, indices=self._gambit_indices(five_bet))
 
 
 class NeoFoodClub(BetMixin):
