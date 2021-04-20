@@ -28,6 +28,7 @@ __all__ = (
     "get_bet_odds_from_bets",
     "make_round_dicts",
     "FULL_BETS",
+    "BIT_MASKS",
 )
 
 
@@ -36,6 +37,8 @@ BET_AMOUNT_MIN = 50
 BET_AMOUNT_MAX = 70304
 # this fixed number is the max that NeoFoodClub can encode,
 # given the current bet (and bet amount) encoding specification
+
+BIT_MASKS = (0xF0000, 0xF000, 0xF00, 0xF0, 0xF)
 
 float_array = types.float64[:]
 
@@ -304,16 +307,14 @@ def get_bet_odds_from_bets(
     # pir_ib[i] will accept pirates of index i (from 0 to 3) pir_ib[0] = 0b10001000100010001000, pir_ib[1] = 0b01000100010001000100, pir_ib[2] = 0b00100010001000100010, pir_ib[3] = 0b00010001000100010001
     pir_ib = [0x88888, 0x44444, 0x22222, 0x11111]
 
-    bit_masks = (0xF0000, 0xF000, 0xF00, 0xF0, 0xF)
-
     # checks if there are possible winning combinations for ib
     def ib_doable(_ib) -> bool:
         return (
-            _ib & bit_masks[0]
-            and _ib & bit_masks[1]
-            and _ib & bit_masks[2]
-            and _ib & bit_masks[3]
-            and _ib & bit_masks[4]
+            _ib & BIT_MASKS[0]
+            and _ib & BIT_MASKS[1]
+            and _ib & BIT_MASKS[2]
+            and _ib & BIT_MASKS[3]
+            and _ib & BIT_MASKS[4]
         )
 
     # expand_ib_object takes an ibObj and returns an ibObj.
@@ -330,7 +331,7 @@ def get_bet_odds_from_bets(
                 if ib_doable(com):
                     val_key = res.pop(ib_key)
                     res[com] = winnings + val_key
-                    for _ar in bit_masks:
+                    for _ar in BIT_MASKS:
                         tst = ib_key ^ (com & _ar)
                         if ib_doable(tst):
                             res[tst] = val_key
@@ -343,7 +344,7 @@ def get_bet_odds_from_bets(
         for _i in range(5):
             ar_prob = 0.0
             for _j in range(4):
-                if _ib & bit_masks[_i] & pir_ib[_j]:
+                if _ib & BIT_MASKS[_i] & pir_ib[_j]:
                     ar_prob += probabilities[_i][_j + 1]
             total_prob *= ar_prob
         return total_prob
@@ -385,7 +386,7 @@ def get_bet_odds_from_bets(
         ib = 0
         for _x in range(5):
             # this adds pirates meant by bet[i] to the pirates accepted by ib.
-            ib |= convert_pir_ib[bet_value[_x]] & bit_masks[_x]
+            ib |= convert_pir_ib[bet_value[_x]] & BIT_MASKS[_x]
         bets_to_ib[ib] += bet_odds[key]
 
     return compute_win_table(expand_ib_object(bets_to_ib))
