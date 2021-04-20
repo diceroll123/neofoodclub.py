@@ -386,6 +386,33 @@ class BetMixin:
             nfc=self, indices=self._gambit_indices(five_bet=five_bet, random=random)
         )
 
+    def _tenbet_indices(self, pirate_binary: int) -> np.ndarray:
+        bins = self._data_dict["bins"].astype(int)
+        possible_indices = np.where(bins & pirate_binary == pirate_binary)[0]
+
+        ers = (
+            self._net_expected_cache
+            if self._net_expected_cache is not None
+            else self._data_dict["ers"]
+        )
+
+        sorted_odds = np.argsort(ers[possible_indices], kind="mergesort", axis=0)
+
+        return possible_indices[sorted_odds]
+
+    def make_tenbet_bets(self, pirate_binary: int) -> Bets:
+        amount_of_pirates = sum(1 for mask in NFCMath.BIT_MASKS if pirate_binary & mask)
+
+        if amount_of_pirates == 0:
+            raise ValueError("You must pick at least 1 pirate, and at most 3.")
+
+        if amount_of_pirates > 3:
+            raise ValueError("You must pick 3 pirates at most.")
+
+        return Bets._from_generator(
+            nfc=self, indices=self._tenbet_indices(pirate_binary)
+        )
+
 
 class NeoFoodClub(BetMixin):
     __slots__ = (
