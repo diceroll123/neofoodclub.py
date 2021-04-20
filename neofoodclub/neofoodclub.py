@@ -415,6 +415,14 @@ class BetMixin:
             nfc=self, indices=self._tenbet_indices(pirate_binary)
         )
 
+    def _unit_indices(self, units: int) -> np.ndarray:
+        sorted_std = np.argsort(self._data_dict["std"], kind="mergesort", axis=0)
+        possible_indices = np.where(self._data_dict["odds"][sorted_std] >= units)[0]
+        return sorted_std[possible_indices]
+
+    def make_units_bets(self, units: int) -> Bets:
+        return Bets._from_generator(nfc=self, indices=self._unit_indices(units))
+
 
 class NeoFoodClub(BetMixin):
     __slots__ = (
