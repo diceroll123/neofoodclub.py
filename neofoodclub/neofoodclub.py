@@ -370,8 +370,10 @@ class BetMixin:
 
         # these are lazy but they get the job done well enough
         if random:
-            random_five_bet = np.random.choice(NFCMath.FULL_BETS, size=1)
-            return self._gambit_indices(five_bet=random_five_bet)
+            random_five_bet = self._data_dict["bins"][
+                np.random.choice(NFCMath.FULL_BETS, size=1)
+            ]
+            return self._gambit_indices(five_bet=random_five_bet.astype(int)[0])
 
         # get highest ER pirates
         ers = self._data_dict["ers"][NFCMath.FULL_BETS]
