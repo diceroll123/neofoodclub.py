@@ -22,10 +22,52 @@ from neofoodclub.types import (
 )
 
 ARENA_NAMES = ["Shipwreck", "Lagoon", "Treasure", "Hidden", "Harpoon"]
-
-PartialPirate = namedtuple("PartialPirate", ["id"])
+PIRATE_NAMES = {
+    1: "Dan",
+    2: "Sproggie",
+    3: "Orvinn",
+    4: "Lucky",
+    5: "Edmund",
+    6: "Peg Leg",
+    7: "Bonnie",
+    8: "Puffo",
+    9: "Stuff",
+    10: "Squire",
+    11: "Crossblades",
+    12: "Stripey",
+    13: "Ned",
+    14: "Fairfax",
+    15: "Gooblah",
+    16: "Franchisco",
+    17: "Federismo",
+    18: "Blackbeard",
+    19: "Buck",
+    20: "Tailhook",
+}
 
 __all__ = ("NeoFoodClub",)
+
+
+class PirateMixin:
+    @property
+    def name(self):
+        return PIRATE_NAMES[self.id]
+
+    @property
+    def image(self):
+        return f"http://images.neopets.com/pirates/fc/fc_pirate_{self.id}.gif"
+
+
+class PartialPirate(PirateMixin):
+    def __init__(self, _id: int):
+        self._id = _id
+
+    @property
+    def id(self) -> int:
+        return self._id
+
+    def __repr__(self):
+        return f"<NaivePirate name={self.name}>"
 
 
 class OddsChange:
@@ -71,7 +113,7 @@ class OddsChange:
     @property
     def pirate(self) -> PartialPirate:
         return PartialPirate(
-            id=self._round_data["pirates"][self.arena_index][self.pirate_index - 1]
+            self._round_data["pirates"][self.arena_index][self.pirate_index - 1]
         )
 
     @property
@@ -234,7 +276,6 @@ class Odds:
 
 
 class Bets:
-
     __slots__ = (
         "_indices",
         "nfc",
@@ -268,7 +309,7 @@ class Bets:
         )
 
     @property
-    def url_hash(self) -> str:
+    def bet_hash(self) -> str:
         return NFCMath.bet_url_value(self.indices)
 
     @property
@@ -281,7 +322,7 @@ class Bets:
         attrs = [
             ("ne", self.net_expected),
             ("er", self.er),
-            ("bet_hash", self.url_hash),
+            ("bet_hash", self.bet_hash),
             ("amount_hash", self.amounts_hash),
             ("bet_amounts", self.bet_amounts),
         ]
@@ -321,6 +362,8 @@ class Bets:
 
 
 class BetMixin:
+    # TODO: bustproof bets
+
     @property
     def max_amount_of_bets(self) -> int:
         # if self._modifier.cc_perk:
@@ -424,6 +467,177 @@ class BetMixin:
         return Bets._from_generator(nfc=self, indices=self._unit_indices(units))
 
 
+class Pirate(PirateMixin):
+    __slots__ = (
+        "_id",
+        "_arena",
+        "_index",
+        "_odds",
+        "_opening_odds",
+        "_std",
+        "_er",
+    )
+
+    def __init__(self, *, nfc: "NeoFoodClub", id: int, arena: int, index: int):
+        self._id = id
+        self._arena = arena
+        self._index = index
+        self._odds: int = nfc._data["customOdds"][arena][index]
+        self._opening_odds: int = nfc._data["openingOdds"][arena][index]
+        self._std: float = nfc._stds[arena][index]
+        self._er: float = self.std * self.odds
+
+    @property
+    def id(self) -> int:
+        return self._id
+
+    @property
+    def arena(self) -> int:
+        return self._arena
+
+    @property
+    def index(self) -> int:
+        return self._index
+
+    @property
+    def std(self) -> float:
+        return self._std
+
+    @property
+    def odds(self) -> int:
+        return self._odds
+
+    @property
+    def er(self) -> float:
+        return self._er
+
+    @property
+    def opening_odds(self) -> int:
+        return self._opening_odds
+
+    def __int__(self):
+        return NFCMath.pirate_binary(self._index, self._arena)
+
+    def __repr__(self):
+        attrs = [
+            ("name", self.name),
+            ("arena", self.arena),
+            ("index", self.index),
+            ("odds", self.odds),
+            ("opening_odds", self.opening_odds),
+        ]
+        joined = " ".join("%s=%r" % t for t in attrs)
+        return f"<Pirate {joined}>"
+
+
+class Arena:
+    __slots__ = (
+        "_pirates",
+        "_id",
+    )
+
+    def __init__(self, *, nfc: "NeoFoodClub", arena_id: int, pirate_ids: List[int]):
+        self._id = arena_id
+        self._pirates = [  # adding 1 to index because the original list has a length of 4, but everything else has 5
+            Pirate(nfc=nfc, id=p_id, arena=arena_id, index=idx + 1)
+            for idx, p_id in enumerate(pirate_ids)
+        ]
+
+    @property
+    def id(self) -> int:
+        return self._id
+
+    @property
+    def name(self) -> str:
+        return ARENA_NAMES[self._id]
+
+    @property
+    def best(self) -> List[Pirate]:
+        return sorted(self._pirates, key=lambda a: a.odds)
+
+    @property
+    def ids(self):
+        return [p.id for p in self._pirates]
+
+    @property
+    def odds(self) -> float:
+        # do note that arena odds are not the same as pirate odds
+        return 5 / sum(p.odds for p in self._pirates)
+
+    @property
+    def ratio(self) -> float:
+        return 1 / self.odds - 1
+
+    @property
+    def pirates(self) -> List[Pirate]:
+        return self._pirates
+
+    @property
+    def positive(self) -> bool:
+        return self.odds < 1
+
+    @property
+    def negative(self) -> bool:
+        return not self.positive
+
+    def __getitem__(self, item: ValidIndex) -> Optional[Pirate]:
+        try:
+            return self._pirates[item]
+        except KeyError:
+            return None
+
+    def __iter__(self):
+        return self._pirates.__iter__()
+
+    def __repr__(self):
+        return f"<Arena name={self.name} odds={self.odds} pirates={self.pirates}>"
+
+
+class Arenas:
+    __slots__ = ("_arenas",)
+
+    def __init__(self, nfc: "NeoFoodClub"):
+        self._arenas = [
+            Arena(nfc=nfc, arena_id=idx, pirate_ids=a)
+            for idx, a in enumerate(nfc._data["pirates"])
+        ]
+
+    def get_pirate_by_id(self, pirate_id: PirateID) -> Pirate:
+        for p in self.all_pirates:
+            if p.id == pirate_id:
+                return p
+
+    def get_pirates_by_id(self, *pirate_ids: List[PirateID]) -> List[Pirate]:
+        return [p for p in self.all_pirates if p.id in pirate_ids]
+
+    @property
+    def all_pirates(self) -> List[Pirate]:
+        pirates = []
+        for a in self._arenas:
+            for p in a.pirates:
+                pirates.append(p)
+        return pirates
+
+    @property
+    def pirates(self) -> List[List[Pirate]]:
+        return [arena.pirates for arena in self._arenas]
+
+    @property
+    def best(self) -> List[Arena]:
+        return sorted(self._arenas, key=lambda a: a.odds)
+
+    @property
+    def pirate_ids(self) -> List[List[int]]:
+        return [arena.ids for arena in self._arenas]
+
+    @property
+    def positives(self) -> List[Arena]:
+        return sorted([a for a in self._arenas if a.positive], key=lambda _a: _a.odds)
+
+    def __repr__(self):
+        return f"<Arenas {self._arenas!r}>"
+
+
 class NeoFoodClub(BetMixin):
     __slots__ = (
         "_data",
@@ -431,6 +645,8 @@ class NeoFoodClub(BetMixin):
         "_bet_amount",
         "_stds",
         "_data_dict",
+        "_maxbet_odds_cache",
+        "_net_expected_cache",
     )
 
     def __init__(
@@ -447,8 +663,6 @@ class NeoFoodClub(BetMixin):
         self._maxbet_odds_cache = None
         self._net_expected_cache = None
         self._stds = NFCMath.make_probabilities(self._data["openingOdds"])
-
-        # self._arenas: Arenas
 
         if modifier is None:
             modifier = Modifier()
@@ -485,8 +699,6 @@ class NeoFoodClub(BetMixin):
 
         self._add_custom_odds()
 
-        # self._arenas = Arenas(self)
-
         self._cache_dicts()
 
     def _cache_bet_amount_dicts(self):
@@ -511,6 +723,10 @@ class NeoFoodClub(BetMixin):
         self._cache_bet_amount_dicts()
 
     @property
+    def arenas(self) -> Arenas:
+        return Arenas(self)
+
+    @property
     def bet_amount(self) -> Optional[int]:
         return self._bet_amount
 
@@ -518,7 +734,7 @@ class NeoFoodClub(BetMixin):
     def bet_amount(self, val: Optional[int]):
         if val != self._bet_amount:
             self._bet_amount = val
-            self._cache_maxbets()
+            self._cache_bet_amount_dicts()
 
     @property
     def modifier(self):
