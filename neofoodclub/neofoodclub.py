@@ -352,6 +352,21 @@ class BetMixin:
     def make_random_bets(self) -> Bets:
         return Bets._from_generator(nfc=self, indices=self._random_indices())
 
+    def _gambit_indices(self, five_bet: int) -> np.ndarray:
+        bins = self._data_dict["bins"].astype(int)
+        possible_indices = np.where(bins & five_bet == bins)[0]
+
+        odds = (  # this gives us the highest ER bets first
+            self._data_dict["odds"][possible_indices]
+            + self._data_dict["std"][possible_indices]
+        )
+        sorted_odds = np.argsort(odds, kind="mergesort", axis=0)
+
+        return possible_indices[sorted_odds]
+
+    def make_gambit_bets(self, five_bet: int) -> Bets:
+        return Bets._from_generator(nfc=self, indices=self._gambit_indices(five_bet))
+
 
 class NeoFoodClub(BetMixin):
     __slots__ = (
