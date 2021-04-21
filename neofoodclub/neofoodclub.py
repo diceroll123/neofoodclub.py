@@ -360,6 +360,13 @@ class Bets:
     def odds(self) -> Odds:
         return Odds(self)
 
+    def _iterator(self):
+        int_bins = self.nfc._data_dict["bins"].astype(int)
+        yield from int_bins[self._indices]
+
+    def __iter__(self):
+        return self._iterator()
+
 
 class BetMixin:
     # TODO: bustproof bets
