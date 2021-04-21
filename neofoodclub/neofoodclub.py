@@ -369,6 +369,13 @@ class Bets:
     def __iter__(self):
         return self._iterator()
 
+    def __eq__(self, other):
+        return (
+            isinstance(other, self.__class__)
+            and self.bet_hash == other.bet_hash
+            and self.amounts_hash == other.amounts_hash
+        )
+
 
 class BetMixin:
     # TODO: bustproof bets
