@@ -466,6 +466,18 @@ class BetMixin:
     def make_units_bets(self, units: int) -> Bets:
         return Bets._from_generator(nfc=self, indices=self._unit_indices(units))
 
+    def make_bets_from_indices(self, indices: List[List[int]]) -> Bets:
+        # Takes a list of indices like [[1, 2, 3, 4, 2], ...] and turns it into Bets
+        return Bets.from_binary(nfc=self, *NFCMath.bet_indices_to_bet_binaries(indices))
+
+    def make_bets_from_hash(self, bet_hash: str) -> Bets:
+        # Takes a bet hash and turns it into Bets
+        return Bets.from_binary(nfc=self, *NFCMath.bet_string_to_bet_binaries(bet_hash))
+
+    def make_bets_from_binaries(self, *binaries: int) -> Bets:
+        # Takes bet-compatible binary numbers and turns them into Bets
+        return Bets.from_binary(nfc=self, *binaries)
+
 
 class Pirate(PirateMixin):
     __slots__ = (

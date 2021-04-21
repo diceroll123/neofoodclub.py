@@ -21,7 +21,9 @@ __all__ = (
     "bet_amounts_to_string",
     "bet_string_to_bet_amounts",
     "bet_string_to_bet_indices",
-    "bet_string_to_bets_amount",
+    "bet_string_to_bets_count",
+    "bet_string_to_bet_binaries",
+    "bet_indices_to_bet_binaries",
     "bet_string_to_bets",
     "bet_url_value",
     "make_probabilities",
@@ -30,7 +32,6 @@ __all__ = (
     "FULL_BETS",
     "BIT_MASKS",
 )
-
 
 BET_AMOUNT_MIN = 50
 
@@ -152,7 +153,17 @@ def bet_string_to_bet_indices(bet_string: str) -> Tuple[Tuple[int, ...], ...]:
     )
 
 
-def bet_string_to_bets_amount(bet_string: str) -> int:
+def bet_string_to_bet_binaries(bet_string: str) -> Tuple[int, ...]:
+    return tuple(
+        pirates_binary(indices) for indices in bet_string_to_bet_indices(bet_string)
+    )
+
+
+def bet_indices_to_bet_binaries(bet_indices: List[List[int]]) -> Tuple[int]:
+    return tuple(pirates_binary(tuple(indices)) for indices in bet_indices)
+
+
+def bet_string_to_bets_count(bet_string: str) -> int:
     # the amount of bets in the set, that is
     return len(bet_string_to_bet_indices(bet_string))
 
