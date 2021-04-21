@@ -299,7 +299,10 @@ class Bets:
     @property
     def bet_amounts(self) -> np.ndarray:
         # TODO: custom bet amounts
-        return self.nfc._maxbet_odds_cache[self._indices].astype(int)
+        if self.nfc._maxbet_odds_cache is not None:
+            return self.nfc._maxbet_odds_cache[self._indices].astype(int)
+
+        return np.full(self._indices.size, 0)
 
     @property
     def indices(self) -> Tuple[Tuple[int, ...], ...]:
