@@ -3,7 +3,7 @@ import itertools
 import math
 from collections import defaultdict
 from string import ascii_lowercase, ascii_uppercase
-from typing import Tuple, Dict, Optional, List
+from typing import Tuple, Dict, Optional, Sequence, List
 
 import numpy as np
 
@@ -72,7 +72,7 @@ def pirate_binary(index: int, arena: int) -> int:
 
 
 @functools.lru_cache(maxsize=None)
-def pirates_binary(bet_indices: Tuple[int, ...]) -> int:
+def pirates_binary(bet_indices: Sequence[int]) -> int:
     # the inverse of binary_to_indices
     # turns (1, 2, 3, 4, 2) (for example) into 0b10000100001000010100, a bet-binary compatible number
     return sum(pirate_binary(index, arena) for arena, index in enumerate(bet_indices))
@@ -159,7 +159,7 @@ def bet_string_to_bet_binaries(bet_string: str) -> Tuple[int, ...]:
     )
 
 
-def bet_indices_to_bet_binaries(bet_indices: List[List[int]]) -> Tuple[int]:
+def bet_indices_to_bet_binaries(bet_indices: Sequence[Sequence[int]]) -> Tuple[int]:
     return tuple(pirates_binary(tuple(indices)) for indices in bet_indices)
 
 
@@ -187,7 +187,9 @@ def bet_url_value(bet_indices: Tuple[Tuple[int, ...], ...]) -> str:
     )
 
 
-def make_probabilities(opening_odds: List[List[ValidOdds]]) -> List[List[float]]:
+def make_probabilities(
+    opening_odds: Sequence[Sequence[ValidOdds]],
+) -> List[List[float]]:
     # TODO: look into numba-fying, so far any attempts have been *SLOWER*
 
     _min = [
@@ -299,8 +301,8 @@ def make_probabilities(opening_odds: List[List[ValidOdds]]) -> List[List[float]]
 
 def get_bet_odds_from_bets(
     bets: Tuple[Tuple[ValidIndex, ...], ...],
-    bet_odds: List[ValidOdds],
-    probabilities: List[List[float]],
+    bet_odds: Sequence[ValidOdds],
+    probabilities: Sequence[Sequence[float]],
 ) -> List[BetOdds]:
     # ib is a binary format to represent bets.
     # It works on 20 bits (because there are 20 pirates).

@@ -6,7 +6,7 @@ import numpy as np
 
 import neofoodclub.math as NFCMath
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple, Set
+from typing import Dict, List, Optional, Tuple, Set, Sequence
 
 import dateutil
 from dateutil.tz import UTC, tzutc
@@ -475,7 +475,7 @@ class BetMixin:
     def make_units_bets(self, units: int) -> Bets:
         return Bets._from_generator(nfc=self, indices=self._unit_indices(units))
 
-    def make_bets_from_indices(self, indices: List[List[int]]) -> Bets:
+    def make_bets_from_indices(self, indices: Sequence[Sequence[int]]) -> Bets:
         # Takes a list of indices like [[1, 2, 3, 4, 2], ...] and turns it into Bets
         return Bets.from_binary(nfc=self, *NFCMath.bet_indices_to_bet_binaries(indices))
 
@@ -557,7 +557,7 @@ class Arena:
         "_id",
     )
 
-    def __init__(self, *, nfc: "NeoFoodClub", arena_id: int, pirate_ids: List[int]):
+    def __init__(self, *, nfc: "NeoFoodClub", arena_id: int, pirate_ids: Sequence[int]):
         self._id = arena_id
         self._pirates = [  # adding 1 to index because the original list has a length of 4, but everything else has 5
             Pirate(nfc=nfc, id=p_id, arena=arena_id, index=idx + 1)
@@ -628,7 +628,7 @@ class Arenas:
             if p.id == pirate_id:
                 return p
 
-    def get_pirates_by_id(self, *pirate_ids: List[PirateID]) -> List[Pirate]:
+    def get_pirates_by_id(self, *pirate_ids: Sequence[PirateID]) -> List[Pirate]:
         return [p for p in self.all_pirates if p.id in pirate_ids]
 
     @property
