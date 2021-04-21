@@ -332,7 +332,7 @@ class Bets:
         return f"<Bets {joined}>"
 
     @classmethod
-    def _from_generator(cls, *, nfc: "NeoFoodClub", indices: np.ndarray):
+    def _from_generator(cls, *, indices: np.ndarray, nfc: "NeoFoodClub"):
         # here is where we will take indices and sort as needed
         # to avoid confusion with "manually" making bets
         if not nfc._modifier.reverse:
@@ -342,9 +342,9 @@ class Bets:
         return cls(nfc=nfc, indices=indices)
 
     @classmethod
-    def from_binary(cls, nfc: "NeoFoodClub", *bins: int):
         # TODO: raise duplicate errors
         # TODO: maintain order of bins
+    def from_binary(cls, *bins: int, nfc: "NeoFoodClub"):
         int_bins = nfc._data_dict["bins"].astype(int)
         intersection = np.where(np.isin(int_bins, bins))[0]
 
@@ -395,7 +395,7 @@ class BetMixin:
         )
 
     def make_max_ter_set(self) -> Bets:
-        return Bets._from_generator(nfc=self, indices=self._max_ter_indices())
+        return Bets._from_generator(indices=self._max_ter_indices(), nfc=self)
 
     def _crazy_bets_indices(self) -> np.ndarray:
         return np.random.choice(
@@ -403,13 +403,13 @@ class BetMixin:
         )
 
     def make_crazy_bets(self) -> Bets:
-        return Bets._from_generator(nfc=self, indices=self._crazy_bets_indices())
+        return Bets._from_generator(indices=self._crazy_bets_indices(), nfc=self)
 
     def _random_indices(self) -> np.ndarray:
         return np.random.choice(3124, size=self.max_amount_of_bets, replace=False)
 
     def make_random_bets(self) -> Bets:
-        return Bets._from_generator(nfc=self, indices=self._random_indices())
+        return Bets._from_generator(indices=self._random_indices(), nfc=self)
 
     def _gambit_indices(
         self, *, five_bet: Optional[int] = None, random: bool = False
@@ -444,7 +444,7 @@ class BetMixin:
         self, *, five_bet: Optional[int] = None, random: bool = False
     ) -> Bets:
         return Bets._from_generator(
-            nfc=self, indices=self._gambit_indices(five_bet=five_bet, random=random)
+            indices=self._gambit_indices(five_bet=five_bet, random=random), nfc=self
         )
 
     def _tenbet_indices(self, pirate_binary: int) -> np.ndarray:
@@ -471,7 +471,7 @@ class BetMixin:
             raise ValueError("You must pick 3 pirates at most.")
 
         return Bets._from_generator(
-            nfc=self, indices=self._tenbet_indices(pirate_binary)
+            indices=self._tenbet_indices(pirate_binary), nfc=self
         )
 
     def _unit_indices(self, units: int) -> np.ndarray:
@@ -480,19 +480,19 @@ class BetMixin:
         return sorted_std[possible_indices]
 
     def make_units_bets(self, units: int) -> Bets:
-        return Bets._from_generator(nfc=self, indices=self._unit_indices(units))
+        return Bets._from_generator(indices=self._unit_indices(units), nfc=self)
 
     def make_bets_from_indices(self, indices: Sequence[Sequence[int]]) -> Bets:
         # Takes a list of indices like [[1, 2, 3, 4, 2], ...] and turns it into Bets
-        return Bets.from_binary(nfc=self, *NFCMath.bet_indices_to_bet_binaries(indices))
+        return Bets.from_binary(*NFCMath.bet_indices_to_bet_binaries(indices), nfc=self)
 
     def make_bets_from_hash(self, bet_hash: str) -> Bets:
         # Takes a bet hash and turns it into Bets
-        return Bets.from_binary(nfc=self, *NFCMath.bet_string_to_bet_binaries(bet_hash))
+        return Bets.from_binary(*NFCMath.bet_string_to_bet_binaries(bet_hash), nfc=self)
 
     def make_bets_from_binaries(self, *binaries: int) -> Bets:
         # Takes bet-compatible binary numbers and turns them into Bets
-        return Bets.from_binary(nfc=self, *binaries)
+        return Bets.from_binary(*binaries, nfc=self)
 
 
 class Pirate(PirateMixin):
