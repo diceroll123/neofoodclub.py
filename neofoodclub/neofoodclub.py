@@ -343,8 +343,9 @@ class Bets:
 
     @classmethod
     def from_binary(cls, *bins: int, nfc: "NeoFoodClub"):
+        # duplicate bins are removed
         int_bins = nfc._data_dict["bins"].astype(int)
-        np_bins = np.array(bins)
+        np_bins = np.array([*set(bins)])
 
         # thanks @mikeshardmind
         intersection = np.where(np_bins[:, np.newaxis] == int_bins)[1]
