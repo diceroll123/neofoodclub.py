@@ -327,7 +327,6 @@ class Bets:
             ("er", self.er),
             ("bet_hash", self.bet_hash),
             ("amount_hash", self.amounts_hash),
-            ("bet_amounts", self.bet_amounts),
         ]
         joined = " ".join("%s=%r" % t for t in attrs)
         return f"<Bets {joined}>"
