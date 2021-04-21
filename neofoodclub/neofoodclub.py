@@ -342,15 +342,22 @@ class Bets:
         return cls(nfc=nfc, indices=indices)
 
     @classmethod
-        # TODO: raise duplicate errors
-        # TODO: maintain order of bins
     def from_binary(cls, *bins: int, nfc: "NeoFoodClub"):
         int_bins = nfc._data_dict["bins"].astype(int)
-        intersection = np.where(np.isin(int_bins, bins))[0]
+        np_bins = np.array(bins)
+
+        # thanks @mikeshardmind
+        intersection = np.where(np_bins[:, np.newaxis] == int_bins)[1]
 
         if intersection.size == 0:
             raise ValueError(
-                "Bets class requires at least one valid index (an integer from 0-3124 inclusive)"
+                "Bets class requires at least one valid bet binary integer."
+            )
+
+        if intersection.size != np_bins.size:
+            diff = np.setdiff1d(np_bins, np_bins[intersection])
+            raise ValueError(
+                f"Invalid bet binaries entered: {', '.join([hex(b) for b in diff])}"
             )
 
         return cls(nfc=nfc, indices=intersection)
