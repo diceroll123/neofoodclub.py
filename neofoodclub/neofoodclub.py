@@ -520,6 +520,53 @@ class BetMixin:
     def make_units_bets(self, units: int) -> Bets:
         return Bets._from_generator(indices=self._unit_indices(units), nfc=self)
 
+    def make_bustproof_bets(self) -> Optional[Bets]:
+        arenas = self.arenas
+        if not arenas.positives:
+            # nothing to do here!
+            return None
+
+        if len(arenas.positives) == 1:
+            best_arena = arenas.best[0]
+            bets = Bets.from_binary(*[p.binary for p in best_arena.pirates], nfc=self)
+        elif len(arenas.positives) == 2:
+            # If two arenas are positive, we place 1 bet on each of the three worst pirates of the best arena and
+            # 1 bet on each of the pirates of the second arena + the best pirate of the best arena. Total bets = 7
+            best_arena, second_arena = arenas.best[:2]
+            bets = Bets.from_binary(
+                *[p.binary for p in best_arena.best[-3:]],
+                *[p.binary | best_arena.best[0].binary for p in second_arena.pirates],
+                nfc=self,
+            )
+        else:
+            # If three arenas are positive, we place 1 bet on each of the three worst pirates of the best arena,
+            # If four or more arenas are positive, we only play the three best arenas, seen below
+            # 1 bet on each of the three worst pirates of the second arena + the best pirate of the best arena,
+            # and 1 bet on each of the pirates of the third arena + the best pirate of the best arena + the best pirate
+            # of the second arena. Total bets = 10.
+            best_arena, second_arena, third_arena = arenas.best[:3]
+
+            bets = Bets.from_binary(
+                *[p.binary for p in best_arena.best[-3:]],
+                *[p.binary | best_arena.best[0].binary for p in second_arena.best[-3:]],
+                *[
+                    p.binary | best_arena.best[0].binary | second_arena.best[0].binary
+                    for p in third_arena.best
+                ],
+                nfc=self,
+            )
+
+        if bet_amount := self.bet_amount:
+            current_odds = self._data_dict["odds"][bets._indices]
+            lowest_odds_index = np.argmin(current_odds)
+            lowest_odds = current_odds[lowest_odds_index]
+
+            new_bet_amounts = (bet_amount * lowest_odds // current_odds).astype(int)
+            bets.bet_amounts = new_bet_amounts
+
+        return bets
+
+    # bet decoding methods
     def make_bets_from_indices(self, indices: Sequence[Sequence[int]]) -> Bets:
         # Takes a list of indices like [[1, 2, 3, 4, 2], ...] and turns it into Bets
         return Bets.from_binary(*NFCMath.bet_indices_to_bet_binaries(indices), nfc=self)
