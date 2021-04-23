@@ -983,5 +983,42 @@ class NeoFoodClub(BetMixin):
         ]
         return list(sorted(changed, key=lambda oc: oc.timestamp))
 
+    def _get_winning_bet_indices(self, bets: Bets) -> np.ndarray:
+        bet_bins = self._data_dict["bins"][bets._indices].astype(int)
+        winning_bet_indices = np.where(bet_bins & self.winners_binary == bet_bins)[0]
+        return bets._indices[winning_bet_indices]
+
+    def _get_winning_odds(self, bets: Bets) -> np.ndarray:
+        winning_bet_bins = self._get_winning_bet_indices(bets)
+        return self._data_dict["odds"][winning_bet_bins]
+
+    def get_win_units(self, bets: Bets) -> int:
+        return np.sum(self._get_winning_odds(bets)).astype(int)
+
+    def get_win_np(
+        self, bets: Bets, use_bet_amount_if_none: bool = True
+    ) -> Optional[int]:
+        winning_bins_indices = self._get_winning_bet_indices(bets)
+
+        if winning_bins_indices.size == 0:
+            # these bets lost
+            return None
+
+        use_backup_if_needed = use_bet_amount_if_none and self.bet_amount
+        use_provided = np.any(bets.bet_amounts)
+
+        if use_provided:
+            multiplier = bets.bet_amounts
+        elif use_backup_if_needed:
+            multiplier = np.full(bets._indices.size, self.bet_amount)
+        else:
+            return 0
+
+        return np.sum(
+            np.clip(
+                self._data_dict["odds"][winning_bins_indices] * multiplier, 0, 1_000_000
+            )
+        ).astype(int)
+
     def __repr__(self):
         return f"<NeoFoodClub round={self.round} timestamp={self.timestamp!r} is_over={self.is_over}>"
