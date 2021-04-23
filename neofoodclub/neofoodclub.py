@@ -543,6 +543,7 @@ class BetMixin:
             return None
 
         if len(arenas.positives) == 1:
+            # If only one arena is positive, we place 1 bet on each of the pirates of that arena. Total bets = 4.
             best_arena = arenas.best[0]
             bets = Bets.from_binary(*[p.binary for p in best_arena.pirates], nfc=self)
         elif len(arenas.positives) == 2:
