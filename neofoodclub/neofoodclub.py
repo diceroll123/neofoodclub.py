@@ -247,6 +247,7 @@ class Odd:
 
 class Odds:
     __slots__ = (
+        "_odds_values",
         "_odds",
         "best",
         "bust",
@@ -255,8 +256,9 @@ class Odds:
     )
 
     def __init__(self, bets: "Bets"):
+        self._odds_values = bets.nfc._data_dict["odds"][bets._indices]
         odds = NFCMath.get_bet_odds_from_bets(
-            bets.indices, bets.nfc._data_dict["odds"][bets._indices], bets.nfc._stds
+            bets.indices, self._odds_values, bets.nfc._stds
         )
         self._odds = [Odd(**odd) for odd in odds]
         self.best = self._odds[-1]  # highest odds
@@ -270,6 +272,12 @@ class Odds:
         self.partial_rate = sum(
             o.probability for o in self._odds if 0 < int(o.value) < amount_of_bets
         )
+
+    def _iterator(self):
+        yield from self._odds_values
+
+    def __iter__(self):
+        return self._iterator()
 
     def __repr__(self):
         attrs = [
