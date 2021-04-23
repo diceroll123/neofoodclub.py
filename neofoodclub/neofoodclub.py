@@ -246,6 +246,14 @@ class Odd:
 
 
 class Odds:
+    __slots__ = (
+        "_odds",
+        "best",
+        "bust",
+        "most_likely_winner",
+        "partial_rate",
+    )
+
     def __init__(self, bets: "Bets"):
         odds = NFCMath.get_bet_odds_from_bets(
             bets.indices, bets.nfc._data_dict["odds"][bets._indices], bets.nfc._stds
