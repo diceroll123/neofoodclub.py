@@ -1026,5 +1026,43 @@ class NeoFoodClub(BetMixin):
             )
         ).astype(int)
 
+    def make_url(self, bets: Optional[Bets]) -> str:
+        def encode(int_lists) -> str:
+            return json.dumps(int_lists, separators=(",", ":"))
+
+        url = (
+            "https://foodclub.neocities.org/"
+            + ("15/" if bets and 10 < len(bets) <= 15 else "")
+            + "#round="
+            + str(self.round)
+            + "&pirates="
+            + encode(self.pirates)
+            + "&openingOdds="
+            + encode(self.opening_odds)
+            + "&currentOdds="
+            + encode(self.current_odds)
+        )
+
+        if any(self.foods):
+            url += "&foods=" + encode(self.foods)
+
+        if any(self.winners):
+            url += "&winners=" + encode(self.winners)
+
+        if self.timestamp:
+            url += (
+                "&timestamp="
+                + self.timestamp.replace(
+                    microsecond=0, tzinfo=datetime.timezone.utc
+                ).isoformat()
+            )
+
+        if bets:
+            url += "&b=" + bets.bet_hash
+            if np.sum(bets.bet_amounts):
+                url += "&a=" + bets.amounts_hash
+
+        return url
+
     def __repr__(self):
         return f"<NeoFoodClub round={self.round} timestamp={self.timestamp!r} is_over={self.is_over}>"
