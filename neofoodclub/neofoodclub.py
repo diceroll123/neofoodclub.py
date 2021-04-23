@@ -902,6 +902,10 @@ class NeoFoodClub(BetMixin):
         self.modifier = modifier
         return self
 
+    def to_dict(self) -> RoundData:
+        # return a deep copy of this round's dict
+        return json.loads(json.dumps(self._data))
+
     @property
     def data(self) -> RoundData:
         return self._data
