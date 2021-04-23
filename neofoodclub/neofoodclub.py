@@ -1,5 +1,6 @@
 import datetime
 import json
+import re
 
 import numpy as np
 
@@ -18,6 +19,11 @@ from neofoodclub.types import (
     ValidOdds,
     ValidIndex,
     PirateID,
+)
+
+NEO_FC_REGEX = re.compile(
+    r"(/(?P<perk>15/)?)#(?P<query>[a-zA-Z0-9=&\[\],%-:+]+)",
+    re.IGNORECASE,
 )
 
 ARENA_NAMES = ["Shipwreck", "Lagoon", "Treasure", "Hidden", "Harpoon"]
@@ -1063,6 +1069,48 @@ class NeoFoodClub(BetMixin):
                 url += "&a=" + bets.amounts_hash
 
         return url
+
+    @classmethod
+    def from_loaded_url(
+        cls,
+        url: str,
+        *,
+        bet_amount: Optional[int] = None,
+        modifier: Optional[Modifier] = None,
+    ):
+        neo_fc = NEO_FC_REGEX.search(url)
+        if neo_fc is None:
+            raise TypeError
+
+        querystring = url.partition("#")[-1]
+
+        import urllib.parse
+        import json
+
+        olddata = urllib.parse.parse_qs(urllib.parse.unquote(querystring))
+        data = {
+            key: json.loads(olddata[key][0])
+            for key in ["pirates", "openingOdds", "currentOdds", "round"]
+        }
+
+        # validate
+
+        if sorted(set(sum(data["pirates"], []))) != [*range(1, 21)]:
+            raise ValueError
+
+        for odd_type in ["openingOdds", "currentOdds"]:
+            odds = data[odd_type]
+            for odd in odds:
+                first, *rest = odd
+
+                if first != 1:
+                    raise ValueError
+
+                for num in rest:
+                    if num not in range(2, 14):
+                        raise ValueError
+
+        return cls(data, bet_amount=bet_amount, modifier=modifier)
 
     def __repr__(self):
         return f"<NeoFoodClub round={self.round} timestamp={self.timestamp!r} is_over={self.is_over}>"
