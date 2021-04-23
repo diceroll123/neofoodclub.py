@@ -1,4 +1,3 @@
-from collections import namedtuple
 import datetime
 import json
 
@@ -6,7 +5,7 @@ import numpy as np
 
 import neofoodclub.math as NFCMath
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple, Set, Sequence
+from typing import Dict, List, Optional, Tuple, Sequence
 
 import dateutil
 from dateutil.tz import UTC, tzutc
@@ -278,13 +277,21 @@ class Odds:
 class Bets:
     __slots__ = (
         "_indices",
+        "_bet_amounts",
         "nfc",
     )
 
-    def __init__(self, *, nfc: "NeoFoodClub", indices: np.ndarray):
-        # TODO: custom bet amounts
+    def __init__(
+        self,
+        *,
+        nfc: "NeoFoodClub",
+        indices: np.ndarray,
+        amounts: Optional[Sequence[Optional[int]]] = None,
+    ):
         self.nfc = nfc
         self._indices = indices
+
+        self.bet_amounts = amounts or None
 
     @property
     def net_expected(self) -> float:
@@ -298,11 +305,34 @@ class Bets:
 
     @property
     def bet_amounts(self) -> np.ndarray:
-        # TODO: custom bet amounts
+        # user-defined (and sometimes generated) bet amounts
+        if self._bet_amounts is not None:
+            return self._bet_amounts
+
         if self.nfc._maxbet_odds_cache is not None:
             return self.nfc._maxbet_odds_cache[self._indices].astype(int)
 
         return np.full(self._indices.size, 0)
+
+    @bet_amounts.setter
+    def bet_amounts(self, val: Optional[Sequence[int]]):
+        if val is None:
+            self._bet_amounts = None
+            return
+        # strictly enforcing amount of values provided
+        if len(val) != self._indices.size:
+            raise ValueError(
+                f"Invalid bet amounts provided. Expected length: {self._indices.size}, but received {len(val)}."
+            )
+
+        amts = np.array([v or 0 for v in val])
+
+        # fix any values between 1 and 50 to be 50, to maintain working bets
+        amts[(amts < 50) & (amts > 0)] = 50
+        # floor any values above max bet amount
+        amts[amts > NFCMath.BET_AMOUNT_MAX] = NFCMath.BET_AMOUNT_MAX
+        # negatives are allowed
+        self._bet_amounts = amts
 
     @property
     def indices(self) -> Tuple[Tuple[int, ...], ...]:
