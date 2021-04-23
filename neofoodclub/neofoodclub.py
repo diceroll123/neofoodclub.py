@@ -551,6 +551,10 @@ class Pirate(PirateMixin):
     def opening_odds(self) -> int:
         return self._opening_odds
 
+    @property
+    def binary(self) -> int:
+        return NFCMath.pirate_binary(self._index, self._arena)
+
     def __int__(self):
         return NFCMath.pirate_binary(self._index, self._arena)
 
@@ -561,6 +565,7 @@ class Pirate(PirateMixin):
             ("index", self.index),
             ("odds", self.odds),
             ("opening_odds", self.opening_odds),
+            ("int", hex(self.binary)),
         ]
         joined = " ".join("%s=%r" % t for t in attrs)
         return f"<Pirate {joined}>"
