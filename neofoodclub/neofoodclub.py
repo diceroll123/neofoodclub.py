@@ -907,8 +907,8 @@ class NeoFoodClub(BetMixin):
         return json.loads(json.dumps(self._data))
 
     @property
-    def data(self) -> RoundData:
-        return self._data
+    def pirates(self) -> List[List[PirateID]]:
+        return self._data["pirates"]
 
     @property
     def opening_odds(self) -> List[List[ValidOdds]]:
