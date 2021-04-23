@@ -598,7 +598,7 @@ class Arena:
     @property
     def odds(self) -> float:
         # do note that arena odds are not the same as pirate odds
-        return 5 / sum(p.odds for p in self._pirates)
+        return sum(1 / p.odds for p in self._pirates)
 
     @property
     def ratio(self) -> float:
