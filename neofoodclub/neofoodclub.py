@@ -127,7 +127,7 @@ class OddsChange:
         return f"<OddsChange index={self.index} pirate={self.pirate} old={self.old} new={self.new} timestamp={self.timestamp}>"
 
     def __eq__(self, other):  # for the "in" list check
-        return self._data == other.data
+        return isinstance(other, self.__class__) and self._data == other.data
 
     def __iter__(self):
         yield from self._data.items()
@@ -221,7 +221,8 @@ class Modifier:
 
     def __eq__(self, other):
         return (
-            self.opening_odds == other.opening_odds
+            isinstance(other, self.__class__)
+            and self.opening_odds == other.opening_odds
             and self.custom_odds == other.custom_odds
         )
 
