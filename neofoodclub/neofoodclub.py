@@ -50,7 +50,10 @@ PIRATE_NAMES = {
     20: "Tailhook",
 }
 
-__all__ = ("NeoFoodClub",)
+__all__ = (
+    "NeoFoodClub",
+    "NEO_FC_REGEX",
+)
 
 
 class PirateMixin:
