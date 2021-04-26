@@ -1049,10 +1049,10 @@ class NeoFoodClub(BetMixin):
             + encode(self.current_odds)
         )
 
-        if any(self.foods):
+        if self.foods is not None:
             url += "&foods=" + encode(self.foods)
 
-        if any(self.winners):
+        if self.is_over:
             url += "&winners=" + encode(self.winners)
 
         if self.timestamp:
