@@ -1,3 +1,4 @@
+from __future__ import annotations
 import datetime
 import json
 import re
@@ -12,14 +13,16 @@ import dateutil
 from dateutil.tz import UTC, tzutc
 
 from dateutil.parser import parse
+from typing import TYPE_CHECKING
 
-from neofoodclub.types import (
-    RoundData,
-    FoodID,
-    ValidOdds,
-    ValidIndex,
-    PirateID,
-)
+if TYPE_CHECKING:
+    from neofoodclub.types import (
+        RoundData,
+        FoodID,
+        ValidOdds,
+        ValidIndex,
+        PirateID,
+    )
 
 NEO_FC_REGEX = re.compile(
     r"(/(?P<perk>15/)?)#(?P<query>[a-zA-Z0-9=&\[\],%-:+]+)",
@@ -52,6 +55,10 @@ PIRATE_NAMES = {
 
 __all__ = (
     "NeoFoodClub",
+    "PartialPirate",
+    "OddsChange",
+    "Modifier",
+    "Bets",
     "NEO_FC_REGEX",
 )
 
