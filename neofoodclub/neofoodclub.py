@@ -1040,7 +1040,7 @@ class NeoFoodClub(BetMixin):
         copied_data = self.to_dict()
         changed = [
             OddsChange(index=idx, round_data=copied_data, data=c)
-            for idx, c in enumerate(copied_data.get("changes", []))
+            for idx, c in enumerate(copied_data.get("changes") or [])
         ]
         return list(sorted(changed, key=lambda oc: oc.timestamp))
 
