@@ -456,8 +456,6 @@ class Bets:
 
 
 class BetMixin:
-    # TODO: bustproof bets
-
     @property
     def max_amount_of_bets(self) -> int:
         if self._modifier._cc_perk:
@@ -562,15 +560,16 @@ class BetMixin:
 
     def make_bustproof_bets(self) -> Optional[Bets]:
         arenas = self.arenas
-        if not arenas.positives:
+        positives = arenas.positives
+        if not positives:
             # nothing to do here!
             return None
 
-        if len(arenas.positives) == 1:
+        if len(positives) == 1:
             # If only one arena is positive, we place 1 bet on each of the pirates of that arena. Total bets = 4.
             best_arena = arenas.best[0]
             bets = Bets.from_binary(*[p.binary for p in best_arena.pirates], nfc=self)
-        elif len(arenas.positives) == 2:
+        elif len(positives) == 2:
             # If two arenas are positive, we place 1 bet on each of the three worst pirates of the best arena and
             # 1 bet on each of the pirates of the second arena + the best pirate of the best arena. Total bets = 7
             best_arena, second_arena = arenas.best[:2]
