@@ -148,6 +148,7 @@ class Modifier:
         "_custom_odds",
         "_nfc",
         "_time",
+        "_cc_perk",
     )
     # if any are added, be sure to put it in ALL_MODIFIERS and add a letter in LETTERS.
     GENERAL = 1
@@ -159,6 +160,8 @@ class Modifier:
     def __init__(
         self,
         flags: int = 0,
+        *,
+        cc_perk: bool = False,
         custom_odds: Optional[Dict[PirateID, ValidOdds]] = None,
         custom_time: Optional[datetime.time] = None,
     ):
@@ -166,6 +169,7 @@ class Modifier:
         self._custom_odds = custom_odds or {}
         self._nfc = None
         self._time = custom_time
+        self._cc_perk = cc_perk
 
     def __repr__(self):
         return f"<Modifier value={self.value} letters={self.letters} time={self.time}>"
@@ -196,6 +200,14 @@ class Modifier:
             self._nfc.reset()
 
     @property
+    def cc_perk(self) -> bool:
+        return self._cc_perk
+
+    @cc_perk.setter
+    def cc_perk(self, val: bool):
+        self._cc_perk = val
+
+    @property
     def custom_odds(self) -> Dict[PirateID, ValidOdds]:
         # custom_odds is a Dict[int, int] of {pirate_id: odds}
         return self._custom_odds
@@ -209,6 +221,7 @@ class Modifier:
     def copy(self):
         return type(self)(
             self.value,
+            cc_perk=self._cc_perk,
             custom_odds=self._custom_odds,
             custom_time=self._time,
         )
@@ -447,8 +460,8 @@ class BetMixin:
 
     @property
     def max_amount_of_bets(self) -> int:
-        # if self._modifier.cc_perk:
-        #     return 15
+        if self._modifier._cc_perk:
+            return 15
         return 10
 
     def _max_ter_indices(self) -> np.ndarray:
@@ -1040,9 +1053,11 @@ class NeoFoodClub(BetMixin):
         def encode(int_lists) -> str:
             return json.dumps(int_lists, separators=(",", ":"))
 
+        use_15 = bets and 10 < len(bets) <= 15 or self._modifier._cc_perk
+
         url = (
             "https://foodclub.neocities.org/"
-            + ("15/" if bets and 10 < len(bets) <= 15 else "")
+            + ("15/" if use_15 else "")
             + "#round="
             + str(self.round)
             + "&pirates="
@@ -1085,6 +1100,12 @@ class NeoFoodClub(BetMixin):
         neo_fc = NEO_FC_REGEX.search(url)
         if neo_fc is None:
             raise TypeError
+
+        if modifier is None:
+            modifier = Modifier()
+
+        if bool(neo_fc.group("perk")):
+            modifier.cc_perk = True
 
         querystring = url.partition("#")[-1]
 
