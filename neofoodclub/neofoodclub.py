@@ -443,6 +443,23 @@ class Bets:
     def odds(self) -> Odds:
         return Odds(self)
 
+    @property
+    def is_bustproof(self) -> bool:
+        return self.odds.bust is None
+
+    @property
+    def is_guaranteed_win(self) -> bool:  # guaranteed to profit, that is
+        amounts = self.bet_amounts
+
+        if np.sum(amounts) <= 0:
+            return False
+
+        highest_bet_amount = np.max(amounts)
+        bets_odds = self.nfc._data_dict["odds"][self._indices]
+        lowest_winning_bet_amount = np.min(bets_odds * amounts)
+
+        return highest_bet_amount < lowest_winning_bet_amount and self.is_bustproof
+
     def _iterator(self):
         int_bins = self.nfc._data_dict["bins"].astype(int)
         yield from int_bins[self._indices]
