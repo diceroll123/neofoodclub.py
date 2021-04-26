@@ -207,7 +207,11 @@ class Modifier:
             self._nfc.reset()
 
     def copy(self):
-        return type(self)(self.value)
+        return type(self)(
+            self.value,
+            custom_odds=self._custom_odds,
+            custom_time=self._time,
+        )
 
     @classmethod
     def from_type(cls, letters):
