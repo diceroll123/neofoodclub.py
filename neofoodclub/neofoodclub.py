@@ -1162,5 +1162,12 @@ class NeoFoodClub(BetMixin):
 
         return cls(data, bet_amount=bet_amount, modifier=modifier)
 
+    def copy(self, keep_custom: bool = False) -> "NeoFoodClub":
+        return NeoFoodClub(
+            self.to_dict(keep_custom=keep_custom),
+            bet_amount=self._bet_amount,
+            modifier=self._modifier,
+        )
+
     def __repr__(self):
         return f"<NeoFoodClub round={self.round} timestamp={self.timestamp!r} is_over={self.is_over}>"
