@@ -1071,7 +1071,7 @@ class NeoFoodClub(BetMixin):
         return url
 
     @classmethod
-    def from_loaded_url(
+    def from_url(
         cls,
         url: str,
         *,
@@ -1088,15 +1088,32 @@ class NeoFoodClub(BetMixin):
         import json
 
         olddata = urllib.parse.parse_qs(urllib.parse.unquote(querystring))
+
+        # gather relevant variables from the query string
         data = {
             key: json.loads(olddata[key][0])
-            for key in ["pirates", "openingOdds", "currentOdds", "round"]
+            for key in [
+                "pirates",  # required
+                "openingOdds",  # required
+                "currentOdds",  # required
+                "round",
+                "winners",
+                "foods",
+            ]
+            if key in olddata
         }
 
         # validate
 
-        if sorted(set(sum(data["pirates"], []))) != [*range(1, 21)]:
-            raise ValueError
+        if data["round"] and type(data["round"]) is not int:
+            # we only need the round number to make a proper URL
+            # the actual value doesn't matter
+            raise ValueError("Improper value for current round number")
+
+        has_proper_ids = sorted(set(sum(data["pirates"], []))) == [*range(1, 21)]
+        has_proper_shape = [len(row) for row in data["pirates"]] == [4, 4, 4, 4, 4]
+        if not all([has_proper_ids, has_proper_shape]):
+            raise ValueError("Improper pirates array")
 
         for odd_type in ["openingOdds", "currentOdds"]:
             odds = data[odd_type]
@@ -1104,11 +1121,11 @@ class NeoFoodClub(BetMixin):
                 first, *rest = odd
 
                 if first != 1:
-                    raise ValueError
+                    raise ValueError("Improper odds passed")
 
                 for num in rest:
-                    if num not in range(2, 14):
-                        raise ValueError
+                    if not 2 <= num <= 13:
+                        raise ValueError("Improper odds passed")
 
         return cls(data, bet_amount=bet_amount, modifier=modifier)
 
