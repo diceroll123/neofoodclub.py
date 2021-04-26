@@ -1056,14 +1056,12 @@ class NeoFoodClub(BetMixin):
     def get_win_units(self, bets: Bets) -> int:
         return np.sum(self._get_winning_odds(bets)).astype(int)
 
-    def get_win_np(
-        self, bets: Bets, use_bet_amount_if_none: bool = True
-    ) -> Optional[int]:
+    def get_win_np(self, bets: Bets, use_bet_amount_if_none: bool = True) -> int:
         winning_bins_indices = self._get_winning_bet_indices(bets)
 
         if winning_bins_indices.size == 0:
             # these bets lost
-            return None
+            return 0
 
         use_backup_if_needed = use_bet_amount_if_none and self.bet_amount
         use_provided = np.any(bets.bet_amounts)
