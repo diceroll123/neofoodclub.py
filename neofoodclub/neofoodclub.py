@@ -497,7 +497,7 @@ class BetMixin:
             else self._data_dict["ers"]
         )
 
-    def make_max_ter_set(self) -> Bets:
+    def make_max_ter_bets(self) -> Bets:
         return Bets._from_generator(indices=self._max_ter_indices(), nfc=self)
 
     def _crazy_bets_indices(self) -> np.ndarray:

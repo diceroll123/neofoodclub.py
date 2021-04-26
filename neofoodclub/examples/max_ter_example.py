@@ -11,13 +11,13 @@ if __name__ == "__main__":
     nfc = NeoFoodClub.from_url(url, bet_amount=amount)
 
     # generate max TER bets tailored to your bet amount
-    max_ter_bets = nfc.make_max_ter_set()
+    max_ter_bets = nfc.make_max_ter_bets()
 
     print(nfc.make_url(max_ter_bets))
 
     # let's say Charity Corner (https://www.jellyneo.net/?go=charity_corner) is back up and you've got the FC perk!
     # we can generate 15 bets if you just tell the modifier to do so!
     nfc.modifier.cc_perk = True
-    max_ter_bets = nfc.make_max_ter_set()
+    max_ter_bets = nfc.make_max_ter_bets()
 
     print(nfc.make_url(max_ter_bets))
