@@ -926,9 +926,12 @@ class NeoFoodClub(BetMixin):
         self.modifier = modifier
         return self
 
-    def to_dict(self) -> RoundData:
+    def to_dict(self, keep_custom: bool = False) -> RoundData:
         # return a deep copy of this round's dict
-        return json.loads(json.dumps(self._data))
+        data = json.loads(json.dumps(self._data))
+        if not keep_custom:
+            data.pop("customOdds", None)
+        return data
 
     @property
     def pirates(self) -> List[List[PirateID]]:
