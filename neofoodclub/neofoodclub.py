@@ -1073,11 +1073,11 @@ class NeoFoodClub(BetMixin):
         else:
             return 0
 
-        return np.sum(
-            np.clip(
-                self._data_dict["odds"][winning_bins_indices] * multiplier, 0, 1_000_000
-            )
-        ).astype(int)
+        mask = bets._indices == winning_bins_indices
+        bets_odds = self._data_dict["odds"][bets._indices]
+        winnings = bets_odds * multiplier
+
+        return np.sum(np.clip(winnings[mask], 0, 1_000_000)).astype(int)
 
     def make_url(self, bets: Optional[Bets]) -> str:
         def encode(int_lists) -> str:
