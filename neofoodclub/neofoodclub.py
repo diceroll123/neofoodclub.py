@@ -596,7 +596,8 @@ class BetMixin:
                 nfc=self,
             )
 
-        if bet_amount := self.bet_amount:
+        bet_amount = self.bet_amount
+        if bet_amount:
             current_odds = self._data_dict["odds"][bets._indices]
             lowest_odds_index = np.argmin(current_odds)
             lowest_odds = current_odds[lowest_odds_index]
@@ -951,13 +952,15 @@ class NeoFoodClub(BetMixin):
 
     @property
     def start(self) -> Optional[datetime.datetime]:
-        if start := self._data.get("start"):
+        start = self._data.get("start")
+        if start:
             return parse(start).astimezone(UTC)
         return None
 
     @property
     def timestamp(self) -> Optional[datetime.datetime]:
-        if timestamp := self._data.get("timestamp"):
+        timestamp = self._data.get("timestamp")
+        if timestamp:
             return parse(timestamp).astimezone(UTC)
         return None
 
