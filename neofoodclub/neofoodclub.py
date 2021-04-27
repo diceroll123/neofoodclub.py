@@ -949,11 +949,16 @@ class NeoFoodClub(BetMixin):
     @modifier.setter
     def modifier(self, val: Modifier):
         reset = False
-        if (self._modifier.opening_odds, self._modifier.custom_odds) != (
+        if (
+            self._modifier.opening_odds,
+            self._modifier.custom_odds,
+            self._modifier.time,
+        ) != (
             val.opening_odds,
             val.custom_odds,
+            val.time,
         ):
-            # data is only changed with differing opening odds, or custom odds
+            # data is only changed with differing opening odds, custom odds, or custom time
             reset = True
 
         self._modifier = val
