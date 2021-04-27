@@ -17,9 +17,11 @@ from typing import TYPE_CHECKING
 
 from . import utils
 from .errors import InvalidData, MissingData
-from .food_adjustments import NEGATIVE_FOOD, POSITIVE_FOOD
+
 
 if TYPE_CHECKING:
+    from .pirates import PartialPirate, Pirate
+    from .arenas import Arenas
     from neofoodclub.types import (
         RoundData,
         FoodID,
@@ -33,64 +35,15 @@ NEO_FC_REGEX = re.compile(
     re.IGNORECASE,
 )
 
-ARENA_NAMES = ["Shipwreck", "Lagoon", "Treasure", "Hidden", "Harpoon"]
-PIRATE_NAMES = {
-    1: "Dan",
-    2: "Sproggie",
-    3: "Orvinn",
-    4: "Lucky",
-    5: "Edmund",
-    6: "Peg Leg",
-    7: "Bonnie",
-    8: "Puffo",
-    9: "Stuff",
-    10: "Squire",
-    11: "Crossblades",
-    12: "Stripey",
-    13: "Ned",
-    14: "Fairfax",
-    15: "Gooblah",
-    16: "Franchisco",
-    17: "Federismo",
-    18: "Blackbeard",
-    19: "Buck",
-    20: "Tailhook",
-}
 
 __all__ = (
     "NeoFoodClub",
-    "PartialPirate",
     "OddsChange",
     "Modifier",
     "Bets",
-    "Arenas",
-    "Arena",
     "Odds",
-    "Pirate",
     "NEO_FC_REGEX",
 )
-
-
-class PirateMixin:
-    @property
-    def name(self):
-        return PIRATE_NAMES[self.id]
-
-    @property
-    def image(self):
-        return f"http://images.neopets.com/pirates/fc/fc_pirate_{self.id}.gif"
-
-
-class PartialPirate(PirateMixin):
-    def __init__(self, _id: int):
-        self._id = _id
-
-    @property
-    def id(self) -> int:
-        return self._id
-
-    def __repr__(self):
-        return f"<NaivePirate name={self.name}>"
 
 
 class OddsChange:
@@ -135,6 +88,8 @@ class OddsChange:
 
     @property
     def pirate(self) -> PartialPirate:
+        from .pirates import PartialPirate  # to prevent circular imports
+
         return PartialPirate(
             self._round_data["pirates"][self.arena_index][self.pirate_index - 1]
         )
@@ -145,6 +100,8 @@ class OddsChange:
 
     @property
     def arena(self) -> str:
+        from .arenas import ARENA_NAMES  # to prevent circular imports
+
         return ARENA_NAMES[self.arena_index]
 
     def __repr__(self):
@@ -297,7 +254,7 @@ class Odds:
         "partial_rate",
     )
 
-    def __init__(self, bets: "Bets"):
+    def __init__(self, bets: Bets):
         self._odds_values = bets.nfc._data_dict["odds"][bets._indices]
         odds = NFCMath.get_bet_odds_from_bets(
             bets.indices, self._odds_values, bets.nfc._stds
@@ -342,7 +299,7 @@ class Bets:
     def __init__(
         self,
         *,
-        nfc: "NeoFoodClub",
+        nfc: NeoFoodClub,
         indices: np.ndarray,
         amounts: Optional[Sequence[Optional[int]]] = None,
     ):
@@ -416,7 +373,7 @@ class Bets:
         return f"<Bets {joined}>"
 
     @classmethod
-    def _from_generator(cls, *, indices: np.ndarray, nfc: "NeoFoodClub"):
+    def _from_generator(cls, *, indices: np.ndarray, nfc: NeoFoodClub):
         # here is where we will take indices and sort as needed
         # to avoid confusion with "manually" making bets
         if not nfc._modifier.reverse:
@@ -426,7 +383,7 @@ class Bets:
         return cls(nfc=nfc, indices=indices)
 
     @classmethod
-    def from_binary(cls, *bins: int, nfc: "NeoFoodClub"):
+    def from_binary(cls, *bins: int, nfc: NeoFoodClub):
         # duplicate bins are removed
         int_bins = nfc._data_dict["bins"].astype(int)
         np_bins = np.array([b for b in dict.fromkeys(bins)])
@@ -660,206 +617,6 @@ class BetMixin:
         return Bets.from_binary(*binaries, nfc=self)
 
 
-class Pirate(PirateMixin):
-    __slots__ = (
-        "_id",
-        "_arena",
-        "_index",
-        "_odds",
-        "_opening_odds",
-        "_std",
-        "_er",
-        "_fa",
-    )
-
-    def __init__(self, *, nfc: "NeoFoodClub", id: int, arena: int, index: int):
-        self._id = id
-        self._arena = arena
-        self._index = index
-        self._odds: int = nfc._data["customOdds"][arena][index]
-        self._opening_odds: int = nfc._data["openingOdds"][arena][index]
-        self._std: float = nfc._stds[arena][index]
-        self._er: float = self.std * self.odds
-        self._fa = None
-
-        if "foods" in nfc._data:
-            foods = nfc._data["foods"][arena]
-            self._fa = sum(-NEGATIVE_FOOD[id][f] + POSITIVE_FOOD[id][f] for f in foods)
-
-    @property
-    def id(self) -> int:
-        return self._id
-
-    @property
-    def arena(self) -> int:
-        return self._arena
-
-    @property
-    def index(self) -> int:
-        return self._index
-
-    @property
-    def std(self) -> float:
-        return self._std
-
-    @property
-    def odds(self) -> int:
-        return self._odds
-
-    @property
-    def er(self) -> float:
-        return self._er
-
-    @property
-    def fa(self) -> Optional[int]:
-        return self._fa
-
-    @property
-    def opening_odds(self) -> int:
-        return self._opening_odds
-
-    @property
-    def binary(self) -> int:
-        return NFCMath.pirate_binary(self._index, self._arena)
-
-    def __int__(self):
-        return NFCMath.pirate_binary(self._index, self._arena)
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and int(self) == int(other)
-
-    def __repr__(self):
-        attrs = [
-            ("name", self.name),
-            ("arena", self.arena),
-            ("index", self.index),
-            ("odds", self.odds),
-            ("fa", self.fa),
-            ("opening_odds", self.opening_odds),
-            ("int", hex(self.binary)),
-        ]
-        joined = " ".join("%s=%r" % t for t in attrs)
-        return f"<Pirate {joined}>"
-
-
-class Arena:
-    __slots__ = (
-        "_pirates",
-        "_id",
-    )
-
-    def __init__(self, *, nfc: "NeoFoodClub", arena_id: int, pirate_ids: Sequence[int]):
-        self._id = arena_id
-        self._pirates = [  # adding 1 to index because the original list has a length of 4, but everything else has 5
-            Pirate(nfc=nfc, id=p_id, arena=arena_id, index=idx + 1)
-            for idx, p_id in enumerate(pirate_ids)
-        ]
-
-    @property
-    def id(self) -> int:
-        return self._id
-
-    @property
-    def name(self) -> str:
-        return ARENA_NAMES[self._id]
-
-    @property
-    def best(self) -> List[Pirate]:
-        return sorted(self._pirates, key=lambda a: a.odds)
-
-    @property
-    def ids(self):
-        return [p.id for p in self._pirates]
-
-    @property
-    def odds(self) -> float:
-        # do note that arena odds are not the same as pirate odds
-        return sum(1 / p.odds for p in self._pirates)
-
-    @property
-    def ratio(self) -> float:
-        return 1 / self.odds - 1
-
-    @property
-    def pirates(self) -> List[Pirate]:
-        return self._pirates
-
-    @property
-    def positive(self) -> bool:
-        return self.odds < 1
-
-    @property
-    def negative(self) -> bool:
-        return not self.positive
-
-    def __getitem__(self, item: ValidIndex) -> Optional[Pirate]:
-        try:
-            return self._pirates[item]
-        except KeyError:
-            return None
-
-    def __iter__(self):
-        return self._pirates.__iter__()
-
-    def __repr__(self):
-        return f"<Arena name={self.name} odds={self.odds} pirates={self.pirates}>"
-
-
-class Arenas:
-    __slots__ = ("_arenas",)
-
-    def __init__(self, nfc: "NeoFoodClub"):
-        self._arenas = [
-            Arena(nfc=nfc, arena_id=idx, pirate_ids=a)
-            for idx, a in enumerate(nfc._data["pirates"])
-        ]
-
-    def get_pirate_by_id(self, pirate_id: PirateID) -> Pirate:
-        for p in self.all_pirates:
-            if p.id == pirate_id:
-                return p
-
-    def get_pirates_by_id(self, *pirate_ids: Sequence[PirateID]) -> List[Pirate]:
-        return [p for p in self.all_pirates if p.id in pirate_ids]
-
-    @property
-    def all_pirates(self) -> List[Pirate]:
-        pirates = []
-        for a in self._arenas:
-            for p in a.pirates:
-                pirates.append(p)
-        return pirates
-
-    def get_pirates_from_binary(self, binary: int) -> List[Pirate]:
-        return [
-            self._arenas[arena][index - 1]
-            for arena, index in enumerate(NFCMath.binary_to_indices(binary))
-            if index > 0
-        ]
-
-    @property
-    def pirates(self) -> List[List[Pirate]]:
-        return [arena.pirates for arena in self._arenas]
-
-    @property
-    def best(self) -> List[Arena]:
-        return sorted(self._arenas, key=lambda a: a.odds)
-
-    @property
-    def pirate_ids(self) -> List[List[int]]:
-        return [arena.ids for arena in self._arenas]
-
-    @property
-    def positives(self) -> List[Arena]:
-        return sorted([a for a in self._arenas if a.positive], key=lambda _a: _a.odds)
-
-    def __iter__(self):
-        yield from self._arenas
-
-    def __repr__(self):
-        return f"<Arenas {self._arenas!r}>"
-
-
 class NeoFoodClub(BetMixin):
     __slots__ = (
         "_data",
@@ -947,6 +704,8 @@ class NeoFoodClub(BetMixin):
 
     @property
     def arenas(self) -> Arenas:
+        from .arenas import Arenas  # to prevent circular imports
+
         return Arenas(self)
 
     @property
@@ -1230,7 +989,7 @@ class NeoFoodClub(BetMixin):
 
         return cls(data, bet_amount=bet_amount, modifier=modifier)
 
-    def copy(self, keep_custom: bool = False) -> "NeoFoodClub":
+    def copy(self, keep_custom: bool = False) -> NeoFoodClub:
         return NeoFoodClub(
             self.to_dict(keep_custom=keep_custom),
             bet_amount=self._bet_amount,
