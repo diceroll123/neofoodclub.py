@@ -1058,6 +1058,10 @@ class NeoFoodClub(BetMixin):
         return NFCMath.pirates_binary(tuple(self.winners))
 
     @property
+    def winners_pirates(self) -> List[Pirate]:
+        return self.arenas.get_pirates_from_binary(self.winners_binary)
+
+    @property
     def foods(self) -> Optional[List[List[FoodID]]]:
         return self._data.get("foods")
 
