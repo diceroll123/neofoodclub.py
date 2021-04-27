@@ -5,3 +5,4 @@ __copyright__ = "Copyright 2021-present diceroll123"
 __version__ = "0.0.1a"
 
 from .neofoodclub import *
+from .errors import *

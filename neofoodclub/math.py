@@ -13,6 +13,8 @@ from numba import njit
 from numba.core import types
 from numba.typed import Dict as TypedDict
 
+from .errors import InvalidData
+
 if TYPE_CHECKING:
     from .types import ValidOdds, ValidIndex, BetOdds
 
@@ -178,7 +180,7 @@ def bets_hash_to_bets(bets_hash: str) -> Dict:
     bet_length = len(bets)
     if not 1 <= bet_length <= 15:
         # currently support 15 bets still for reverse-compatibility i guess
-        raise ValueError
+        raise InvalidData("An invalid amount of bets was in bets_hash")
 
     return dict(zip(range(1, bet_length + 1), bets))
 

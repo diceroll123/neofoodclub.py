@@ -15,7 +15,8 @@ from dateutil.tz import UTC, tzutc
 from dateutil.parser import parse
 from typing import TYPE_CHECKING
 
-from neofoodclub.food_adjustments import NEGATIVE_FOOD, POSITIVE_FOOD
+from .errors import InvalidData, MissingData
+from .food_adjustments import NEGATIVE_FOOD, POSITIVE_FOOD
 
 if TYPE_CHECKING:
     from neofoodclub.types import (
@@ -377,7 +378,7 @@ class Bets:
             return
         # strictly enforcing amount of values provided
         if len(val) != self._indices.size:
-            raise ValueError(
+            raise InvalidData(
                 f"Invalid bet amounts provided. Expected length: {self._indices.size}, but received {len(val)}."
             )
 
@@ -437,13 +438,13 @@ class Bets:
         intersection = np.where(np_bins[:, np.newaxis] == int_bins)[1]
 
         if intersection.size == 0:
-            raise ValueError(
+            raise InvalidData(
                 "Bets class requires at least one valid bet binary integer."
             )
 
         if intersection.size != np_bins.size:
             diff = np.setdiff1d(np_bins, np_bins[intersection])
-            raise ValueError(
+            raise InvalidData(
                 f"Invalid bet binaries entered: {', '.join([hex(b) for b in diff])}"
             )
 
@@ -573,10 +574,10 @@ class BetMixin:
         amount_of_pirates = sum(1 for mask in NFCMath.BIT_MASKS if pirate_binary & mask)
 
         if amount_of_pirates == 0:
-            raise ValueError("You must pick at least 1 pirate, and at most 3.")
+            raise InvalidData("You must pick at least 1 pirate, and at most 3.")
 
         if amount_of_pirates > 3:
-            raise ValueError("You must pick 3 pirates at most.")
+            raise InvalidData("You must pick 3 pirates at most.")
 
         return Bets._from_generator(
             indices=self._tenbet_indices(pirate_binary), nfc=self
@@ -1175,7 +1176,7 @@ class NeoFoodClub(BetMixin):
     ):
         neo_fc = NEO_FC_REGEX.search(url)
         if neo_fc is None:
-            raise TypeError
+            raise MissingData("No relevant NeoFoodClub-like URL data found.")
 
         if modifier is None:
             modifier = Modifier()
@@ -1209,12 +1210,12 @@ class NeoFoodClub(BetMixin):
         if data["round"] and type(data["round"]) is not int:
             # we only need the round number to make a proper URL
             # the actual value doesn't matter
-            raise ValueError("Improper value for current round number")
+            raise InvalidData("Improper value for current round number")
 
         has_proper_ids = sorted(set(sum(data["pirates"], []))) == [*range(1, 21)]
         has_proper_shape = [len(row) for row in data["pirates"]] == [4, 4, 4, 4, 4]
         if not all([has_proper_ids, has_proper_shape]):
-            raise ValueError("Improper pirates array")
+            raise InvalidData("Improper pirates array")
 
         for odd_type in ["openingOdds", "currentOdds"]:
             odds = data[odd_type]
@@ -1222,11 +1223,11 @@ class NeoFoodClub(BetMixin):
                 first, *rest = odd
 
                 if first != 1:
-                    raise ValueError("Improper odds passed")
+                    raise InvalidData("Improper odds passed")
 
                 for num in rest:
                     if not 2 <= num <= 13:
-                        raise ValueError("Improper odds passed")
+                        raise InvalidData("Improper odds passed")
 
         return cls(data, bet_amount=bet_amount, modifier=modifier)
 
