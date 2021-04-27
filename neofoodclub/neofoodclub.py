@@ -358,6 +358,9 @@ class Bets:
 
     @property
     def amounts_hash(self) -> str:
+        if self.bet_amounts is None:
+            return ""
+
         return NFCMath.bet_amounts_to_string(
             dict(zip(range(len(self.bet_amounts)), self.bet_amounts))
         )
