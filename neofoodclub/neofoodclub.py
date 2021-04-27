@@ -494,12 +494,11 @@ class BetMixin:
         return 10
 
     def _max_ter_indices(self) -> np.ndarray:
-        # use net expected if we've got it
-        return np.argsort(
-            self._net_expected_cache
-            if self._net_expected_cache is not None
-            else self._data_dict["ers"]
-        )
+        # use net expected only if needed
+        if self._modifier.general or self._net_expected_cache is None:
+            return np.argsort(self._data_dict["ers"])
+        else:
+            return np.argsort(self._net_expected_cache)
 
     def make_max_ter_bets(self) -> Bets:
         return Bets._from_generator(indices=self._max_ter_indices(), nfc=self)
@@ -911,7 +910,8 @@ class NeoFoodClub(BetMixin):
         # cache maxbets, we'll need these a lot later,
         # but only if we need them at all
         bet_amount = self._bet_amount
-        if bet_amount and not self._modifier.general:
+
+        if bet_amount:
             mb_copy = self._data_dict["maxbets"].copy()
             mb_copy[mb_copy > bet_amount] = bet_amount
             self._maxbet_odds_cache = mb_copy
