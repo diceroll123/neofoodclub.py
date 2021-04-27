@@ -362,7 +362,7 @@ class Bets:
         return np.sum(self.nfc._data_dict["ers"][self._indices])
 
     @property
-    def bet_amounts(self) -> np.ndarray:
+    def bet_amounts(self) -> Optional[np.ndarray]:
         # user-defined (and sometimes generated) bet amounts
         if self._bet_amounts is not None:
             return self._bet_amounts
@@ -370,7 +370,7 @@ class Bets:
         if self.nfc._maxbet_odds_cache is not None:
             return self.nfc._maxbet_odds_cache[self._indices].astype(int)
 
-        return np.full(self._indices.size, 0)
+        return None
 
     @bet_amounts.setter
     def bet_amounts(self, val: Optional[Sequence[int]]):
@@ -462,7 +462,7 @@ class Bets:
     def is_guaranteed_win(self) -> bool:  # guaranteed to profit, that is
         amounts = self.bet_amounts
 
-        if np.sum(amounts) <= 0:
+        if amounts is None or np.sum(amounts) <= 0:
             return False
 
         highest_bet_amount = np.max(amounts)
@@ -1111,9 +1111,8 @@ class NeoFoodClub(BetMixin):
             return 0
 
         use_backup_if_needed = use_bet_amount_if_none and self.bet_amount
-        use_provided = np.any(bets.bet_amounts)
 
-        if use_provided:
+        if bets.bet_amounts is not None:
             multiplier = bets.bet_amounts
         elif use_backup_if_needed:
             multiplier = np.full(bets._indices.size, self.bet_amount)
