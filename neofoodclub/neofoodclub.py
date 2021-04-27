@@ -397,7 +397,7 @@ class Bets:
 
     @property
     def bet_hash(self) -> str:
-        return NFCMath.bet_url_value(self.indices)
+        return NFCMath.bets_url_value(self.indices)
 
     @property
     def amounts_hash(self) -> str:
