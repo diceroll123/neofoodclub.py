@@ -23,13 +23,13 @@ __all__ = (
     "pirates_binary",
     "binary_to_indices",
     "bet_amounts_to_string",
-    "bet_string_to_bet_amounts",
-    "bet_string_to_bet_indices",
-    "bet_string_to_bets_count",
-    "bet_string_to_bet_binaries",
-    "bet_indices_to_bet_binaries",
-    "bet_string_to_bets",
-    "bet_url_value",
+    "amounts_hash_to_bet_amounts",
+    "bets_hash_to_bet_indices",
+    "bets_hash_to_bets_count",
+    "bets_hash_to_bet_binaries",
+    "bets_indices_to_bet_binaries",
+    "bets_hash_to_bets",
+    "bets_url_value",
     "make_probabilities",
     "get_bet_odds_from_bets",
     "make_round_dicts",
@@ -51,7 +51,7 @@ float_array = types.float64[:]
 def precompile():
     # run the numba methods to compile, and fill some caches so they're speedier
     # using garbage data is fine for compiling with.
-    bet_string_to_bet_amounts("aaa")
+    amounts_hash_to_bet_amounts("aaa")
     make_round_dicts(
         tuple((1.0, 1.0, 1.0, 1.0, 1.0) for _ in range(5)),
         tuple((1.0, 1.0, 1.0, 1.0, 1.0) for _ in range(5)),
@@ -121,9 +121,9 @@ def bet_amounts_to_string(bet_amounts: Dict[int, int]) -> str:
 
 
 @njit()
-def bet_string_to_bet_amounts_numba(bet_string: str) -> List[Optional[int]]:
+def amounts_hash_to_bet_amounts_numba(amounts_hash: str) -> List[Optional[int]]:
     nums: List[Optional[int]] = []
-    chunked = [bet_string[i : i + 3] for i in range(0, len(bet_string), 3)]
+    chunked = [amounts_hash[i : i + 3] for i in range(0, len(amounts_hash), 3)]
 
     for p in chunked:
         e = 0
@@ -141,15 +141,15 @@ def bet_string_to_bet_amounts_numba(bet_string: str) -> List[Optional[int]]:
 
 
 @functools.lru_cache
-def bet_string_to_bet_amounts(bet_string: str) -> Tuple[Optional[int], ...]:
+def amounts_hash_to_bet_amounts(amounts_hash: str) -> Tuple[Optional[int], ...]:
     # convenience method to cache the list as a tuple because i don't think Numba can *do* tuples.
-    return tuple(bet_string_to_bet_amounts_numba(bet_string))
+    return tuple(amounts_hash_to_bet_amounts_numba(amounts_hash))
 
 
 @functools.lru_cache(maxsize=256)
-def bet_string_to_bet_indices(bet_string: str) -> Tuple[Tuple[int, ...], ...]:
+def bets_hash_to_bet_indices(bets_hash: str) -> Tuple[Tuple[int, ...], ...]:
     # TODO: look into numba-fying (tried once now, it was about 3x slower to get the same result uncached)
-    indices = [ord(letter) - 97 for letter in bet_string]
+    indices = [ord(letter) - 97 for letter in bets_hash]
     s = itertools.chain.from_iterable((e // 5, e % 5) for e in indices)
     # https://docs.python.org/3/library/itertools.html#itertools-recipes (see "grouper" recipe)
     return tuple(
@@ -157,34 +157,34 @@ def bet_string_to_bet_indices(bet_string: str) -> Tuple[Tuple[int, ...], ...]:
     )
 
 
-def bet_string_to_bet_binaries(bet_string: str) -> Tuple[int, ...]:
+def bets_hash_to_bet_binaries(bets_hash: str) -> Tuple[int, ...]:
     return tuple(
-        pirates_binary(indices) for indices in bet_string_to_bet_indices(bet_string)
+        pirates_binary(indices) for indices in bets_hash_to_bet_indices(bets_hash)
     )
 
 
-def bet_indices_to_bet_binaries(bet_indices: Sequence[Sequence[int]]) -> Tuple[int]:
-    return tuple(pirates_binary(tuple(indices)) for indices in bet_indices)
+def bets_indices_to_bet_binaries(bets_indices: Sequence[Sequence[int]]) -> Tuple[int]:
+    return tuple(pirates_binary(tuple(indices)) for indices in bets_indices)
 
 
-def bet_string_to_bets_count(bet_string: str) -> int:
+def bets_hash_to_bets_count(bets_hash: str) -> int:
     # the amount of bets in the set, that is
-    return len(bet_string_to_bet_indices(bet_string))
+    return len(bets_hash_to_bet_indices(bets_hash))
 
 
-def bet_string_to_bets(bet_string: str) -> Dict:
-    bets = bet_string_to_bet_indices(bet_string)
+def bets_hash_to_bets(bets_hash: str) -> Dict:
+    bets = bets_hash_to_bet_indices(bets_hash)
 
     bet_length = len(bets)
-    if bet_length not in range(1, 16):
+    if not 1 <= bet_length <= 15:
         # currently support 15 bets still for reverse-compatibility i guess
         raise ValueError
 
     return dict(zip(range(1, bet_length + 1), bets))
 
 
-def bet_url_value(bet_indices: Tuple[Tuple[int, ...], ...]) -> str:
-    flat = itertools.chain.from_iterable(bet_indices)
+def bets_url_value(bets_indices: Tuple[Tuple[int, ...], ...]) -> str:
+    flat = itertools.chain.from_iterable(bets_indices)
     return "".join(
         ascii_lowercase[multiplier * 5 + adder]
         for multiplier, adder in itertools.zip_longest(*[iter(flat)] * 2, fillvalue=0)

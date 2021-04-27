@@ -641,11 +641,13 @@ class BetMixin:
     # bet decoding methods
     def make_bets_from_indices(self, indices: Sequence[Sequence[int]]) -> Bets:
         # Takes a list of indices like [[1, 2, 3, 4, 2], ...] and turns it into Bets
-        return Bets.from_binary(*NFCMath.bet_indices_to_bet_binaries(indices), nfc=self)
+        return Bets.from_binary(
+            *NFCMath.bets_indices_to_bet_binaries(indices), nfc=self
+        )
 
     def make_bets_from_hash(self, bet_hash: str) -> Bets:
         # Takes a bet hash and turns it into Bets
-        return Bets.from_binary(*NFCMath.bet_string_to_bet_binaries(bet_hash), nfc=self)
+        return Bets.from_binary(*NFCMath.bets_hash_to_bet_binaries(bet_hash), nfc=self)
 
     def make_bets_from_binaries(self, *binaries: int) -> Bets:
         # Takes bet-compatible binary numbers and turns them into Bets
