@@ -808,6 +808,13 @@ class Arenas:
                 pirates.append(p)
         return pirates
 
+    def get_pirates_from_binary(self, binary: int) -> List[Pirate]:
+        return [
+            self._arenas[arena][index - 1]
+            for arena, index in enumerate(NFCMath.binary_to_indices(binary))
+            if index > 0
+        ]
+
     @property
     def pirates(self) -> List[List[Pirate]]:
         return [arena.pirates for arena in self._arenas]
@@ -1196,4 +1203,11 @@ class NeoFoodClub(BetMixin):
         )
 
     def __repr__(self):
-        return f"<NeoFoodClub round={self.round} timestamp={self.timestamp!r} is_over={self.is_over}>"
+        attrs = [
+            ("round", self.round),
+            ("bet_amount", self._bet_amount),
+            ("timestamp", self.timestamp),
+            ("is_over", self.is_over),
+        ]
+        joined = " ".join("%s=%r" % t for t in attrs if t[1] is not None)
+        return f"<NeoFoodClub {joined}>"
