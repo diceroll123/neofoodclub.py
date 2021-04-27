@@ -97,19 +97,19 @@ binaries_bets = test_nfc.make_bets_from_binaries(*test_binaries)
 class BetDecodingTest(unittest.TestCase):
     def test_bet_hash_encoding(self):
         self.assertEqual(
-            (hash_bets.bet_hash, hash_bets.indices, tuple(hash_bets)),
+            (hash_bets.bets_hash, hash_bets.indices, tuple(hash_bets)),
             test_expected_results,
         )
 
     def test_bet_indices_encoding(self):
         self.assertEqual(
-            (indices_bets.bet_hash, indices_bets.indices, tuple(indices_bets)),
+            (indices_bets.bets_hash, indices_bets.indices, tuple(indices_bets)),
             test_expected_results,
         )
 
     def test_bet_binary_encoding(self):
         self.assertEqual(
-            (binaries_bets.bet_hash, binaries_bets.indices, tuple(binaries_bets)),
+            (binaries_bets.bets_hash, binaries_bets.indices, tuple(binaries_bets)),
             test_expected_results,
         )
 

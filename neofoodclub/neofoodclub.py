@@ -396,7 +396,7 @@ class Bets:
         )
 
     @property
-    def bet_hash(self) -> str:
+    def bets_hash(self) -> str:
         return NFCMath.bets_url_value(self.indices)
 
     @property
@@ -409,8 +409,8 @@ class Bets:
         attrs = [
             ("ne", self.net_expected),
             ("er", self.er),
-            ("bet_hash", self.bet_hash),
-            ("amount_hash", self.amounts_hash),
+            ("bets_hash", self.bets_hash),
+            ("amounts_hash", self.amounts_hash),
         ]
         joined = " ".join("%s=%r" % t for t in attrs)
         return f"<Bets {joined}>"
@@ -481,7 +481,7 @@ class Bets:
     def __eq__(self, other):
         return (
             isinstance(other, self.__class__)
-            and self.bet_hash == other.bet_hash
+            and self.bets_hash == other.bets_hash
             and self.amounts_hash == other.amounts_hash
         )
 
@@ -1133,7 +1133,7 @@ class NeoFoodClub(BetMixin):
             )
 
         if bets:
-            url += "&b=" + bets.bet_hash
+            url += "&b=" + bets.bets_hash
             if np.sum(bets.bet_amounts):
                 url += "&a=" + bets.amounts_hash
 
