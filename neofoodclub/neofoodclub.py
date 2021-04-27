@@ -15,6 +15,8 @@ from dateutil.tz import UTC, tzutc
 from dateutil.parser import parse
 from typing import TYPE_CHECKING
 
+from neofoodclub.food_adjustments import NEGATIVE_FOOD, POSITIVE_FOOD
+
 if TYPE_CHECKING:
     from neofoodclub.types import (
         RoundData,
@@ -669,6 +671,7 @@ class Pirate(PirateMixin):
         "_opening_odds",
         "_std",
         "_er",
+        "_fa",
     )
 
     def __init__(self, *, nfc: "NeoFoodClub", id: int, arena: int, index: int):
@@ -679,6 +682,11 @@ class Pirate(PirateMixin):
         self._opening_odds: int = nfc._data["openingOdds"][arena][index]
         self._std: float = nfc._stds[arena][index]
         self._er: float = self.std * self.odds
+        self._fa = None
+
+        if "foods" in nfc._data:
+            foods = nfc._data["foods"][arena]
+            self._fa = sum(-NEGATIVE_FOOD[id][f] + POSITIVE_FOOD[id][f] for f in foods)
 
     @property
     def id(self) -> int:
@@ -705,6 +713,10 @@ class Pirate(PirateMixin):
         return self._er
 
     @property
+    def fa(self) -> Optional[int]:
+        return self._fa
+
+    @property
     def opening_odds(self) -> int:
         return self._opening_odds
 
@@ -721,6 +733,7 @@ class Pirate(PirateMixin):
             ("arena", self.arena),
             ("index", self.index),
             ("odds", self.odds),
+            ("fa", self.fa),
             ("opening_odds", self.opening_odds),
             ("int", hex(self.binary)),
         ]
