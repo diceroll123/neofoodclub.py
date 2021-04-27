@@ -59,6 +59,10 @@ __all__ = (
     "OddsChange",
     "Modifier",
     "Bets",
+    "Arenas",
+    "Arena",
+    "Odds",
+    "Pirate",
     "NEO_FC_REGEX",
 )
 
