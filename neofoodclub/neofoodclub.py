@@ -645,9 +645,16 @@ class BetMixin:
             *NFCMath.bets_indices_to_bet_binaries(indices), nfc=self
         )
 
-    def make_bets_from_hash(self, bet_hash: str) -> Bets:
+    def make_bets_from_hash(
+        self, bets_hash: str, amounts_hash: Optional[str] = None
+    ) -> Bets:
         # Takes a bet hash and turns it into Bets
-        return Bets.from_binary(*NFCMath.bets_hash_to_bet_binaries(bet_hash), nfc=self)
+        bets = Bets.from_binary(*NFCMath.bets_hash_to_bet_binaries(bets_hash), nfc=self)
+        if amounts_hash:
+            amounts = NFCMath.amounts_hash_to_bet_amounts(amounts_hash)
+            bets.bet_amounts = amounts
+
+        return bets
 
     def make_bets_from_binaries(self, *binaries: int) -> Bets:
         # Takes bet-compatible binary numbers and turns them into Bets
