@@ -6,3 +6,4 @@ __version__ = "0.0.1a"
 
 from .neofoodclub import *
 from .errors import *
+from . import utils, math
