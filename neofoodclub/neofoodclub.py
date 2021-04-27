@@ -856,6 +856,9 @@ class Arenas:
     def positives(self) -> List[Arena]:
         return sorted([a for a in self._arenas if a.positive], key=lambda _a: _a.odds)
 
+    def __iter__(self):
+        yield from self._arenas
+
     def __repr__(self):
         return f"<Arenas {self._arenas!r}>"
 
