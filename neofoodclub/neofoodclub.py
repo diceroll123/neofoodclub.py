@@ -15,6 +15,7 @@ from dateutil.tz import UTC, tzutc
 from dateutil.parser import parse
 from typing import TYPE_CHECKING
 
+from . import utils
 from .errors import InvalidData, MissingData
 from .food_adjustments import NEGATIVE_FOOD, POSITIVE_FOOD
 
@@ -376,20 +377,16 @@ class Bets:
         if val is None:
             self._bet_amounts = None
             return
+
         # strictly enforcing amount of values provided
         if len(val) != self._indices.size:
             raise InvalidData(
                 f"Invalid bet amounts provided. Expected length: {self._indices.size}, but received {len(val)}."
             )
 
-        amts = np.array([v or 0 for v in val])
+        amts = np.array([v or 50 for v in val])
 
-        # fix any values between 1 and 50 to be 50, to maintain working bets
-        amts[(amts < 50) & (amts > 0)] = 50
-        # floor any values above max bet amount
-        amts[amts > NFCMath.BET_AMOUNT_MAX] = NFCMath.BET_AMOUNT_MAX
-        # negatives are allowed
-        self._bet_amounts = amts
+        self._bet_amounts = utils.fix_bet_amounts(amts)
 
     @property
     def indices(self) -> Tuple[Tuple[int, ...], ...]:
@@ -934,7 +931,7 @@ class NeoFoodClub(BetMixin):
         if bet_amount:
             mb_copy = self._data_dict["maxbets"].copy()
             mb_copy[mb_copy > bet_amount] = bet_amount
-            self._maxbet_odds_cache = mb_copy
+            self._maxbet_odds_cache = utils.fix_bet_amounts(mb_copy)
 
             # for making maxter faster...
             self._net_expected_cache = mb_copy * self._data_dict["ers"] - mb_copy
