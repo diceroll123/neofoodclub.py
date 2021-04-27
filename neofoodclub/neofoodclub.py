@@ -1093,7 +1093,7 @@ class NeoFoodClub(BetMixin):
         else:
             return 0
 
-        mask = bets._indices == winning_bins_indices
+        mask = np.in1d(bets._indices, winning_bins_indices)
         bets_odds = self._data_dict["odds"][bets._indices]
         winnings = bets_odds * multiplier
 
