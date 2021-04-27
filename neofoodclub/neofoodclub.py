@@ -148,7 +148,7 @@ class OddsChange:
     def __repr__(self):
         return f"<OddsChange index={self.index} pirate={self.pirate} old={self.old} new={self.new} timestamp={self.timestamp}>"
 
-    def __eq__(self, other):  # for the "in" list check
+    def __eq__(self, other):
         return isinstance(other, self.__class__) and self._data == other.data
 
     def __iter__(self):
@@ -726,6 +726,9 @@ class Pirate(PirateMixin):
 
     def __int__(self):
         return NFCMath.pirate_binary(self._index, self._arena)
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and int(self) == int(other)
 
     def __repr__(self):
         attrs = [
