@@ -947,7 +947,8 @@ class NeoFoodClub(BetMixin):
         return self._modifier
 
     @modifier.setter
-    def modifier(self, val: Modifier):
+    def modifier(self, val: Optional[Modifier]):
+        val = val or Modifier()
         reset = False
         if (
             self._modifier.opening_odds,
