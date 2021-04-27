@@ -1125,7 +1125,7 @@ class NeoFoodClub(BetMixin):
 
         return np.sum(np.clip(winnings[mask], 0, 1_000_000)).astype(int)
 
-    def make_url(self, bets: Optional[Bets]) -> str:
+    def make_url(self, bets: Optional[Bets] = None) -> str:
         def encode(int_lists) -> str:
             return json.dumps(int_lists, separators=(",", ":"))
 
