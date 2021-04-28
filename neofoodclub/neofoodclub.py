@@ -224,9 +224,6 @@ class Modifier:
             and self.custom_odds == other.custom_odds
         )
 
-    def __bool__(self):
-        return self.opening_odds or bool(self._custom_odds) or bool(self._time)
-
     @property
     def nfc(self):
         return self._nfc
