@@ -1,4 +1,5 @@
 import numpy as np
+
 import neofoodclub.math as NFCMath
 
 __all__ = ("fix_bet_amounts",)

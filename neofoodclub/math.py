@@ -1,14 +1,13 @@
 from __future__ import annotations
+
 import functools
 import itertools
 import math
 from collections import defaultdict
 from string import ascii_lowercase, ascii_uppercase
-from typing import Tuple, Dict, Optional, Sequence, List, TYPE_CHECKING
-
+from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
-
 from numba import njit
 from numba.core import types
 from numba.typed import Dict as TypedDict
@@ -16,7 +15,7 @@ from numba.typed import Dict as TypedDict
 from .errors import InvalidData
 
 if TYPE_CHECKING:
-    from .types import ValidOdds, ValidIndex, BetOdds
+    from .types import BetOdds, ValidIndex, ValidOdds
 
 # at least for now, we won't be exposing the numba methods.
 __all__ = (

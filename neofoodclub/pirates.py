@@ -1,9 +1,10 @@
 from __future__ import annotations
+
 from typing import TYPE_CHECKING, Optional
 
-from .food_adjustments import NEGATIVE_FOOD, POSITIVE_FOOD
 import neofoodclub.math as NFCMath
 
+from .food_adjustments import NEGATIVE_FOOD, POSITIVE_FOOD
 
 if TYPE_CHECKING:
     from .neofoodclub import NeoFoodClub

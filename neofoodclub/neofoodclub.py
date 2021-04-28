@@ -1,34 +1,26 @@
 from __future__ import annotations
+
 import datetime
 import json
 import re
-
-import numpy as np
-
-import neofoodclub.math as NFCMath
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple, Sequence
+from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple
 
 import dateutil
+import numpy as np
+from dateutil.parser import parse
 from dateutil.tz import UTC, tzutc
 
-from dateutil.parser import parse
-from typing import TYPE_CHECKING
+import neofoodclub.math as NFCMath
 
 from . import utils
 from .errors import InvalidData, MissingData
 
-
 if TYPE_CHECKING:
-    from .pirates import PartialPirate, Pirate
+    from neofoodclub.types import FoodID, PirateID, RoundData, ValidIndex, ValidOdds
+
     from .arenas import Arenas
-    from neofoodclub.types import (
-        RoundData,
-        FoodID,
-        ValidOdds,
-        ValidIndex,
-        PirateID,
-    )
+    from .pirates import PartialPirate, Pirate
 
 NEO_FC_REGEX = re.compile(
     r"(/(?P<perk>15/)?)#(?P<query>[a-zA-Z0-9=&\[\],%-:+]+)",
@@ -944,8 +936,8 @@ class NeoFoodClub(BetMixin):
 
         querystring = url.partition("#")[-1]
 
-        import urllib.parse
         import json
+        import urllib.parse
 
         olddata = urllib.parse.parse_qs(urllib.parse.unquote(querystring))
 

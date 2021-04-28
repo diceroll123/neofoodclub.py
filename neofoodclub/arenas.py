@@ -1,14 +1,14 @@
 from __future__ import annotations
-from typing import Sequence, List, TYPE_CHECKING, Optional
-from .neofoodclub import NeoFoodClub
-from .pirates import Pirate
+
+from typing import TYPE_CHECKING, List, Optional, Sequence
+
 import neofoodclub.math as NFCMath
 
+from .neofoodclub import NeoFoodClub
+from .pirates import Pirate
+
 if TYPE_CHECKING:
-    from neofoodclub.types import (
-        ValidIndex,
-        PirateID,
-    )
+    from neofoodclub.types import PirateID, ValidIndex
 
 __all__ = (
     "Arena",

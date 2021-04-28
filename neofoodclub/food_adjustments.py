@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Tuple, Optional, Dict
+from typing import Dict, Optional, Tuple
 
 
 # this is just a convoluted way of pre-allocating food adjustment values

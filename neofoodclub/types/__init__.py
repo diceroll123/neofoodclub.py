@@ -1,4 +1,4 @@
-from typing import TypedDict, List, Literal, Optional
+from typing import List, Literal, Optional, TypedDict
 
 # fmt: off
 FoodID = Literal[
