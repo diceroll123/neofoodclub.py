@@ -445,12 +445,14 @@ class BetMixin:
     def _max_ter_indices(self) -> np.ndarray:
         # use net expected only if needed
         if self._modifier.general or self._net_expected_cache is None:
-            return np.argsort(self._data_dict["ers"])
+            return self._data_dict["ers"]
         else:
-            return np.argsort(self._net_expected_cache)
+            return self._net_expected_cache
 
     def make_max_ter_bets(self) -> Bets:
-        return Bets._from_generator(indices=self._max_ter_indices(), nfc=self)
+        return Bets._from_generator(
+            indices=np.argsort(self._max_ter_indices()), nfc=self
+        )
 
     def _crazy_bets_indices(self) -> np.ndarray:
         return np.random.choice(
@@ -490,7 +492,7 @@ class BetMixin:
             return self._gambit_indices(five_bet=random_five_bet.astype(int)[0])
 
         # get highest ER pirates
-        ers = self._data_dict["ers"][NFCMath.FULL_BETS]
+        ers = self._max_ter_indices()[NFCMath.FULL_BETS]
         highest_er = np.argsort(ers, kind="mergesort", axis=0)[::-1][0]
         pirate_bin = self._data_dict["bins"][NFCMath.FULL_BETS[highest_er]]
         return self._gambit_indices(five_bet=pirate_bin.astype(int))
