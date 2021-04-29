@@ -20,6 +20,10 @@ ARENA_NAMES = ["Shipwreck", "Lagoon", "Treasure", "Hidden", "Harpoon"]
 
 
 class Arena:
+    """Represents an arena for a given round of Food Club.
+    This class is not to be constructed manually.
+    """
+
     __slots__ = (
         "_pirates",
         "_id",
@@ -34,39 +38,48 @@ class Arena:
 
     @property
     def id(self) -> int:
+        """:class:`int`: The arena's zero-based ID, correlating to its place in the list ["Shipwreck", "Lagoon", "Treasure", "Hidden", "Harpoon"]"""
         return self._id
 
     @property
     def name(self) -> str:
+        """:class:`str`: The name of this arena, can be one of ["Shipwreck", "Lagoon", "Treasure", "Hidden", "Harpoon"]"""
         return ARENA_NAMES[self._id]
 
     @property
     def best(self) -> List[Pirate]:
+        """List[:class:`Pirate`]: Returns a list of the pirates in this arena sorted from least to greatest odds."""
         return sorted(self._pirates, key=lambda a: a.odds)
 
     @property
-    def ids(self):
+    def ids(self) -> List[int]:
+        """List[:class:`int`]: Returns a list of the IDs of the pirates in this arena."""
         return [p.id for p in self._pirates]
 
     @property
     def odds(self) -> float:
+        """:class:`float`: Returns the odds of this arena, which is equal to the sum of (1 / odds) of each pirate."""
         # do note that arena odds are not the same as pirate odds
         return sum(1 / p.odds for p in self._pirates)
 
     @property
     def ratio(self) -> float:
+        """:class:`float`: Returns the ratio of this arena, which is `1 / Arena.odds - 1`"""
         return 1 / self.odds - 1
 
     @property
     def pirates(self) -> List[Pirate]:
+        """List[:class:`Pirate`]: Returns a list of the pirates in this arena."""
         return self._pirates
 
     @property
     def positive(self) -> bool:
+        """:class:`bool`: Returns whether or not `Arena.odds` is greater than 1."""
         return self.odds < 1
 
     @property
     def negative(self) -> bool:
+        """:class:`bool`: Returns whether or not `Arena.odds` is less than 1."""
         return not self.positive
 
     def __getitem__(self, item: ValidIndex) -> Optional[Pirate]:
@@ -83,6 +96,10 @@ class Arena:
 
 
 class Arenas:
+    """A container object for all of the arenas for a given round of Food Club.
+    This class is not to be constructed manually.
+    """
+
     __slots__ = ("_arenas",)
 
     def __init__(self, nfc: NeoFoodClub):
@@ -92,15 +109,18 @@ class Arenas:
         ]
 
     def get_pirate_by_id(self, pirate_id: PirateID) -> Pirate:
+        """:class:`Pirate`: Returns a single pirate where their ID matches pirate_id."""
         for p in self.all_pirates:
             if p.id == pirate_id:
                 return p
 
     def get_pirates_by_id(self, *pirate_ids: Sequence[PirateID]) -> List[Pirate]:
+        """List[:class:`Pirate`]: Returns a list of pirates where their IDs match IDs in pirate_ids."""
         return [p for p in self.all_pirates if p.id in pirate_ids]
 
     @property
     def all_pirates(self) -> List[Pirate]:
+        """List[:class:`Pirate`]: Returns a flat list of all pirates in arena-order."""
         pirates = []
         for a in self._arenas:
             for p in a.pirates:
@@ -108,6 +128,7 @@ class Arenas:
         return pirates
 
     def get_pirates_from_binary(self, binary: int) -> List[Pirate]:
+        """List[:class:`Pirate`]: Return a list of pirates based on their bet-binary representation."""
         return [
             self._arenas[arena][index - 1]
             for arena, index in enumerate(NFCMath.binary_to_indices(binary))
@@ -116,18 +137,22 @@ class Arenas:
 
     @property
     def pirates(self) -> List[List[Pirate]]:
+        """List[List[:class:`Pirate`]]: Returns a nested list of all pirates in arena-order."""
         return [arena.pirates for arena in self._arenas]
 
     @property
     def best(self) -> List[Arena]:
+        """List[:class:`Arena`]: Returns a list of the arenas sorted from least to greatest odds."""
         return sorted(self._arenas, key=lambda a: a.odds)
 
     @property
     def pirate_ids(self) -> List[List[int]]:
+        """List[List[:class:`int`]]: Returns a nested list of all pirate IDs in arena-order."""
         return [arena.ids for arena in self._arenas]
 
     @property
     def positives(self) -> List[Arena]:
+        """List[:class:`Arena`]: Returns a list of positive arenas sorted from least to greatest odds."""
         return sorted([a for a in self._arenas if a.positive], key=lambda _a: _a.odds)
 
     def __iter__(self):

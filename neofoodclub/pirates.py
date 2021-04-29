@@ -50,6 +50,18 @@ class PirateMixin:
 
 
 class PartialPirate(PirateMixin):
+    """Represents a "partial" pirate that only has an ID.
+
+    Attributes
+    -----------
+    id: :class:`int`
+        The pirate's ID.
+    name: :class:`str`
+        The pirate's name.
+    image: :class:`str`
+        The pirates image.
+    """
+
     def __init__(self, _id: int):
         self._id = _id
 
@@ -62,6 +74,16 @@ class PartialPirate(PirateMixin):
 
 
 class Pirate(PirateMixin):
+    """Represents a single pirate.
+
+    Attributes
+    -----------
+    name: :class:`str`
+        The pirate's name.
+    image: :class:`str`
+        The pirates image.
+    """
+
     __slots__ = (
         "_id",
         "_arena",
@@ -89,38 +111,47 @@ class Pirate(PirateMixin):
 
     @property
     def id(self) -> int:
+        """:class:`int`: The pirate's ID."""
         return self._id
 
     @property
     def arena(self) -> int:
+        """:class:`int`: The ID of the arena this pirate is in."""
         return self._arena
 
     @property
     def index(self) -> int:
+        """:class:`int`: The pirate's index in the arena the pirate is in."""
         return self._index
 
     @property
     def std(self) -> float:
+        """:class:`float`: The pirate's std probability."""
         return self._std
 
     @property
     def odds(self) -> int:
+        """:class:`int`: The pirate's current odds."""
         return self._odds
 
     @property
     def er(self) -> float:
+        """:class:`float`: The pirate's expected ratio. This is equal to std * odds."""
         return self._er
 
     @property
     def fa(self) -> Optional[int]:
+        """Optional[:class:`int`]: The pirate's food adjustment. Can be None if no foods are found."""
         return self._fa
 
     @property
     def opening_odds(self) -> int:
+        """:class:`int`: The pirate's opening odds."""
         return self._opening_odds
 
     @property
     def binary(self) -> int:
+        """:class:`int`: The pirate's bet-binary representation."""
         return NFCMath.pirate_binary(self._index, self._arena)
 
     def __int__(self):

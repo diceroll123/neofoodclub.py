@@ -23,14 +23,14 @@ __all__ = (
     "pirate_binary",
     "pirates_binary",
     "binary_to_indices",
-    "bet_amounts_to_string",
+    "bet_amounts_to_amounts_hash",
     "amounts_hash_to_bet_amounts",
     "bets_hash_to_bet_indices",
     "bets_hash_to_bets_count",
     "bets_hash_to_bet_binaries",
     "bets_indices_to_bet_binaries",
     "bets_hash_to_bets",
-    "bets_url_value",
+    "bets_hash_value",
     "make_probabilities",
     "get_bet_odds_from_bets",
     "make_round_dicts",
@@ -68,19 +68,35 @@ def precompile():
 
 
 @functools.lru_cache(maxsize=None)
-def pirate_binary(index: int, arena: int) -> int:
-    # binary position of the pirate in its arena, it's just a 1 with 19 zeros surrounding it
-    # this assumes the index is actually index+1 because of odds etc starting with a 1 in the 0th index
+def pirate_binary(index: ValidIndex, arena: ValidIndex) -> int:
+    """:class:`int`: Returns the bet-binary representation of a pirate in an arena.
+
+    Parameters
+    -----------
+    index: :class:`ValidIndex`
+        The index of the pirate in the arena. Can be 0 to 4. If 0, then there is no pirate.
+    arena: :class:`ValidIndex`
+        The arena's index. Can be 0 to 4.
+    """
     if index == 0:
         return 0
     return 1 << (19 - (index - 1 + arena * 4))
 
 
 @functools.lru_cache(maxsize=None)
-def pirates_binary(bet_indices: Sequence[int]) -> int:
-    # the inverse of binary_to_indices
-    # turns (1, 2, 3, 4, 2) (for example) into 0b10000100001000010100, a bet-binary compatible number
-    return sum(pirate_binary(index, arena) for arena, index in enumerate(bet_indices))
+def pirates_binary(bets_indices: Sequence[ValidIndex]) -> int:
+    """:class:`int`: Returns the bet-binary representation of bet indices.
+
+    Turns something like (1, 2, 3, 4, 2) for example into 0b10000100001000010100, a bet-binary number.
+
+    This is fundamentally the inverse of binary_to_indices.
+
+    Parameters
+    -----------
+    bets_indices: Sequence[:class:`int`]
+        A sequence of integers from 0 to 4 to represent a bet.
+    """
+    return sum(pirate_binary(index, arena) for arena, index in enumerate(bets_indices))
 
 
 @njit()
@@ -103,12 +119,28 @@ def binary_to_indices_numba(bet_binary: int) -> List[int]:
 
 
 @functools.lru_cache(maxsize=3125)
-def binary_to_indices(bet_binary: int) -> Tuple[int, ...]:
-    # convenience method to cache the list as a tuple because i don't think Numba can *do* tuples.
+def binary_to_indices(bet_binary: int) -> Tuple[ValidIndex, ...]:
+    """Tuple[ValidIndex, ...]: Returns the bet indices of a bet-binary value.
+
+    Parameters
+    -----------
+    bet_binary: :class:`int`
+        An integer representing a bet.
+    """
+    # this is a convenience method to cache the list as a tuple because i don't think Numba can *do* tuples.
     return tuple(binary_to_indices_numba(bet_binary))
 
 
-def bet_amounts_to_string(bet_amounts: Dict[int, int]) -> str:
+def bet_amounts_to_amounts_hash(bet_amounts: Dict[int, int]) -> str:
+    """:class:`str`: Returns the hash for the provided bet amounts.
+
+    This is fundamentally the inverse of amounts_hash_to_bet_amounts.
+
+    Parameters
+    -----------
+    bet_amounts: Dict[int, int]
+        A dict of bet amounts where the key is the index and the value is the bet amount.
+    """
     letters = ""
     for idx, value in bet_amounts.items():
         e = ""
@@ -143,13 +175,27 @@ def amounts_hash_to_bet_amounts_numba(amounts_hash: str) -> List[Optional[int]]:
 
 @functools.lru_cache
 def amounts_hash_to_bet_amounts(amounts_hash: str) -> Tuple[Optional[int], ...]:
-    # convenience method to cache the list as a tuple because i don't think Numba can *do* tuples.
+    """Tuple[Optional[:class:`int`], ...]: Returns a tuple of bet amounts from the provided amounts hash.
+
+    Parameters
+    -----------
+    amounts_hash: :class:`str`
+        The hash of bet amounts.
+    """
+
+    # this is a convenience method to cache the list as a tuple because i don't think Numba can *do* tuples.
     return tuple(amounts_hash_to_bet_amounts_numba(amounts_hash))
 
 
 @functools.lru_cache(maxsize=256)
-def bets_hash_to_bet_indices(bets_hash: str) -> Tuple[Tuple[int, ...], ...]:
-    # TODO: look into numba-fying (tried once now, it was about 3x slower to get the same result uncached)
+def bets_hash_to_bet_indices(bets_hash: str) -> Tuple[Tuple[ValidIndex, ...], ...]:
+    """Tuple[Tuple[:class:`ValidIndex`, ...], ...]: Returns a tuple of bet indices from the provided bets hash.
+
+    Parameters
+    -----------
+    bets_hash: :class:`str`
+        The hash of bet amounts.
+    """
     indices = [ord(letter) - 97 for letter in bets_hash]
     s = itertools.chain.from_iterable((e // 5, e % 5) for e in indices)
     # https://docs.python.org/3/library/itertools.html#itertools-recipes (see "grouper" recipe)
@@ -158,22 +204,52 @@ def bets_hash_to_bet_indices(bets_hash: str) -> Tuple[Tuple[int, ...], ...]:
     )
 
 
-def bets_hash_to_bet_binaries(bets_hash: str) -> Tuple[int, ...]:
+def bets_hash_to_bet_binaries(bets_hash: str) -> Tuple[ValidIndex, ...]:
+    """Tuple[:class:`ValidIndex`, ...]: Returns the bet-binary representations of the bets hash provided.
+
+    Parameters
+    -----------
+    bets_hash: :class:`str`
+        The hash of bet amounts.
+    """
     return tuple(
         pirates_binary(indices) for indices in bets_hash_to_bet_indices(bets_hash)
     )
 
 
-def bets_indices_to_bet_binaries(bets_indices: Sequence[Sequence[int]]) -> Tuple[int]:
+def bets_indices_to_bet_binaries(
+    bets_indices: Sequence[Sequence[ValidIndex]],
+) -> Tuple[int, ...]:
+    """Tuple[:class:`int`, ...]: Returns the bet-binary representations of the bets indices provided.
+
+    Parameters
+    -----------
+    bets_indices: Sequence[Sequence[:class:`ValidIndex`]]
+        A sequence of integers from 0 to 4 to represent a bet.
+    """
     return tuple(pirates_binary(tuple(indices)) for indices in bets_indices)
 
 
 def bets_hash_to_bets_count(bets_hash: str) -> int:
-    # the amount of bets in the set, that is
+    """:class:`int`: Returns the amount of bets for a given bets hash.
+
+    Parameters
+    -----------
+    bets_hash: :class:`str`
+        The hash of bet amounts.
+    """
     return len(bets_hash_to_bet_indices(bets_hash))
 
 
-def bets_hash_to_bets(bets_hash: str) -> Dict:
+def bets_hash_to_bets(bets_hash: str) -> Dict[int, Tuple[ValidIndex, ...]]:
+    """Dict[:class:`int`, Tuple[:class:`ValidIndex`, ...]]: Returns a dict of bets where keys are the index and values
+    are bet indicies.
+
+    Parameters
+    -----------
+    bets_hash: :class:`str`
+        The hash of bet amounts.
+    """
     bets = bets_hash_to_bet_indices(bets_hash)
 
     bet_length = len(bets)
@@ -184,7 +260,14 @@ def bets_hash_to_bets(bets_hash: str) -> Dict:
     return dict(zip(range(1, bet_length + 1), bets))
 
 
-def bets_url_value(bets_indices: Tuple[Tuple[int, ...], ...]) -> str:
+def bets_hash_value(bets_indices: Sequence[Sequence[ValidIndex]]) -> str:
+    """:class:`str`: Returns a hash for the bets indices provided.
+
+    Parameters
+    -----------
+    bets_indices: Sequence[Sequence[:class:`ValidIndex`]]
+        A sequence of integers from 0 to 4 to represent a bet.
+    """
     flat = itertools.chain.from_iterable(bets_indices)
     return "".join(
         ascii_lowercase[multiplier * 5 + adder]
@@ -195,7 +278,6 @@ def bets_url_value(bets_indices: Tuple[Tuple[int, ...], ...]) -> str:
 def make_probabilities(
     opening_odds: Sequence[Sequence[ValidOdds]],
 ) -> List[List[float]]:
-    # TODO: look into numba-fying, so far any attempts have been *SLOWER*
 
     _min = [
         [1.0, 0.0, 0.0, 0.0, 0.0],
@@ -305,7 +387,7 @@ def make_probabilities(
 
 
 def get_bet_odds_from_bets(
-    bets: Tuple[Tuple[ValidIndex, ...], ...],
+    bets: Sequence[Sequence[ValidIndex, ...], ...],
     bet_odds: Sequence[ValidOdds],
     probabilities: Sequence[Sequence[float]],
 ) -> List[BetOdds]:

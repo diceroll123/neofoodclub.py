@@ -19,7 +19,7 @@ ValidIndex = Literal[0, 1, 2, 3, 4]
 # fmt: on
 
 
-class OddsChange(TypedDict):
+class OddsChangeDict(TypedDict):
     arena: ValidIndex
     pirate: PirateID
     old: ValidOdds
@@ -32,7 +32,7 @@ class RoundData(TypedDict, total=False):
     openingOdds: List[List[ValidOdds]]
     currentOdds: List[List[ValidOdds]]
     customOdds: List[List[ValidOdds]]  # this is used internally ONLY
-    changes: List[OddsChange]
+    changes: List[OddsChangeDict]
     round: int
     start: str
     timestamp: str
