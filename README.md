@@ -3,7 +3,6 @@ A Python implementation of functionality used in https://neofood.club
 
 Notes:
 - *For the time being*, there are no front-facing docs for this beyond docstrings in the code itself 
-    - most of which do not exist yet
 
 ## Installing
 **Python 3.7 or higher is suggested**
