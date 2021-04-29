@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import functools
 import json
 import re
 import urllib.parse
@@ -44,6 +45,19 @@ __all__ = (
     "Odds",
     "NEO_FC_REGEX",
 )
+
+
+def _require_cache(func):
+    # for internal use only.
+    # if the NFC object has no cache, it will after this runs.
+
+    @functools.wraps(func)
+    def wrapper(self: NeoFoodClub, *args, **kwargs):
+        if self._data_dict is None:
+            self.reset()
+        return func(self, *args, **kwargs)
+
+    return wrapper
 
 
 class OddsChange:
@@ -571,6 +585,7 @@ class BetMixin:
             return 15
         return 10
 
+    @_require_cache
     def _max_ter_indices(self) -> np.ndarray:
         # use net expected only if needed
         if self._modifier.general or self._net_expected_cache is None:
@@ -578,32 +593,38 @@ class BetMixin:
         else:
             return self._net_expected_cache
 
+    @_require_cache
     def make_max_ter_bets(self) -> Bets:
         """:class:`Bets`: Creates a Bets object that consists of the highest ERs."""
         return Bets._from_generator(
             indices=np.argsort(self._max_ter_indices()), nfc=self
         )
 
+    @_require_cache
     def _crazy_bets_indices(self) -> np.ndarray:
         return np.random.choice(
             NFCMath.FULL_BETS, size=self.max_amount_of_bets, replace=False
         )
 
+    @_require_cache
     def make_crazy_bets(self) -> Bets:
         """:class:`Bets`: Creates a Bets object that consists of randomly-selected, full-arena bets.
 
         These bets are not for the faint of heart."""
         return Bets._from_generator(indices=self._crazy_bets_indices(), nfc=self)
 
+    @_require_cache
     def _random_indices(self) -> np.ndarray:
         return np.random.choice(3124, size=self.max_amount_of_bets, replace=False)
 
+    @_require_cache
     def make_random_bets(self) -> Bets:
         """:class:`Bets`: Creates a Bets object that consists of randomly-selected bets.
 
         These bets are not for the faint of heart."""
         return Bets._from_generator(indices=self._random_indices(), nfc=self)
 
+    @_require_cache
     def _gambit_indices(
         self, *, five_bet: Optional[int] = None, random: bool = False
     ) -> np.ndarray:
@@ -633,6 +654,7 @@ class BetMixin:
         pirate_bin = self._data_dict["bins"][NFCMath.FULL_BETS[highest_er]]
         return self._gambit_indices(five_bet=pirate_bin.astype(int))
 
+    @_require_cache
     def make_gambit_bets(
         self, *, five_bet: Optional[int] = None, random: bool = False
     ) -> Bets:
@@ -642,6 +664,7 @@ class BetMixin:
             indices=self._gambit_indices(five_bet=five_bet, random=random), nfc=self
         )
 
+    @_require_cache
     def _tenbet_indices(self, pirate_binary: int) -> np.ndarray:
         bins = self._data_dict["bins"].astype(int)
         possible_indices = np.where(bins & pirate_binary == pirate_binary)[0]
@@ -656,6 +679,7 @@ class BetMixin:
 
         return possible_indices[sorted_odds]
 
+    @_require_cache
     def make_tenbet_bets(self, pirate_binary: int) -> Bets:
         """:class:`Bets`: Creates a Bets object that consists of the highest Expected Ratio -- or Net Expected -- bets
         that include between 1 and 3 selected pirates.
@@ -673,11 +697,13 @@ class BetMixin:
             indices=self._tenbet_indices(pirate_binary), nfc=self
         )
 
+    @_require_cache
     def _unit_indices(self, units: int) -> np.ndarray:
         sorted_std = np.argsort(self._data_dict["std"], kind="mergesort", axis=0)
         possible_indices = np.where(self._data_dict["odds"][sorted_std] >= units)[0]
         return sorted_std[possible_indices]
 
+    @_require_cache
     def make_units_bets(self, units: int) -> Bets:
         """:class:`Bets`: Creates a Bets object that consists of the highest STD probability that are greater than or
         equal to the units value.
@@ -685,6 +711,7 @@ class BetMixin:
         This CAN return an empty Bets object."""
         return Bets._from_generator(indices=self._unit_indices(units), nfc=self)
 
+    @_require_cache
     def make_bustproof_bets(self) -> Optional[Bets]:
         """Optional[:class:`Bets`]: Creates a Bets object that consists of the bets made in such a way that with a given bet
         amount, you will not bust.
@@ -739,12 +766,14 @@ class BetMixin:
         return bets
 
     # bet decoding methods
+    @_require_cache
     def make_bets_from_indices(self, indices: Sequence[Sequence[ValidIndex]]) -> Bets:
         """:class:`Bets`: Creates a Bets object made up of arena indices."""
         return Bets._from_binary(
             *NFCMath.bets_indices_to_bet_binaries(indices), nfc=self
         )
 
+    @_require_cache
     def make_bets_from_hash(
         self, bets_hash: str, amounts_hash: Optional[str] = None
     ) -> Bets:
@@ -759,6 +788,7 @@ class BetMixin:
 
         return bets
 
+    @_require_cache
     def make_bets_from_binaries(self, *binaries: int) -> Bets:
         """:class:`Bets`: Creates a Bets object made up of bet-compatible binary numbers."""
         return Bets._from_binary(*binaries, nfc=self)
@@ -808,9 +838,12 @@ class NeoFoodClub(BetMixin):
         self._modifier = modifier
         self._modifier.nfc = self
 
-        self.reset()
+        self.soft_reset()
 
     def _add_custom_odds(self):
+        if self._modifier.custom_odds is None:
+            return
+
         for k1, a in enumerate(self._data["pirates"]):
             for k2, p in enumerate(a):
                 # custom, user-added odds
@@ -828,9 +861,8 @@ class NeoFoodClub(BetMixin):
                     change.pirate_index
                 ] = change.new
 
-    def reset(self):
-        """Recalculates the odds used to create bets with."""
-        # start with the desired odds
+    def soft_reset(self):
+        """Resets the custom odds used internally."""
         key = "openingOdds" if self._modifier.opening_odds else "currentOdds"
         self._data["customOdds"] = json.loads(json.dumps(self._data[key]))
 
@@ -838,6 +870,10 @@ class NeoFoodClub(BetMixin):
             self._do_snapshot()
 
         self._add_custom_odds()
+
+    def reset(self):
+        """Recalculates the odds used to create bets with."""
+        self.soft_reset()
 
         self._cache_dicts()
 
@@ -1057,15 +1093,18 @@ class NeoFoodClub(BetMixin):
         ]
         return list(sorted(changed, key=lambda oc: oc.timestamp))
 
+    @_require_cache
     def _get_winning_bet_indices(self, bets: Bets) -> np.ndarray:
         bet_bins = self._data_dict["bins"][bets._indices].astype(int)
         winning_bet_indices = np.where(bet_bins & self.winners_binary == bet_bins)[0]
         return bets._indices[winning_bet_indices]
 
+    @_require_cache
     def _get_winning_odds(self, bets: Bets) -> np.ndarray:
         winning_bet_bins = self._get_winning_bet_indices(bets)
         return self._data_dict["odds"][winning_bet_bins]
 
+    @_require_cache
     def get_win_units(self, bets: Bets) -> int:
         """Returns the amount of units that won, given the provided bets.
 
@@ -1076,6 +1115,7 @@ class NeoFoodClub(BetMixin):
         """
         return np.sum(self._get_winning_odds(bets)).astype(int)
 
+    @_require_cache
     def get_win_np(self, bets: Bets, use_bet_amount_if_none: bool = True) -> int:
         """Returns the amount of neopoints that won, given the provided bets.
         If the bets object has no bet amounts, you can opt to use the NeoFoodClub object's bet amount.
