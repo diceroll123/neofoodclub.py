@@ -1151,13 +1151,16 @@ class NeoFoodClub(BetMixin):
 
         return np.sum(np.clip(winnings[mask], 0, 1_000_000)).astype(int)
 
-    def make_url(self, bets: Optional[Bets] = None) -> str:
-        """:class:`str`: Returns a fully-loaded NeoFoodClub URL to describe the provided bets.
+    def make_url(self, bets: Optional[Bets] = None, all_data: bool = False) -> str:
+        """:class:`str`: Returns an optionally-fully-loaded NeoFoodClub URL to describe the provided bets.
 
         Parameters
         -----------
         bets: :class:`Bets`
             The bets you'd like to make the URL for.
+        all_data: :class:`bool`
+            Whether or not you want the url with all pirates, odds, etc. included. Usually, this is not necessary.
+            Default = False.
         """
 
         def encode(int_lists) -> str:
@@ -1168,29 +1171,29 @@ class NeoFoodClub(BetMixin):
         url = (
             "https://foodclub.neocities.org/"
             + ("15/" if use_15 else "")
-            + "#round="
-            + str(self.round)
-            + "&pirates="
-            + encode(self.pirates)
-            + "&openingOdds="
-            + encode(self.opening_odds)
-            + "&currentOdds="
-            + encode(self.current_odds)
+            + f"#round={self.round}"
         )
 
-        if self.foods is not None:
-            url += "&foods=" + encode(self.foods)
+        if all_data:
+            params = [
+                ("pirates", encode(self.pirates)),
+                ("openingOdds", encode(self.opening_odds)),
+                ("currentOdds", encode(self.current_odds)),
+            ]
 
-        if self.is_over:
-            url += "&winners=" + encode(self.winners)
+            if self.foods is not None:
+                params.append(("foods", encode(self.foods)))
 
-        if self.timestamp:
-            url += (
-                "&timestamp="
-                + self.timestamp.replace(
+            if self.is_over:
+                params.append(("winners", encode(self.winners)))
+
+            if self.timestamp:
+                timestamp = self.timestamp.replace(
                     microsecond=0, tzinfo=datetime.timezone.utc
                 ).isoformat()
-            )
+                params.append(("timestamp", timestamp))
+
+            url += "".join([f"&{k}={v}" for k, v in params])
 
         if bets:
             url += "&b=" + bets.bets_hash
