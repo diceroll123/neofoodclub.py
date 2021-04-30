@@ -915,7 +915,10 @@ class NeoFoodClub(BetMixin):
     def bet_amount(self, val: Optional[int]):
         if val != self._bet_amount:
             self._bet_amount = val
-            self._cache_bet_amount_dicts()
+            if self._data_dict is not None:
+                self._cache_bet_amount_dicts()
+            else:
+                self._cache_dicts()
 
     @property
     def modifier(self) -> Optional[Modifier]:
