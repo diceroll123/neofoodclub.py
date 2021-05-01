@@ -955,9 +955,9 @@ class NeoFoodClub(BetMixin):
             return False
 
         return (
-            self._modifier.custom_odds is not None
-            or self._modifier.time is not None
-            or self._modifier.opening_odds is not None
+            self._modifier.custom_odds is None
+            and self._modifier.time is None
+            and self._modifier.opening_odds is None
         )
 
     def with_modifier(self, modifier: Optional[Modifier] = None):
