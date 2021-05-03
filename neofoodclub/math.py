@@ -225,7 +225,7 @@ def bets_indices_to_bet_binaries(
     Parameters
     -----------
     bets_indices: Sequence[Sequence[:class:`ValidIndex`]]
-        A sequence of integers from 0 to 4 to represent a bet.
+        A sequence of a sequence of integers from 0 to 4 to represent a bet.
     """
     return tuple(pirates_binary(tuple(indices)) for indices in bets_indices)
 
@@ -266,7 +266,7 @@ def bets_hash_value(bets_indices: Sequence[Sequence[ValidIndex]]) -> str:
     Parameters
     -----------
     bets_indices: Sequence[Sequence[:class:`ValidIndex`]]
-        A sequence of integers from 0 to 4 to represent a bet.
+        A sequence of a sequence of integers from 0 to 4 to represent a bet.
     """
     flat = itertools.chain.from_iterable(bets_indices)
     return "".join(
