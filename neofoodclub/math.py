@@ -104,7 +104,7 @@ def binary_to_indices_numba(bet_binary: int) -> List[int]:
     # thanks @mikeshardmind
     # the inverse of pirates_binary
     ret = [1 for _ in range(0)]
-    for mask in (0xF0000, 0xF000, 0xF00, 0xF0, 0xF):
+    for mask in BIT_MASKS:
         val = mask & bet_binary
         if val:
             # bit length intentionally offset here
