@@ -1,9 +1,13 @@
 from setuptools import setup
 import contextlib
+import re
 
-import neofoodclub
+version = ''
+with open('neofoodclub/__init__.py') as f:
+    version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE).group(1)
 
-version = neofoodclub.__version__
+if not version:
+    raise RuntimeError('version is not set')
 
 if version.endswith(("a", "b", "rc")):
     # append version identifier based on commit count
