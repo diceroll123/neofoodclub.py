@@ -301,8 +301,8 @@ class Modifier:
         )
 
     @property
-    def nfc(self) -> NeoFoodClub:
-        """:class:`NeoFoodClub`: The NeoFoodClub round that this modifier is connected to."""
+    def nfc(self) -> Optional[NeoFoodClub]:
+        """:class:`NeoFoodClub`: The NeoFoodClub round that this modifier is connected to. Can be None if not set yet."""
         return self._nfc
 
     @nfc.setter
@@ -469,8 +469,8 @@ class Bets:
         self._bet_amounts = utils.fix_bet_amounts(amts)
 
     @property
-    def indices(self) -> Tuple[Tuple[int, ...], ...]:
-        """Tuple[Tuple[int, ...], ...]: Returns a nested array of the indices of the pirates in their arenas
+    def indices(self) -> Tuple[Tuple[ValidIndex, ...], ...]:
+        """Tuple[Tuple[:class:`ValidIndex`, ...], ...]: Returns a nested array of the indices of the pirates in their arenas
         making up these bets."""
         return tuple(
             NFCMath.binary_to_indices(binary)
