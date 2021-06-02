@@ -53,7 +53,7 @@ def _require_cache(func):
 
     @functools.wraps(func)
     def wrapper(self: NeoFoodClub, *args, **kwargs):
-        if self._data_dict is None:
+        if self._data_dict is None or self._stds is None:
             self.reset()
         return func(self, *args, **kwargs)
 
@@ -806,6 +806,9 @@ class NeoFoodClub(BetMixin):
         An integer representing a bet amount to be used for generating bets.
     modifier: Optional[:class:`Modifier`]
         The desired modifier for generating bets.
+    cache: :class:`bool`
+        Whether or not to instantly calculate and cache the round's data.
+        Turning this off is useful for when you're just analyzing data and not generating bets.
     """
 
     __slots__ = (
@@ -824,6 +827,7 @@ class NeoFoodClub(BetMixin):
         *,
         bet_amount: Optional[int] = None,
         modifier: Optional[Modifier] = None,
+        cache: bool = True,
     ):
         # so it's not changing old cache data around, have a deep copy (safety precaution for custom odds)
         self._data = json.loads(json.dumps(data))
@@ -831,14 +835,17 @@ class NeoFoodClub(BetMixin):
         self._data_dict = None
         self._maxbet_odds_cache = None
         self._net_expected_cache = None
-        self._stds = NFCMath.make_probabilities(self._data["openingOdds"])
+        self._stds = None
 
         if modifier is None:
             modifier = Modifier()
         self._modifier = modifier
         self._modifier.nfc = self
 
-        self.soft_reset()
+        if cache:
+            self.reset()
+        else:
+            self.soft_reset()
 
     def _add_custom_odds(self):
         if self._modifier.custom_odds is None:
@@ -891,6 +898,7 @@ class NeoFoodClub(BetMixin):
             self._net_expected_cache = mb_copy * self._data_dict["ers"] - mb_copy
 
     def _cache_dicts(self):
+        self._stds = NFCMath.make_probabilities(self._data["openingOdds"])
         # most of the binary/odds/std data sits here
         self._data_dict = NFCMath.make_round_dicts(
             tuple(tuple(row) for row in self._stds),

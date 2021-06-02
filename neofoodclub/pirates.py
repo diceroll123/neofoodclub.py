@@ -101,8 +101,12 @@ class Pirate(PirateMixin):
         self._index = index
         self._odds: int = nfc._data["customOdds"][arena][index]
         self._opening_odds: int = nfc._data["openingOdds"][arena][index]
-        self._std: float = nfc._stds[arena][index]
-        self._er: float = self.std * self.odds
+        if nfc._stds:
+            self._std: float = nfc._stds[arena][index]
+            self._er: float = self.std * self.odds
+        else:
+            self._std = None
+            self._er = None
         self._fa = None
 
         if "foods" in nfc._data:
@@ -125,8 +129,8 @@ class Pirate(PirateMixin):
         return self._index
 
     @property
-    def std(self) -> float:
-        """:class:`float`: The pirate's std probability."""
+    def std(self) -> Optional[float]:
+        """Optional[:class:`float`]: The pirate's std probability. If this is None, the NeoFoodClub object has not been cached yet."""
         return self._std
 
     @property
@@ -135,8 +139,8 @@ class Pirate(PirateMixin):
         return self._odds
 
     @property
-    def er(self) -> float:
-        """:class:`float`: The pirate's expected ratio. This is equal to std * odds."""
+    def er(self) -> Optional[float]:
+        """Optional[:class:`float`]: The pirate's expected ratio. This is equal to std * odds. If this is None, the NeoFoodClub object has not been cached yet."""
         return self._er
 
     @property
