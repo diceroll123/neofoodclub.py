@@ -1177,9 +1177,7 @@ class NeoFoodClub(BetMixin):
         use_15 = bets and 10 < len(bets) <= 15 or self._modifier._cc_perk
 
         url = (
-            "https://foodclub.neocities.org/"
-            + ("15/" if use_15 else "")
-            + f"#round={self.round}"
+            "https://neofood.club/" + ("15/" if use_15 else "") + f"#round={self.round}"
         )
 
         if all_data:
