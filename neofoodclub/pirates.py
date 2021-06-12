@@ -40,6 +40,8 @@ PIRATE_NAMES = {
 
 
 class PirateMixin:
+    id: int
+
     @property
     def name(self):
         return PIRATE_NAMES[self.id]
@@ -102,8 +104,8 @@ class Pirate(PirateMixin):
         self._odds: int = nfc._data["customOdds"][arena][index]
         self._opening_odds: int = nfc._data["openingOdds"][arena][index]
         if nfc._stds:
-            self._std: float = nfc._stds[arena][index]
-            self._er: float = self.std * self.odds
+            self._std = nfc._stds[arena][index]
+            self._er = self.std * self.odds
         else:
             self._std = None
             self._er = None

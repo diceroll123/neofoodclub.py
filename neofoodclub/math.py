@@ -142,7 +142,7 @@ def bet_amounts_to_amounts_hash(bet_amounts: Dict[int, int]) -> str:
         A dict of bet amounts where the key is the index and the value is the bet amount.
     """
     letters = ""
-    for idx, value in bet_amounts.items():
+    for _, value in bet_amounts.items():
         e = ""
         letter = int(value) % BET_AMOUNT_MAX + BET_AMOUNT_MAX
         for _ in range(3):
@@ -387,7 +387,7 @@ def make_probabilities(
 
 
 def get_bet_odds_from_bets(
-    bets: Sequence[Sequence[ValidIndex, ...], ...],
+    bets: Sequence[Sequence[ValidIndex]],
     bet_odds: Sequence[ValidOdds],
     probabilities: Sequence[Sequence[float]],
 ) -> List[BetOdds]:

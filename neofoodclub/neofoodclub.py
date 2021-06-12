@@ -6,11 +6,11 @@ import json
 import re
 import urllib.parse
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple, Union
 
 import dateutil
+import dateutil.parser
 import numpy as np
-from dateutil.parser import parse
 from dateutil.tz import UTC, tzutc
 
 import neofoodclub.math as NFCMath
@@ -363,7 +363,7 @@ class Odds:
         self._odds = [
             Chance(**chance)
             for chance in NFCMath.get_bet_odds_from_bets(
-                bets.indices, self._odds_values, bets.nfc._stds
+                bets.indices, self._odds_values, bets.nfc._stds  # type: ignore
             )
         ]
         self.best = self._odds[-1]  # highest odds
@@ -453,7 +453,7 @@ class Bets:
         return None
 
     @bet_amounts.setter
-    def bet_amounts(self, val: Optional[Sequence[int]]):
+    def bet_amounts(self, val: Optional[Union[Sequence[int], np.ndarray]]):
         if val is None:
             self._bet_amounts = None
             return
@@ -480,7 +480,7 @@ class Bets:
     @property
     def bets_hash(self) -> str:
         """:class:`str`: Returns a NeoFoodClub-compatible encoded hash of bet indices."""
-        return NFCMath.bets_hash_value(self.indices)
+        return NFCMath.bets_hash_value(self.indices)  # type: ignore
 
     @property
     def amounts_hash(self) -> str:

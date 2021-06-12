@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Optional, Sequence
+from typing import TYPE_CHECKING, List, Sequence
 
 import neofoodclub.math as NFCMath
 
@@ -82,11 +82,8 @@ class Arena:
         """:class:`bool`: Returns whether or not `Arena.odds` is less than 1."""
         return not self.positive
 
-    def __getitem__(self, item: ValidIndex) -> Optional[Pirate]:
-        try:
-            return self._pirates[item]
-        except KeyError:
-            return None
+    def __getitem__(self, item: ValidIndex) -> Pirate:
+        return self._pirates[item]
 
     def __iter__(self):
         return self._pirates.__iter__()
@@ -108,7 +105,7 @@ class Arenas:
             for idx, a in enumerate(nfc._data["pirates"])
         ]
 
-    def get_pirate_by_id(self, pirate_id: PirateID) -> Pirate:
+    def get_pirate_by_id(self, pirate_id: PirateID) -> Pirate:  # type: ignore
         """:class:`Pirate`: Returns a single pirate where their ID matches pirate_id."""
         for p in self.all_pirates:
             if p.id == pirate_id:
@@ -130,7 +127,7 @@ class Arenas:
     def get_pirates_from_binary(self, binary: int) -> List[Pirate]:
         """List[:class:`Pirate`]: Return a list of pirates based on their bet-binary representation."""
         return [
-            self._arenas[arena][index - 1]
+            self._arenas[arena][index - 1]  # type: ignore
             for arena, index in enumerate(NFCMath.binary_to_indices(binary))
             if index > 0
         ]
