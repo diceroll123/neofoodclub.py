@@ -29,7 +29,7 @@ class Arena:
         "_id",
     )
 
-    def __init__(self, *, nfc: NeoFoodClub, arena_id: int, pirate_ids: Sequence[int]):
+    def __init__(self, *, nfc: NeoFoodClub, arena_id: ValidIndex, pirate_ids: Sequence[PirateID]):
         self._id = arena_id
         self._pirates = [  # adding 1 to index because the original list has a length of 4, but everything else has 5
             Pirate(nfc=nfc, id=p_id, arena=arena_id, index=idx + 1)
@@ -101,7 +101,7 @@ class Arenas:
 
     def __init__(self, nfc: NeoFoodClub):
         self._arenas = [
-            Arena(nfc=nfc, arena_id=idx, pirate_ids=a)
+            Arena(nfc=nfc, arena_id=idx, pirate_ids=a)  # type: ignore
             for idx, a in enumerate(nfc._data["pirates"])
         ]
 
