@@ -1028,7 +1028,7 @@ class NeoFoodClub(BetMixin):
         """Optional[datetime.datetime]: When the round started in UTC, if applicable."""
         start = self._data.get("start")
         if start:
-            return parse(start).astimezone(UTC)
+            return dateutil.parser.parse(start).astimezone(UTC)
         return None
 
     @property
@@ -1036,7 +1036,7 @@ class NeoFoodClub(BetMixin):
         """Optional[datetime.datetime]: When the round data was last updated in UTC, if applicable."""
         timestamp = self._data.get("timestamp")
         if timestamp:
-            return parse(timestamp).astimezone(UTC)
+            return dateutil.parser.parse(timestamp).astimezone(UTC)
         return None
 
     def _get_round_time(self, t: datetime.time) -> Optional[datetime.datetime]:
