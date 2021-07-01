@@ -87,6 +87,7 @@ class Pirate(PirateMixin):
     """
 
     __slots__ = (
+        "nfc",
         "_id",
         "_arena",
         "_index",
@@ -98,6 +99,7 @@ class Pirate(PirateMixin):
     )
 
     def __init__(self, *, nfc: NeoFoodClub, id: int, arena: int, index: int):
+        self.nfc = nfc
         self._id = id
         self._arena = arena
         self._index = index
@@ -174,7 +176,7 @@ class Pirate(PirateMixin):
             ("odds", self.odds),
             ("fa", self.fa),
             ("opening_odds", self.opening_odds),
-            ("int", hex(self.binary)),
+            ("binary", self.binary),
         ]
         joined = " ".join("%s=%r" % t for t in attrs)
         return f"<Pirate {joined}>"

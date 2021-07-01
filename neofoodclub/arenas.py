@@ -25,11 +25,15 @@ class Arena:
     """
 
     __slots__ = (
+        "nfc",
         "_pirates",
         "_id",
     )
 
-    def __init__(self, *, nfc: NeoFoodClub, arena_id: ValidIndex, pirate_ids: Sequence[PirateID]):
+    def __init__(
+        self, *, nfc: NeoFoodClub, arena_id: ValidIndex, pirate_ids: Sequence[PirateID]
+    ):
+        self.nfc = nfc
         self._id = arena_id
         self._pirates = [  # adding 1 to index because the original list has a length of 4, but everything else has 5
             Pirate(nfc=nfc, id=p_id, arena=arena_id, index=idx + 1)
