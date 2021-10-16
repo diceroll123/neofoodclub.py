@@ -162,6 +162,32 @@ class Pirate(PirateMixin):
         """:class:`int`: The pirate's bet-binary representation."""
         return NFCMath.pirate_binary(self._index, self._arena)
 
+    @property
+    def positive_foods(self) -> List[int]:
+        """Returns a list of the positive Food IDs for this pirate's arena that affect this pirate."""
+        if "foods" in self.nfc._data:  # type: ignore
+            foods: List[int] = self.nfc._data["foods"][self._arena]  # type: ignore
+            ret: List[int] = []
+            for f in foods:
+                if POSITIVE_FOOD[self._id][f] != 0:
+                    ret.append(f)
+            return ret
+
+        return []
+
+    @property
+    def negative_foods(self) -> List[int]:
+        """Returns a list of the negative Food IDs for this pirate's arena that affect this pirate."""
+        if "foods" in self.nfc._data:  # type: ignore
+            foods: List[int] = self.nfc._data["foods"][self._arena]  # type: ignore
+            ret: List[int] = []
+            for f in foods:
+                if NEGATIVE_FOOD[self._id][f] != 0:
+                    ret.append(f)
+            return ret
+
+        return []
+
     def __int__(self) -> int:
         return NFCMath.pirate_binary(self._index, self._arena)
 
