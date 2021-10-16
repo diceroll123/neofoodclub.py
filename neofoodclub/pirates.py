@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Any, List, Optional
 
 import neofoodclub.math as NFCMath
 
@@ -68,7 +68,7 @@ class PartialPirate(PirateMixin):
         self._id = _id
 
     @property
-    def id(self) -> int:
+    def id(self) -> int:  # type: ignore
         return self._id
 
     def __repr__(self):
@@ -103,22 +103,22 @@ class Pirate(PirateMixin):
         self._id = id
         self._arena = arena
         self._index = index
-        self._odds: int = nfc._data["customOdds"][arena][index]
-        self._opening_odds: int = nfc._data["openingOdds"][arena][index]
-        if nfc._stds:
-            self._std = nfc._stds[arena][index]
-            self._er = self.std * self.odds
+        self._odds: int = nfc._data["customOdds"][arena][index]  # type: ignore
+        self._opening_odds: int = nfc._data["openingOdds"][arena][index]  # type: ignore
+        if nfc._stds:  # type: ignore
+            self._std = nfc._stds[arena][index]  # type: ignore
+            self._er = self._std * self.odds
         else:
             self._std = None
             self._er = None
         self._fa = None
 
-        if "foods" in nfc._data:
-            foods = nfc._data["foods"][arena]
+        if "foods" in nfc._data:  # type: ignore
+            foods = nfc._data["foods"][arena]  # type: ignore
             self._fa = sum(-NEGATIVE_FOOD[id][f] + POSITIVE_FOOD[id][f] for f in foods)
 
     @property
-    def id(self) -> int:
+    def id(self) -> int:  # type: ignore
         """:class:`int`: The pirate's ID."""
         return self._id
 
@@ -162,10 +162,10 @@ class Pirate(PirateMixin):
         """:class:`int`: The pirate's bet-binary representation."""
         return NFCMath.pirate_binary(self._index, self._arena)
 
-    def __int__(self):
+    def __int__(self) -> int:
         return NFCMath.pirate_binary(self._index, self._arena)
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         return isinstance(other, self.__class__) and int(self) == int(other)
 
     def __repr__(self):

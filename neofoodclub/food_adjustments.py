@@ -1,22 +1,31 @@
 from collections import defaultdict
-from typing import Dict, Optional, Tuple
+from typing import TYPE_CHECKING, DefaultDict, Dict, Optional, Tuple
 
 
 # this is just a convoluted way of pre-allocating food adjustment values
-class FA(defaultdict):
+class FA(DefaultDict[int, int]):
     def __new__(
         cls,
         *,
         one: Optional[Tuple[int, ...]] = None,
         two: Optional[Tuple[int, ...]] = None
     ):
-        data = {}
+        data: Dict[int, int] = {}
 
         for fa_value, values in zip((1, 2), (one, two)):
             for food_id in values or ():
                 data[food_id] = fa_value
 
         return defaultdict(int, data)
+
+    if TYPE_CHECKING:
+        def __init__(
+            self,
+            *,
+            one: Optional[Tuple[int, ...]] = None,
+            two: Optional[Tuple[int, ...]] = None
+        ):
+            pass
 
 
 # the keys are the pirate IDs

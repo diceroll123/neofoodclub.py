@@ -106,7 +106,7 @@ class Arenas:
     def __init__(self, nfc: NeoFoodClub):
         self._arenas = [
             Arena(nfc=nfc, arena_id=idx, pirate_ids=a)  # type: ignore
-            for idx, a in enumerate(nfc._data["pirates"])
+            for idx, a in enumerate(nfc._data["pirates"])  # type: ignore
         ]
 
     def get_pirate_by_id(self, pirate_id: PirateID) -> Pirate:  # type: ignore
@@ -122,7 +122,7 @@ class Arenas:
     @property
     def all_pirates(self) -> List[Pirate]:
         """List[:class:`Pirate`]: Returns a flat list of all pirates in arena-order."""
-        pirates = []
+        pirates: List[Pirate] = []
         for a in self._arenas:
             for p in a.pirates:
                 pirates.append(p)
