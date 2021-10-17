@@ -28,7 +28,7 @@ if TYPE_CHECKING:
         ValidOdds,
     )
 
-    from .arenas import Arenas
+    from .arenas import Arena, Arenas
     from .pirates import PartialPirate, Pirate
 
 NEO_FC_REGEX = re.compile(
@@ -906,6 +906,14 @@ class NeoFoodClub(BetMixin):
         )
 
         self._cache_bet_amount_dicts()
+
+    def get_arena(self, arena_id: ValidIndex) -> Arena:
+        """:class:Arena: Returns the desired Arena object."""
+        from .arenas import Arena  # to prevent circular imports
+
+        return Arena(
+            nfc=self, arena_id=arena_id, pirate_ids=self._data["pirates"][arena_id]
+        )
 
     @property
     def arenas(self) -> Arenas:

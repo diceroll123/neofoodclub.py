@@ -158,6 +158,12 @@ class Arenas:
         """List[:class:`Arena`]: Returns a list of positive arenas sorted from least to greatest odds."""
         return sorted([a for a in self._arenas if a.positive], key=lambda _a: _a._odds)  # type: ignore
 
+    def get_arena(self, arena_id: ValidIndex) -> Arena:
+        return self._arenas[arena_id]
+
+    def __getitem__(self, key: int) -> Arena:
+        return self._arenas[key]
+
     def __iter__(self):
         yield from self._arenas
 
