@@ -88,6 +88,14 @@ class Arena:
         """:class:`bool`: Returns whether or not `Arena.odds` is less than 1."""
         return not self.positive
 
+    @property
+    def foods(self) -> List[int]:
+        """List[:class:`int`]: Returns a list of the IDs of the foods in this arena, where applicable."""
+        foods = self.nfc.foods
+        if foods:
+            return foods[self._id]
+        return []
+
     def __getitem__(self, item: ValidIndex) -> Pirate:
         return self._pirates[item]
 
