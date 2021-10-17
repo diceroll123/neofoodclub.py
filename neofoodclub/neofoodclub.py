@@ -1177,7 +1177,7 @@ class NeoFoodClub(BetMixin):
             Default = False.
         """
 
-        def encode(int_lists) -> str:
+        def encode(int_lists: List[List[int]]) -> str:
             return json.dumps(int_lists, separators=(",", ":"))
 
         use_15 = bets and 10 < len(bets) <= 15 or self._modifier._cc_perk

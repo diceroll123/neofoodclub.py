@@ -107,7 +107,7 @@ class Pirate(PirateMixin):
         self._opening_odds: int = nfc._data["openingOdds"][arena][index]  # type: ignore
         if nfc._stds:  # type: ignore
             self._std = nfc._stds[arena][index]  # type: ignore
-            self._er = self._std * self.odds
+            self._er = self._std * self._odds
         else:
             self._std = None
             self._er = None
@@ -164,28 +164,18 @@ class Pirate(PirateMixin):
 
     @property
     def positive_foods(self) -> List[int]:
-        """Returns a list of the positive Food IDs for this pirate's arena that affect this pirate."""
-        if "foods" in self.nfc._data:  # type: ignore
-            foods: List[int] = self.nfc._data["foods"][self._arena]  # type: ignore
-            ret: List[int] = []
-            for f in foods:
-                if POSITIVE_FOOD[self._id][f] != 0:
-                    ret.append(f)
-            return ret
-
+        """List[:class:`int`]: Returns a list of the positive Food IDs for this pirate's arena that affect this pirate, where applicable."""
+        foods = self.nfc.foods
+        if foods:
+            return [f for f in foods[self._arena] if POSITIVE_FOOD[self._id][f] != 0]
         return []
 
     @property
     def negative_foods(self) -> List[int]:
-        """Returns a list of the negative Food IDs for this pirate's arena that affect this pirate."""
-        if "foods" in self.nfc._data:  # type: ignore
-            foods: List[int] = self.nfc._data["foods"][self._arena]  # type: ignore
-            ret: List[int] = []
-            for f in foods:
-                if NEGATIVE_FOOD[self._id][f] != 0:
-                    ret.append(f)
-            return ret
-
+        """List[:class:`int`]: Returns a list of the negative Food IDs for this pirate's arena that affect this pirate, where applicable."""
+        foods = self.nfc.foods
+        if foods:
+            return [f for f in foods[self._arena] if NEGATIVE_FOOD[self._id][f] != 0]
         return []
 
     def __int__(self) -> int:
