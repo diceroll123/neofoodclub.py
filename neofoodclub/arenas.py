@@ -28,6 +28,7 @@ class Arena:
         "nfc",
         "_pirates",
         "_id",
+        "_odds",
     )
 
     def __init__(
@@ -39,6 +40,7 @@ class Arena:
             Pirate(nfc=nfc, id=p_id, arena=arena_id, index=idx + 1)
             for idx, p_id in enumerate(pirate_ids)
         ]
+        self._odds = sum(1 / p._odds for p in self._pirates)  # type: ignore
 
     @property
     def id(self) -> int:
@@ -53,7 +55,7 @@ class Arena:
     @property
     def best(self) -> List[Pirate]:
         """List[:class:`Pirate`]: Returns a list of the pirates in this arena sorted from least to greatest odds."""
-        return sorted(self._pirates, key=lambda a: a.odds)
+        return sorted(self._pirates, key=lambda a: a._odds)  # type: ignore
 
     @property
     def ids(self) -> List[int]:
@@ -64,12 +66,12 @@ class Arena:
     def odds(self) -> float:
         """:class:`float`: Returns the odds of this arena, which is equal to the sum of (1 / odds) of each pirate."""
         # do note that arena odds are not the same as pirate odds
-        return sum(1 / p.odds for p in self._pirates)
+        return self._odds
 
     @property
     def ratio(self) -> float:
         """:class:`float`: Returns the ratio of this arena, which is `1 / Arena.odds - 1`"""
-        return 1 / self.odds - 1
+        return 1 / self._odds - 1
 
     @property
     def pirates(self) -> List[Pirate]:
@@ -79,7 +81,7 @@ class Arena:
     @property
     def positive(self) -> bool:
         """:class:`bool`: Returns whether or not `Arena.odds` is greater than 1."""
-        return self.odds < 1
+        return self._odds < 1
 
     @property
     def negative(self) -> bool:
@@ -93,7 +95,7 @@ class Arena:
         return self._pirates.__iter__()
 
     def __repr__(self):
-        return f"<Arena name={self.name} odds={self.odds} pirates={self.pirates}>"
+        return f"<Arena name={self.name} odds={self._odds} pirates={self.pirates}>"
 
 
 class Arenas:
@@ -144,7 +146,7 @@ class Arenas:
     @property
     def best(self) -> List[Arena]:
         """List[:class:`Arena`]: Returns a list of the arenas sorted from least to greatest odds."""
-        return sorted(self._arenas, key=lambda a: a.odds)
+        return sorted(self._arenas, key=lambda a: a._odds)  # type: ignore
 
     @property
     def pirate_ids(self) -> List[List[int]]:
@@ -154,7 +156,7 @@ class Arenas:
     @property
     def positives(self) -> List[Arena]:
         """List[:class:`Arena`]: Returns a list of positive arenas sorted from least to greatest odds."""
-        return sorted([a for a in self._arenas if a.positive], key=lambda _a: _a.odds)
+        return sorted([a for a in self._arenas if a.positive], key=lambda _a: _a._odds)  # type: ignore
 
     def __iter__(self):
         yield from self._arenas
