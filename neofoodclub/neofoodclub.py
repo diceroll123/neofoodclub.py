@@ -6,7 +6,17 @@ import json
 import re
 import urllib.parse
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    Generator,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+)
 
 import dateutil
 import dateutil.parser
@@ -561,14 +571,14 @@ class Bets:
 
         return highest_bet_amount < lowest_winning_bet_amount and self.is_bustproof
 
-    def _iterator(self):
+    def _iterator(self) -> Generator[int, None, None]:
         int_bins = self.nfc._data_dict["bins"].astype(int)
         yield from int_bins[self._indices]
 
-    def __iter__(self):
+    def __iter__(self) -> Generator[int, None, None]:
         return self._iterator()
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any):
         return (
             isinstance(other, self.__class__)
             and self.bets_hash == other.bets_hash
@@ -577,11 +587,13 @@ class Bets:
 
 
 class BetMixin:
+    _modifier: Modifier
+
     @property
     def max_amount_of_bets(self) -> int:
         """:class:`int`: Returns the maximum amount of bets that can be generated. Will be 10, unless
         this class' Modifier has the Charity Corner perk attribute set to True, in which case it returns 15."""
-        if self._modifier._cc_perk:
+        if self._modifier._cc_perk:  # type:ignore
             return 15
         return 10
 
