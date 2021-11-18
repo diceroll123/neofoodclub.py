@@ -1,6 +1,8 @@
 # neofoodclub.py
 A Python implementation of functionality used in https://neofood.club
 
+![Tests](https://github.com/diceroll123/neofoodclub.py/actions/workflows/tests.yml/badge.svg)
+
 Notes:
 - *For the time being*, there are no front-facing docs for this beyond docstrings in the code itself 
 

@@ -1,6 +1,8 @@
 import unittest
-from neofoodclub import NeoFoodClub
-from neofoodclub.types import RoundData
+from typing import Tuple
+
+from neofoodclub import NeoFoodClub  # type: ignore
+from neofoodclub.types import RoundData  # type: ignore
 
 # i picked the smallest round I could quickly find
 test_round_data: RoundData = {
@@ -58,7 +60,7 @@ test_round_data: RoundData = {
 }
 
 test_bet_hash = "ltqvqwgimhqtvrnywrwvijwnn"
-test_indices = (
+test_indices: Tuple[Tuple[int, ...], ...] = (
     (2, 1, 3, 4, 3),
     (1, 4, 1, 3, 1),
     (4, 2, 1, 1, 1),
@@ -70,7 +72,7 @@ test_indices = (
     (1, 3, 1, 4, 4),
     (2, 2, 3, 2, 3),
 )
-test_binaries = (
+test_binaries: Tuple[int, ...] = (
     0x48212,
     0x81828,
     0x14888,
@@ -88,7 +90,7 @@ test_expected_results = (test_bet_hash, test_indices, test_binaries)
 test_nfc = NeoFoodClub(test_round_data)
 
 hash_bets = test_nfc.make_bets_from_hash(test_bet_hash)
-indices_bets = test_nfc.make_bets_from_indices(test_indices)
+indices_bets = test_nfc.make_bets_from_indices(test_indices)  # type: ignore
 binaries_bets = test_nfc.make_bets_from_binaries(*test_binaries)
 
 ########################################################################################################################
@@ -117,7 +119,3 @@ class BetDecodingTest(unittest.TestCase):
 class BetEquivalenceTest(unittest.TestCase):
     def test_bet_equivalence(self):
         self.assertTrue(hash_bets == indices_bets and indices_bets == binaries_bets)
-
-
-if __name__ == "__main__":
-    unittest.main()

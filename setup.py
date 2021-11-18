@@ -4,13 +4,15 @@ import re
 from setuptools import setup
 
 version = ""
-with open("neofoodclub/__init__.py") as f:
+with open("src/neofoodclub/__init__.py") as f:
     version = re.search(
         r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE
-    ).group(1)
+    )
 
 if not version:
     raise RuntimeError("version is not set")
+else:
+    version = version.group(1)
 
 if version.endswith(("a", "b", "rc")):
     # append version identifier based on commit count
@@ -34,19 +36,6 @@ if version.endswith(("a", "b", "rc")):
         if out:
             version += "+g" + out.decode("utf-8").strip()
 
-with open("requirements.txt") as f:
-    requirements = f.read().splitlines()
 
-packages = ["neofoodclub", "neofoodclub.types"]
-
-setup(
-    name="neofoodclub.py",
-    author="diceroll123",
-    url="https://github.com/diceroll123/neofoodclub.py",
-    version=version,
-    license="MIT",
-    description="A Python implementation of functionality used in https://neofood.club",
-    python_requires=">=3.7",
-    packages=packages,
-    install_requires=requirements,
-)
+if __name__ == "__main__":
+    setup(version=version)
