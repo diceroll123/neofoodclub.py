@@ -4,7 +4,7 @@ import re
 from setuptools import setup
 
 version = ""
-with open("src/neofoodclub/__init__.py") as f:
+with open("neofoodclub/__init__.py") as f:
     version = re.search(
         r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE
     )
