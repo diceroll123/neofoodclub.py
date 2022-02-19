@@ -523,7 +523,7 @@ class Bets:
         return cls(nfc=nfc, indices=indices)
 
     @classmethod
-    def _from_binary(cls, *bins: int, nfc: NeoFoodClub) -> Bets:
+    def from_binary(cls, *bins: int, nfc: NeoFoodClub) -> Bets:
         # duplicate bins are removed
         int_bins = nfc._data_dict["bins"].astype(int)
         np_bins = np.array(list(dict.fromkeys(bins)))
@@ -736,12 +736,12 @@ class BetMixin:
         if len(positives) == 1:
             # If only one arena is positive, we place 1 bet on each of the pirates of that arena. Total bets = 4.
             best_arena = arenas.best[0]
-            bets = Bets._from_binary(*[p.binary for p in best_arena.pirates], nfc=self)
+            bets = Bets.from_binary(*[p.binary for p in best_arena.pirates], nfc=self)
         elif len(positives) == 2:
             # If two arenas are positive, we place 1 bet on each of the three worst pirates of the best arena and
             # 1 bet on each of the pirates of the second arena + the best pirate of the best arena. Total bets = 7
             best_arena, second_arena = arenas.best[:2]
-            bets = Bets._from_binary(
+            bets = Bets.from_binary(
                 *[p.binary for p in best_arena.best[-3:]],
                 *[p.binary | best_arena.best[0].binary for p in second_arena.pirates],
                 nfc=self,
@@ -754,7 +754,7 @@ class BetMixin:
             # of the second arena. Total bets = 10.
             best_arena, second_arena, third_arena = arenas.best[:3]
 
-            bets = Bets._from_binary(
+            bets = Bets.from_binary(
                 *[p.binary for p in best_arena.best[-3:]],
                 *[p.binary | best_arena.best[0].binary for p in second_arena.best[-3:]],
                 *[
@@ -779,7 +779,7 @@ class BetMixin:
     @_require_cache
     def make_bets_from_indices(self, indices: Sequence[Sequence[ValidIndex]]) -> Bets:
         """:class:`Bets`: Creates a Bets object made up of arena indices."""
-        return Bets._from_binary(
+        return Bets.from_binary(
             *NFCMath.bets_indices_to_bet_binaries(indices), nfc=self
         )
 
@@ -789,9 +789,7 @@ class BetMixin:
     ) -> Bets:
         """:class:`Bets`: Creates a Bets object by decoding from bets_hash (and optionally an amounts_hash)."""
         # Takes a bet hash and turns it into Bets
-        bets = Bets._from_binary(
-            *NFCMath.bets_hash_to_bet_binaries(bets_hash), nfc=self
-        )
+        bets = Bets.from_binary(*NFCMath.bets_hash_to_bet_binaries(bets_hash), nfc=self)
         if amounts_hash:
             amounts = NFCMath.amounts_hash_to_bet_amounts(amounts_hash)
             bets.bet_amounts = amounts
@@ -801,7 +799,7 @@ class BetMixin:
     @_require_cache
     def make_bets_from_binaries(self, *binaries: int) -> Bets:
         """:class:`Bets`: Creates a Bets object made up of bet-compatible binary numbers."""
-        return Bets._from_binary(*binaries, nfc=self)
+        return Bets.from_binary(*binaries, nfc=self)
 
 
 class NeoFoodClub(BetMixin):
