@@ -134,8 +134,7 @@ class Arenas:
         """List[:class:`Pirate`]: Returns a flat list of all pirates in arena-order."""
         pirates: List[Pirate] = []
         for a in self._arenas:
-            for p in a.pirates:
-                pirates.append(p)
+            pirates.extend(iter(a.pirates))
         return pirates
 
     def get_pirates_from_binary(self, binary: int) -> List[Pirate]:
