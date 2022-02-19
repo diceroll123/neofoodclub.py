@@ -472,11 +472,11 @@ def get_bet_odds_from_bets(
 
         cumulative = 0.0
         tail = 1.0
-        for _a in range(len(sorted_e)):
-            cumulative += sorted_e[_a]["probability"]
-            sorted_e[_a]["cumulative"] = cumulative
-            sorted_e[_a]["tail"] = tail
-            tail -= sorted_e[_a]["probability"]
+        for item in sorted_e:
+            cumulative += item["probability"]
+            item["cumulative"] = cumulative
+            item["tail"] = tail
+            tail -= item["probability"]
 
         return sorted_e
 

@@ -145,7 +145,7 @@ class OddsChange:
     def __repr__(self):
         return f"<OddsChange index={self.index} pirate={self.pirate} old={self.old} new={self.new} timestamp={self.timestamp}>"
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any):
         return isinstance(other, self.__class__) and self._data == other.data
 
     def __iter__(self):
@@ -221,7 +221,7 @@ class Modifier:
     def __repr__(self):
         return f"<Modifier value={self.value} letters={self.letters} time={self.time}>"
 
-    def _has_flag(self, o):
+    def _has_flag(self, o: int) -> bool:
         return (self.value & o) == o
 
     @property
@@ -301,7 +301,7 @@ class Modifier:
             if self._has_flag(1 << bit)
         )
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any):
         return (
             isinstance(other, self.__class__)
             and self.opening_odds == other.opening_odds
@@ -526,7 +526,7 @@ class Bets:
     def _from_binary(cls, *bins: int, nfc: NeoFoodClub) -> Bets:
         # duplicate bins are removed
         int_bins = nfc._data_dict["bins"].astype(int)
-        np_bins = np.array([b for b in dict.fromkeys(bins)])
+        np_bins = np.array(list(dict.fromkeys(bins)))
 
         # thanks @mikeshardmind
         intersection = np.where(np_bins[:, np.newaxis] == int_bins)[1]
@@ -593,9 +593,7 @@ class BetMixin:
     def max_amount_of_bets(self) -> int:
         """:class:`int`: Returns the maximum amount of bets that can be generated. Will be 10, unless
         this class' Modifier has the Charity Corner perk attribute set to True, in which case it returns 15."""
-        if self._modifier._cc_perk:  # type:ignore
-            return 15
-        return 10
+        return 15 if self._modifier._cc_perk else 10
 
     @_require_cache
     def _max_ter_indices(self) -> np.ndarray:
@@ -949,8 +947,8 @@ class NeoFoodClub(BetMixin):
                 self._cache_dicts()
 
     @property
-    def modifier(self) -> Optional[Modifier]:
-        """Optional[:class:`Modifier`]: The desired modifier for generating bets."""
+    def modifier(self) -> Modifier:
+        """:class:`Modifier`: The desired modifier for generating bets."""
         return self._modifier
 
     @modifier.setter
@@ -1199,7 +1197,7 @@ class NeoFoodClub(BetMixin):
         )
 
         if all_data:
-            params = [
+            params: List[Tuple[str, str]] = [
                 ("pirates", encode(self.pirates)),
                 ("openingOdds", encode(self.opening_odds)),
                 ("currentOdds", encode(self.current_odds)),
@@ -1221,7 +1219,7 @@ class NeoFoodClub(BetMixin):
 
         if bets:
             url += "&b=" + bets.bets_hash
-            if np.sum(bets.bet_amounts):
+            if np.sum(bets.bet_amounts or []):
                 url += "&a=" + bets.amounts_hash
 
         return url

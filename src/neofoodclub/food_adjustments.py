@@ -19,6 +19,7 @@ class FA(DefaultDict[int, int]):
         return defaultdict(int, data)
 
     if TYPE_CHECKING:
+
         def __init__(
             self,
             *,
