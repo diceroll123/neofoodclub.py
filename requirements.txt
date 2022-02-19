@@ -1,2 +1,2 @@
-git+git://github.com/numba/numba.git@7b54373156a6e1a5907f92ae86084bb6dc6cf42b
+numba
 python-dateutil
