@@ -1217,7 +1217,7 @@ class NeoFoodClub(BetMixin):
 
         if bets:
             url += "&b=" + bets.bets_hash
-            if np.sum(bets.bet_amounts or []):
+            if np.sum(bets.bet_amounts):
                 url += "&a=" + bets.amounts_hash
 
         return url
