@@ -377,14 +377,14 @@ class Odds:
             )
         ]
         self.best = self._odds[-1]  # highest odds
-        self.bust = self._odds[0] if self._odds[0].value == 0 else None  # lowest odds
+        self.bust: Optional[Chance] = self._odds[0] if self._odds[0].value == 0 else None  # lowest odds
         self.most_likely_winner = max(
             self._odds[1 if self.bust else 0 :], key=lambda o: o.probability
         )
 
         amount_of_bets = max(0, min(len(bets), 15))
 
-        self.partial_rate = sum(
+        self.partial_rate: float = sum(
             o.probability for o in self._odds if 0 < int(o.value) < amount_of_bets
         )
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Sequence
+from typing import TYPE_CHECKING, Generator, List, Sequence
 
 import neofoodclub.math as NFCMath
 
@@ -171,7 +171,7 @@ class Arenas:
     def __getitem__(self, key: int) -> Arena:
         return self._arenas[key]
 
-    def __iter__(self):
+    def __iter__(self) -> Generator[Arena, None, None]:
         yield from self._arenas
 
     def __repr__(self):
