@@ -165,16 +165,14 @@ class Pirate(PirateMixin):
     @property
     def positive_foods(self) -> List[int]:
         """List[:class:`int`]: Returns a list of the positive Food IDs for this pirate's arena that affect this pirate, where applicable."""
-        foods = self.nfc.foods
-        if foods:
+        if foods := self.nfc.foods:
             return [f for f in foods[self._arena] if POSITIVE_FOOD[self._id][f] != 0]
         return []
 
     @property
     def negative_foods(self) -> List[int]:
         """List[:class:`int`]: Returns a list of the negative Food IDs for this pirate's arena that affect this pirate, where applicable."""
-        foods = self.nfc.foods
-        if foods:
+        if foods := self.nfc.foods:
             return [f for f in foods[self._arena] if NEGATIVE_FOOD[self._id][f] != 0]
         return []
 

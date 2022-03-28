@@ -764,8 +764,7 @@ class BetMixin:
                 nfc=self,
             )
 
-        bet_amount = self.bet_amount
-        if bet_amount:
+        if bet_amount := self.bet_amount:
             current_odds = self._data_dict["odds"][bets._indices]
             lowest_odds_index = np.argmin(current_odds)
             lowest_odds = current_odds[lowest_odds_index]
@@ -895,9 +894,7 @@ class NeoFoodClub(BetMixin):
     def _cache_bet_amount_dicts(self):
         # cache maxbets, we'll need these a lot later,
         # but only if we need them at all
-        bet_amount = self._bet_amount
-
-        if bet_amount:
+        if bet_amount := self._bet_amount:
             mb_copy = self._data_dict["maxbets"].copy()
             mb_copy[mb_copy > bet_amount] = bet_amount
             self._maxbet_odds_cache = utils.fix_bet_amounts(mb_copy)
@@ -1040,16 +1037,14 @@ class NeoFoodClub(BetMixin):
     @property
     def start(self) -> Optional[datetime.datetime]:
         """Optional[datetime.datetime]: When the round started in UTC, if applicable."""
-        start = self._data.get("start")
-        if start:
+        if start := self._data.get("start"):
             return dateutil.parser.parse(start).astimezone(UTC)
         return None
 
     @property
     def timestamp(self) -> Optional[datetime.datetime]:
         """Optional[datetime.datetime]: When the round data was last updated in UTC, if applicable."""
-        timestamp = self._data.get("timestamp")
-        if timestamp:
+        if timestamp := self._data.get("timestamp"):
             return dateutil.parser.parse(timestamp).astimezone(UTC)
         return None
 
