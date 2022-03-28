@@ -58,13 +58,9 @@ def precompile():
         tuple((1.0, 1.0, 1.0, 1.0, 1.0) for _ in range(5)),
     )
 
-    for a in range(5):
-        for b in range(5):
-            for c in range(5):
-                for d in range(5):
-                    for e in range(5):
-                        bet_binary = pirates_binary((a, b, c, d, e))
-                        binary_to_indices(bet_binary)
+    for a, b, c, d, e in itertools.product(range(5), repeat=5):
+        bet_binary = pirates_binary((a, b, c, d, e))
+        binary_to_indices(bet_binary)
 
 
 @functools.lru_cache(maxsize=None)
@@ -510,6 +506,7 @@ def make_round_dicts(
 
     arr_index = 0
 
+    # do NOT replace this with itertools.product, etc. numba does not understand itertools.
     for _a in range(5):
         for _b in range(5):
             for _c in range(5):
