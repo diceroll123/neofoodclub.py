@@ -1,14 +1,11 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Generator, List, Sequence
+from typing import Generator, List, Sequence
 
 import neofoodclub.math as NFCMath
 
 from .neofoodclub import NeoFoodClub
 from .pirates import Pirate
-
-if TYPE_CHECKING:
-    from neofoodclub.types import PirateID, ValidIndex
 
 __all__ = (
     "Arena",
@@ -32,7 +29,7 @@ class Arena:
     )
 
     def __init__(
-        self, *, nfc: NeoFoodClub, arena_id: ValidIndex, pirate_ids: Sequence[PirateID]
+        self, *, nfc: NeoFoodClub, arena_id: int, pirate_ids: Sequence[int]
     ):
         self.nfc = nfc
         self._id = arena_id
@@ -93,7 +90,7 @@ class Arena:
         """List[:class:`int`]: Returns a list of the IDs of the foods in this arena, where applicable."""
         return foods[self._id] if (foods := self.nfc.foods) else []
 
-    def __getitem__(self, item: ValidIndex) -> Pirate:
+    def __getitem__(self, item: int) -> Pirate:
         return self._pirates[item]
 
     def __iter__(self):
@@ -116,13 +113,13 @@ class Arenas:
             for idx, a in enumerate(nfc._data["pirates"])  # type: ignore
         ]
 
-    def get_pirate_by_id(self, pirate_id: PirateID) -> Pirate:  # type: ignore
+    def get_pirate_by_id(self, pirate_id: int) -> Pirate:  # type: ignore
         """:class:`Pirate`: Returns a single pirate where their ID matches pirate_id."""
         for p in self.all_pirates:
             if p.id == pirate_id:
                 return p
 
-    def get_pirates_by_id(self, *pirate_ids: Sequence[PirateID]) -> List[Pirate]:
+    def get_pirates_by_id(self, *pirate_ids: Sequence[int]) -> List[Pirate]:
         """List[:class:`Pirate`]: Returns a list of pirates where their IDs match IDs in pirate_ids."""
         return [p for p in self.all_pirates if p.id in pirate_ids]
 
@@ -162,7 +159,7 @@ class Arenas:
         """List[:class:`Arena`]: Returns a list of positive arenas sorted from least to greatest odds."""
         return sorted([a for a in self._arenas if a.positive], key=lambda _a: _a._odds)  # type: ignore
 
-    def get_arena(self, arena_id: ValidIndex) -> Arena:
+    def get_arena(self, arena_id: int) -> Arena:
         return self._arenas[arena_id]
 
     def __getitem__(self, key: int) -> Arena:

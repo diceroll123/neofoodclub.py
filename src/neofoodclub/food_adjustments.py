@@ -26,7 +26,7 @@ class FA(DefaultDict[int, int]):
             one: Optional[Tuple[int, ...]] = None,
             two: Optional[Tuple[int, ...]] = None
         ):
-            pass
+            ...
 
 
 # the keys are the pirate IDs

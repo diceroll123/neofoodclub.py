@@ -29,14 +29,7 @@ from . import utils
 from .errors import InvalidData, MissingData
 
 if TYPE_CHECKING:
-    from neofoodclub.types import (
-        FoodID,
-        OddsChangeDict,
-        PirateID,
-        RoundData,
-        ValidIndex,
-        ValidOdds,
-    )
+    from neofoodclub.types import OddsChangeDict, RoundData
 
     from .arenas import Arena, Arenas
     from .pirates import PartialPirate, Pirate
@@ -167,7 +160,7 @@ class Modifier:
         pass in the two values, bitwise-or'd together like so: Modifier.GENERAL | Modifier.OPENING
     cc_perk: :class:`bool`
         Whether or not you want this modifier to enable up to 15 bets to be made instead of 10. Defaults to False.
-    custom_odds: Optional[Dict[PirateID, ValidOdds]]
+    custom_odds: Optional[Dict[int, int]]
         A dictionary containing a pirate ID (1-20) as the key, and desired odds (2-13) as the value. The NeoFoodClub
         object will be recalculated using these odds on top of the current odds.
     custom_time: Optional[datetime.time]
@@ -209,7 +202,7 @@ class Modifier:
         flags: int = 0,
         *,
         cc_perk: bool = False,
-        custom_odds: Optional[Dict[PirateID, ValidOdds]] = None,
+        custom_odds: Optional[Dict[int, int]] = None,
         custom_time: Optional[datetime.time] = None,
     ):
         self.value = flags
@@ -260,14 +253,14 @@ class Modifier:
         self._cc_perk = val
 
     @property
-    def custom_odds(self) -> Optional[Dict[PirateID, ValidOdds]]:
-        """Optional[Dict[PirateID, ValidOdds]]: A dictionary containing a pirate ID (1-20) as the key, and
+    def custom_odds(self) -> Optional[Dict[int, int]]:
+        """Optional[Dict[int, int]]: A dictionary containing a pirate ID (1-20) as the key, and
         desired odds (2-13) as the value. The NeoFoodClub object will be recalculated using these odds on
         top of the current odds."""
         return self._custom_odds
 
     @custom_odds.setter
-    def custom_odds(self, val: Optional[Dict[PirateID, ValidOdds]]):
+    def custom_odds(self, val: Optional[Dict[int, int]]):
         self._custom_odds = val
         if self._nfc:
             self._nfc.reset()
@@ -479,8 +472,8 @@ class Bets:
         self._bet_amounts = utils.fix_bet_amounts(amts)
 
     @property
-    def indices(self) -> Tuple[Tuple[ValidIndex, ...], ...]:
-        """Tuple[Tuple[:class:`ValidIndex`, ...], ...]: Returns a nested array of the indices of the pirates in their arenas
+    def indices(self) -> Tuple[Tuple[int, ...], ...]:
+        """Tuple[Tuple[:class:`int`, ...], ...]: Returns a nested array of the indices of the pirates in their arenas
         making up these bets."""
         return tuple(
             NFCMath.binary_to_indices(binary)
@@ -776,7 +769,7 @@ class BetMixin:
 
     # bet decoding methods
     @_require_cache
-    def make_bets_from_indices(self, indices: Sequence[Sequence[ValidIndex]]) -> Bets:
+    def make_bets_from_indices(self, indices: Sequence[Sequence[int]]) -> Bets:
         """:class:`Bets`: Creates a Bets object made up of arena indices."""
         return Bets.from_binary(
             *NFCMath.bets_indices_to_bet_binaries(indices), nfc=self
@@ -912,7 +905,7 @@ class NeoFoodClub(BetMixin):
 
         self._cache_bet_amount_dicts()
 
-    def get_arena(self, arena_id: ValidIndex) -> Arena:
+    def get_arena(self, arena_id: int) -> Arena:
         """:class:Arena: Returns the desired Arena object."""
         from .arenas import Arena  # to prevent circular imports
 
@@ -1007,23 +1000,23 @@ class NeoFoodClub(BetMixin):
         return data
 
     @property
-    def pirates(self) -> List[List[PirateID]]:
-        """List[List[:class:`PirateID`]]: Returns a nested list of the pirate IDs per-arena."""
+    def pirates(self) -> List[List[int]]:
+        """List[List[:class:`int`]]: Returns a nested list of the pirate IDs per-arena."""
         return self._data["pirates"]
 
     @property
-    def opening_odds(self) -> List[List[ValidOdds]]:
-        """List[List[:class:`ValidOdds`]]: Returns a nested list of the opening odds per-arena."""
+    def opening_odds(self) -> List[List[int]]:
+        """List[List[:class:`int`]]: Returns a nested list of the opening odds per-arena."""
         return self._data["openingOdds"]
 
     @property
-    def current_odds(self) -> List[List[ValidOdds]]:
-        """List[List[:class:`ValidOdds`]]: Returns a nested list of the current odds per-arena."""
+    def current_odds(self) -> List[List[int]]:
+        """List[List[:class:`int`]]: Returns a nested list of the current odds per-arena."""
         return self._data["currentOdds"]
 
     @property
-    def custom_odds(self) -> List[List[ValidOdds]]:
-        """List[List[:class:`ValidOdds`]]: Returns a nested list of the custom odds per-arena.
+    def custom_odds(self) -> List[List[int]]:
+        """List[List[:class:`int`]]: Returns a nested list of the custom odds per-arena.
 
         These values are mostly just used internally as a second layer of current_odds.
         This may or may not be identical to current_odds."""
@@ -1080,8 +1073,8 @@ class NeoFoodClub(BetMixin):
         return bool(self.winners[0])
 
     @property
-    def winners(self) -> List[ValidIndex]:
-        """List[:class:`ValidIndex`]: Returns the winning pirates, if applicable.
+    def winners(self) -> List[int]:
+        """List[:class:`int`]: Returns the winning pirates, if applicable.
         A list of 5 zeroes if not applicable."""
         return self._data.get("winners") or [0, 0, 0, 0, 0]
 
@@ -1098,8 +1091,8 @@ class NeoFoodClub(BetMixin):
         return self.arenas.get_pirates_from_binary(self.winners_binary)
 
     @property
-    def foods(self) -> Optional[List[List[FoodID]]]:
-        """Optional[List[List[:class:`FoodID`]]]: Returns a nested list of each arena's foods for this round.
+    def foods(self) -> Optional[List[List[int]]]:
+        """Optional[List[List[:class:`int`]]]: Returns a nested list of each arena's foods for this round.
         Can be None."""
         return self._data.get("foods")
 
