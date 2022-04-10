@@ -1,11 +1,10 @@
 import unittest
-from typing import Tuple
+from typing import Any, Dict, Tuple
 
 from neofoodclub import NeoFoodClub  # type: ignore
-from neofoodclub.types import RoundData  # type: ignore
 
 # i picked the smallest round I could quickly find
-test_round_data: RoundData = {
+test_round_data: Dict[str, Any] = {
     "currentOdds": [
         [1, 2, 13, 3, 5],
         [1, 4, 2, 4, 6],
