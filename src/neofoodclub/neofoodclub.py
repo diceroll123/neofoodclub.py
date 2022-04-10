@@ -564,6 +564,18 @@ class Bets:
 
         return highest_bet_amount < lowest_winning_bet_amount and self.is_bustproof
 
+    def make_url(self, *, all_data: bool = False) -> str:
+        """:class:`str`: Returns an optionally-fully-loaded NeoFoodClub URL to describe these bets.
+
+        Parameters
+        -----------
+        all_data: :class:`bool`
+            Whether or not you want the url with all pirates, odds, etc. included. Usually, this is not necessary.
+            Default = False.
+        """
+
+        return self.nfc.make_url(self, all_data=all_data)
+
     def _iterator(self) -> Generator[int, None, None]:
         int_bins = self.nfc._data_dict["bins"].astype(int)
         yield from int_bins[self._indices]
