@@ -591,222 +591,7 @@ class Bets:
         )
 
 
-class BetMixin:
-    _modifier: Modifier
-
-    @property
-    def max_amount_of_bets(self) -> int:
-        """:class:`int`: Returns the maximum amount of bets that can be generated. Will be 10, unless
-        this class' Modifier has the Charity Corner perk attribute set to True, in which case it returns 15."""
-        return 15 if self._modifier._cc_perk else 10
-
-    @_require_cache
-    def _max_ter_indices(self) -> np.ndarray:
-        # use net expected only if needed
-        if self._modifier.general or self._net_expected_cache is None:
-            return self._data_dict["ers"]
-        else:
-            return self._net_expected_cache
-
-    @_require_cache
-    def make_max_ter_bets(self) -> Bets:
-        """:class:`Bets`: Creates a Bets object that consists of the highest ERs."""
-        return Bets._from_generator(
-            indices=np.argsort(self._max_ter_indices()), nfc=self
-        )
-
-    @_require_cache
-    def _crazy_bets_indices(self) -> np.ndarray:
-        return np.random.choice(
-            NFCMath.FULL_BETS, size=self.max_amount_of_bets, replace=False
-        )
-
-    @_require_cache
-    def make_crazy_bets(self) -> Bets:
-        """:class:`Bets`: Creates a Bets object that consists of randomly-selected, full-arena bets.
-
-        These bets are not for the faint of heart."""
-        return Bets._from_generator(indices=self._crazy_bets_indices(), nfc=self)
-
-    @_require_cache
-    def _random_indices(self) -> np.ndarray:
-        return np.random.choice(3124, size=self.max_amount_of_bets, replace=False)
-
-    @_require_cache
-    def make_random_bets(self) -> Bets:
-        """:class:`Bets`: Creates a Bets object that consists of randomly-selected bets.
-
-        These bets are not for the faint of heart."""
-        return Bets._from_generator(indices=self._random_indices(), nfc=self)
-
-    @_require_cache
-    def _gambit_indices(
-        self, *, five_bet: Optional[int] = None, random: bool = False
-    ) -> np.ndarray:
-        if five_bet is not None:
-            bins = self._data_dict["bins"].astype(int)
-            possible_indices = np.where(bins & five_bet == bins)[0]
-
-            odds = (
-                self._data_dict["odds"][possible_indices]
-                + self._data_dict["std"][possible_indices]
-                # this gives us the highest ER bets first
-            )
-            sorted_odds = np.argsort(odds, kind="mergesort", axis=0)
-
-            return possible_indices[sorted_odds]
-
-        # these are lazy but they get the job done well enough
-        if random:
-            random_five_bet = self._data_dict["bins"][
-                np.random.choice(NFCMath.FULL_BETS, size=1)
-            ]
-            return self._gambit_indices(five_bet=random_five_bet.astype(int)[0])
-
-        # get highest ER pirates
-        ers = self._max_ter_indices()[NFCMath.FULL_BETS]
-        highest_er = np.argsort(ers, kind="mergesort", axis=0)[::-1][0]
-        pirate_bin = self._data_dict["bins"][NFCMath.FULL_BETS[highest_er]]
-        return self._gambit_indices(five_bet=pirate_bin.astype(int))
-
-    @_require_cache
-    def make_gambit_bets(
-        self, *, five_bet: Optional[int] = None, random: bool = False
-    ) -> Bets:
-        """:class:`Bets`: Creates a Bets object that consists of the top-unit permutations
-        of a single full-arena bet."""
-        return Bets._from_generator(
-            indices=self._gambit_indices(five_bet=five_bet, random=random), nfc=self
-        )
-
-    @_require_cache
-    def _tenbet_indices(self, pirate_binary: int) -> np.ndarray:
-        bins = self._data_dict["bins"].astype(int)
-        possible_indices = np.where(bins & pirate_binary == pirate_binary)[0]
-
-        ers = (
-            self._net_expected_cache
-            if self._net_expected_cache is not None
-            else self._data_dict["ers"]
-        )
-
-        sorted_odds = np.argsort(ers[possible_indices], kind="mergesort", axis=0)
-
-        return possible_indices[sorted_odds]
-
-    @_require_cache
-    def make_tenbet_bets(self, pirate_binary: int, /) -> Bets:
-        """:class:`Bets`: Creates a Bets object that consists of the highest Expected Ratio -- or Net Expected -- bets
-        that include between 1 and 3 selected pirates.
-
-        There is a hard limit on 3 because any more is impossible."""
-        amount_of_pirates = sum(1 for mask in NFCMath.BIT_MASKS if pirate_binary & mask)
-
-        if amount_of_pirates == 0:
-            raise InvalidData("You must pick at least 1 pirate, and at most 3.")
-
-        if amount_of_pirates > 3:
-            raise InvalidData("You must pick 3 pirates at most.")
-
-        return Bets._from_generator(
-            indices=self._tenbet_indices(pirate_binary), nfc=self
-        )
-
-    @_require_cache
-    def _unit_indices(self, units: int) -> np.ndarray:
-        sorted_std = np.argsort(self._data_dict["std"], kind="mergesort", axis=0)
-        possible_indices = np.where(self._data_dict["odds"][sorted_std] >= units)[0]
-        return sorted_std[possible_indices]
-
-    @_require_cache
-    def make_units_bets(self, units: int, /) -> Bets:
-        """:class:`Bets`: Creates a Bets object that consists of the highest STD probability that are greater than or
-        equal to the units value.
-
-        This CAN return an empty Bets object."""
-        return Bets._from_generator(indices=self._unit_indices(units), nfc=self)
-
-    @_require_cache
-    def make_bustproof_bets(self) -> Optional[Bets]:
-        """Optional[:class:`Bets`]: Creates a Bets object that consists of the bets made in such a way that with a given bet
-        amount, you will not bust.
-
-        This requires at least one positive arena, otherwise will return None."""
-        arenas = self.arenas
-        positives = arenas.positives
-        if not positives:
-            # nothing to do here!
-            return None
-
-        if len(positives) == 1:
-            # If only one arena is positive, we place 1 bet on each of the pirates of that arena. Total bets = 4.
-            best_arena = arenas.best[0]
-            bets = Bets.from_binary(*[p.binary for p in best_arena.pirates], nfc=self)
-        elif len(positives) == 2:
-            # If two arenas are positive, we place 1 bet on each of the three worst pirates of the best arena and
-            # 1 bet on each of the pirates of the second arena + the best pirate of the best arena. Total bets = 7
-            best_arena, second_arena = arenas.best[:2]
-            bets = Bets.from_binary(
-                *[p.binary for p in best_arena.best[-3:]],
-                *[p.binary | best_arena.best[0].binary for p in second_arena.pirates],
-                nfc=self,
-            )
-        else:
-            # If three arenas are positive, we place 1 bet on each of the three worst pirates of the best arena,
-            # If four or more arenas are positive, we only play the three best arenas, seen below
-            # 1 bet on each of the three worst pirates of the second arena + the best pirate of the best arena,
-            # and 1 bet on each of the pirates of the third arena + the best pirate of the best arena + the best pirate
-            # of the second arena. Total bets = 10.
-            best_arena, second_arena, third_arena = arenas.best[:3]
-
-            bets = Bets.from_binary(
-                *[p.binary for p in best_arena.best[-3:]],
-                *[p.binary | best_arena.best[0].binary for p in second_arena.best[-3:]],
-                *[
-                    p.binary | best_arena.best[0].binary | second_arena.best[0].binary
-                    for p in third_arena.best
-                ],
-                nfc=self,
-            )
-
-        if bet_amount := self.bet_amount:
-            current_odds = self._data_dict["odds"][bets._indices]
-            lowest_odds_index = np.argmin(current_odds)
-            lowest_odds = current_odds[lowest_odds_index]
-
-            new_bet_amounts = (bet_amount * lowest_odds // current_odds).astype(int)
-            bets.bet_amounts = new_bet_amounts
-
-        return bets
-
-    # bet decoding methods
-    @_require_cache
-    def make_bets_from_indices(self, indices: Sequence[Sequence[int]], /) -> Bets:
-        """:class:`Bets`: Creates a Bets object made up of arena indices."""
-        return Bets.from_binary(
-            *NFCMath.bets_indices_to_bet_binaries(indices), nfc=self
-        )
-
-    @_require_cache
-    def make_bets_from_hash(
-        self, bets_hash: str, /, *, amounts_hash: Optional[str] = None
-    ) -> Bets:
-        """:class:`Bets`: Creates a Bets object by decoding from bets_hash (and optionally an amounts_hash)."""
-        # Takes a bet hash and turns it into Bets
-        bets = Bets.from_binary(*NFCMath.bets_hash_to_bet_binaries(bets_hash), nfc=self)
-        if amounts_hash:
-            amounts = NFCMath.amounts_hash_to_bet_amounts(amounts_hash)
-            bets.bet_amounts = amounts
-
-        return bets
-
-    @_require_cache
-    def make_bets_from_binaries(self, *binaries: int) -> Bets:
-        """:class:`Bets`: Creates a Bets object made up of bet-compatible binary numbers."""
-        return Bets.from_binary(*binaries, nfc=self)
-
-
-class NeoFoodClub(BetMixin):
+class NeoFoodClub:
     """Represents a Food Club round.
     This class is the basis of this library.
 
@@ -1315,3 +1100,214 @@ class NeoFoodClub(BetMixin):
         ]
         joined = " ".join("%s=%r" % t for t in attrs if t[1] is not None)
         return f"<NeoFoodClub {joined}>"
+
+    @property
+    def max_amount_of_bets(self) -> int:
+        """:class:`int`: Returns the maximum amount of bets that can be generated. Will be 10, unless
+        this class' Modifier has the Charity Corner perk attribute set to True, in which case it returns 15."""
+        return 15 if self._modifier._cc_perk else 10
+
+    @_require_cache
+    def _max_ter_indices(self) -> np.ndarray:
+        # use net expected only if needed
+        if self._modifier.general or self._net_expected_cache is None:
+            return self._data_dict["ers"]
+        else:
+            return self._net_expected_cache
+
+    @_require_cache
+    def make_max_ter_bets(self) -> Bets:
+        """:class:`Bets`: Creates a Bets object that consists of the highest ERs."""
+        return Bets._from_generator(
+            indices=np.argsort(self._max_ter_indices()), nfc=self
+        )
+
+    @_require_cache
+    def _crazy_bets_indices(self) -> np.ndarray:
+        return np.random.choice(
+            NFCMath.FULL_BETS, size=self.max_amount_of_bets, replace=False
+        )
+
+    @_require_cache
+    def make_crazy_bets(self) -> Bets:
+        """:class:`Bets`: Creates a Bets object that consists of randomly-selected, full-arena bets.
+
+        These bets are not for the faint of heart."""
+        return Bets._from_generator(indices=self._crazy_bets_indices(), nfc=self)
+
+    @_require_cache
+    def _random_indices(self) -> np.ndarray:
+        return np.random.choice(3124, size=self.max_amount_of_bets, replace=False)
+
+    @_require_cache
+    def make_random_bets(self) -> Bets:
+        """:class:`Bets`: Creates a Bets object that consists of randomly-selected bets.
+
+        These bets are not for the faint of heart."""
+        return Bets._from_generator(indices=self._random_indices(), nfc=self)
+
+    @_require_cache
+    def _gambit_indices(
+        self, *, five_bet: Optional[int] = None, random: bool = False
+    ) -> np.ndarray:
+        if five_bet is not None:
+            bins = self._data_dict["bins"].astype(int)
+            possible_indices = np.where(bins & five_bet == bins)[0]
+
+            odds = (
+                self._data_dict["odds"][possible_indices]
+                + self._data_dict["std"][possible_indices]
+                # this gives us the highest ER bets first
+            )
+            sorted_odds = np.argsort(odds, kind="mergesort", axis=0)
+
+            return possible_indices[sorted_odds]
+
+        # these are lazy but they get the job done well enough
+        if random:
+            random_five_bet = self._data_dict["bins"][
+                np.random.choice(NFCMath.FULL_BETS, size=1)
+            ]
+            return self._gambit_indices(five_bet=random_five_bet.astype(int)[0])
+
+        # get highest ER pirates
+        ers = self._max_ter_indices()[NFCMath.FULL_BETS]
+        highest_er = np.argsort(ers, kind="mergesort", axis=0)[::-1][0]
+        pirate_bin = self._data_dict["bins"][NFCMath.FULL_BETS[highest_er]]
+        return self._gambit_indices(five_bet=pirate_bin.astype(int))
+
+    @_require_cache
+    def make_gambit_bets(
+        self, *, five_bet: Optional[int] = None, random: bool = False
+    ) -> Bets:
+        """:class:`Bets`: Creates a Bets object that consists of the top-unit permutations
+        of a single full-arena bet."""
+        return Bets._from_generator(
+            indices=self._gambit_indices(five_bet=five_bet, random=random), nfc=self
+        )
+
+    @_require_cache
+    def _tenbet_indices(self, pirate_binary: int) -> np.ndarray:
+        bins = self._data_dict["bins"].astype(int)
+        possible_indices = np.where(bins & pirate_binary == pirate_binary)[0]
+
+        ers = (
+            self._net_expected_cache
+            if self._net_expected_cache is not None
+            else self._data_dict["ers"]
+        )
+
+        sorted_odds = np.argsort(ers[possible_indices], kind="mergesort", axis=0)
+
+        return possible_indices[sorted_odds]
+
+    @_require_cache
+    def make_tenbet_bets(self, pirate_binary: int, /) -> Bets:
+        """:class:`Bets`: Creates a Bets object that consists of the highest Expected Ratio -- or Net Expected -- bets
+        that include between 1 and 3 selected pirates.
+
+        There is a hard limit on 3 because any more is impossible."""
+        amount_of_pirates = sum(1 for mask in NFCMath.BIT_MASKS if pirate_binary & mask)
+
+        if amount_of_pirates == 0:
+            raise InvalidData("You must pick at least 1 pirate, and at most 3.")
+
+        if amount_of_pirates > 3:
+            raise InvalidData("You must pick 3 pirates at most.")
+
+        return Bets._from_generator(
+            indices=self._tenbet_indices(pirate_binary), nfc=self
+        )
+
+    @_require_cache
+    def _unit_indices(self, units: int) -> np.ndarray:
+        sorted_std = np.argsort(self._data_dict["std"], kind="mergesort", axis=0)
+        possible_indices = np.where(self._data_dict["odds"][sorted_std] >= units)[0]
+        return sorted_std[possible_indices]
+
+    @_require_cache
+    def make_units_bets(self, units: int, /) -> Bets:
+        """:class:`Bets`: Creates a Bets object that consists of the highest STD probability that are greater than or
+        equal to the units value.
+
+        This CAN return an empty Bets object."""
+        return Bets._from_generator(indices=self._unit_indices(units), nfc=self)
+
+    @_require_cache
+    def make_bustproof_bets(self) -> Optional[Bets]:
+        """Optional[:class:`Bets`]: Creates a Bets object that consists of the bets made in such a way that with a given bet
+        amount, you will not bust.
+
+        This requires at least one positive arena, otherwise will return None."""
+        arenas = self.arenas
+        positives = arenas.positives
+        if not positives:
+            # nothing to do here!
+            return None
+
+        if len(positives) == 1:
+            # If only one arena is positive, we place 1 bet on each of the pirates of that arena. Total bets = 4.
+            best_arena = arenas.best[0]
+            bets = Bets.from_binary(*[p.binary for p in best_arena.pirates], nfc=self)
+        elif len(positives) == 2:
+            # If two arenas are positive, we place 1 bet on each of the three worst pirates of the best arena and
+            # 1 bet on each of the pirates of the second arena + the best pirate of the best arena. Total bets = 7
+            best_arena, second_arena = arenas.best[:2]
+            bets = Bets.from_binary(
+                *[p.binary for p in best_arena.best[-3:]],
+                *[p.binary | best_arena.best[0].binary for p in second_arena.pirates],
+                nfc=self,
+            )
+        else:
+            # If three arenas are positive, we place 1 bet on each of the three worst pirates of the best arena,
+            # If four or more arenas are positive, we only play the three best arenas, seen below
+            # 1 bet on each of the three worst pirates of the second arena + the best pirate of the best arena,
+            # and 1 bet on each of the pirates of the third arena + the best pirate of the best arena + the best pirate
+            # of the second arena. Total bets = 10.
+            best_arena, second_arena, third_arena = arenas.best[:3]
+
+            bets = Bets.from_binary(
+                *[p.binary for p in best_arena.best[-3:]],
+                *[p.binary | best_arena.best[0].binary for p in second_arena.best[-3:]],
+                *[
+                    p.binary | best_arena.best[0].binary | second_arena.best[0].binary
+                    for p in third_arena.best
+                ],
+                nfc=self,
+            )
+
+        if bet_amount := self.bet_amount:
+            current_odds = self._data_dict["odds"][bets._indices]
+            lowest_odds_index = np.argmin(current_odds)
+            lowest_odds = current_odds[lowest_odds_index]
+
+            new_bet_amounts = (bet_amount * lowest_odds // current_odds).astype(int)
+            bets.bet_amounts = new_bet_amounts
+
+        return bets
+
+    # bet decoding methods
+    @_require_cache
+    def make_bets_from_indices(self, indices: Sequence[Sequence[int]], /) -> Bets:
+        """:class:`Bets`: Creates a Bets object made up of arena indices."""
+        return Bets.from_binary(
+            *NFCMath.bets_indices_to_bet_binaries(indices), nfc=self
+        )
+
+    @_require_cache
+    def make_bets_from_hash(
+        self, bets_hash: str, /, *, amounts_hash: Optional[str] = None
+    ) -> Bets:
+        """:class:`Bets`: Creates a Bets object by decoding from bets_hash (and optionally an amounts_hash)."""
+        # Takes a bet hash and turns it into Bets
+        bets = Bets.from_binary(*NFCMath.bets_hash_to_bet_binaries(bets_hash), nfc=self)
+        if amounts_hash:
+            amounts = NFCMath.amounts_hash_to_bet_amounts(amounts_hash)
+            bets.bet_amounts = amounts
+
+        return bets
+
+    @_require_cache
+    def make_bets_from_binaries(self, *binaries: int) -> Bets:
+        """:class:`Bets`: Creates a Bets object made up of bet-compatible binary numbers."""
+        return Bets.from_binary(*binaries, nfc=self)
