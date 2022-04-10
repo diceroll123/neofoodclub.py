@@ -1,4 +1,6 @@
-from typing import List, Literal, Optional, TypedDict
+from typing import List, Optional, TypedDict
+
+from typing_extensions import NotRequired, Required
 
 
 class OddsChangeDict(TypedDict):
@@ -10,17 +12,17 @@ class OddsChangeDict(TypedDict):
 
 
 class RoundData(TypedDict, total=False):
-    pirates: List[List[int]]
-    openingOdds: List[List[int]]
-    currentOdds: List[List[int]]
-    customOdds: List[List[int]]  # this is used internally ONLY
-    changes: List[OddsChangeDict]
-    round: int
-    start: str
-    timestamp: str
-    lastChange: Optional[str]
-    winners: Optional[List[int]]
-    foods: Optional[List[List[int]]]
+    pirates: Required[List[List[int]]]
+    openingOdds: Required[List[List[int]]]
+    currentOdds: Required[List[List[int]]]
+    customOdds: NotRequired[List[List[int]]]  # this is used internally ONLY
+    changes: Required[List[OddsChangeDict]]
+    round: Required[int]
+    start: Required[str]
+    timestamp: Required[str]
+    lastChange: Required[Optional[str]]
+    winners: Required[Optional[List[int]]]
+    foods: NotRequired[Optional[List[List[int]]]]
 
 
 class BetOdds(TypedDict):
