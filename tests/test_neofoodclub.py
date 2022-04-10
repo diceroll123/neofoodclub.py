@@ -118,3 +118,16 @@ class BetDecodingTest(unittest.TestCase):
 class BetEquivalenceTest(unittest.TestCase):
     def test_bet_equivalence(self):
         self.assertTrue(hash_bets == indices_bets and indices_bets == binaries_bets)
+
+
+class BustproofTest(unittest.TestCase):
+    def test_bustproof_minimal(self):
+        self.assertTrue(
+            test_nfc.make_bets_from_binaries(0x1, 0x2, 0x4, 0x8).is_bustproof
+        )
+
+    def test_not_bustproof_single(self):
+        self.assertFalse(test_nfc.make_bets_from_binaries(0x1).is_bustproof)
+
+    def test_not_bustproof(self):
+        self.assertFalse(binaries_bets.is_bustproof)
