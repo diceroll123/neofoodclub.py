@@ -275,7 +275,7 @@ class Modifier:
         )
 
     @classmethod
-    def from_type(cls, letters: str, *, cc_perk: bool = False) -> Modifier:
+    def from_type(cls, letters: str, /, *, cc_perk: bool = False) -> Modifier:
         """:class:`Modifier`: Creates a Modifier using the letters of the modifiers you'd like. For example, passing in
         "ROG" will result in a modifier with General, Opening, and Reverse modifiers set to True.
         These are generally used as a prefix for commands in NeoBot, such as `?rogmer` for example."""
@@ -695,7 +695,7 @@ class BetMixin:
         return possible_indices[sorted_odds]
 
     @_require_cache
-    def make_tenbet_bets(self, pirate_binary: int) -> Bets:
+    def make_tenbet_bets(self, pirate_binary: int, /) -> Bets:
         """:class:`Bets`: Creates a Bets object that consists of the highest Expected Ratio -- or Net Expected -- bets
         that include between 1 and 3 selected pirates.
 
@@ -719,7 +719,7 @@ class BetMixin:
         return sorted_std[possible_indices]
 
     @_require_cache
-    def make_units_bets(self, units: int) -> Bets:
+    def make_units_bets(self, units: int, /) -> Bets:
         """:class:`Bets`: Creates a Bets object that consists of the highest STD probability that are greater than or
         equal to the units value.
 
@@ -781,7 +781,7 @@ class BetMixin:
 
     # bet decoding methods
     @_require_cache
-    def make_bets_from_indices(self, indices: Sequence[Sequence[int]]) -> Bets:
+    def make_bets_from_indices(self, indices: Sequence[Sequence[int]], /) -> Bets:
         """:class:`Bets`: Creates a Bets object made up of arena indices."""
         return Bets.from_binary(
             *NFCMath.bets_indices_to_bet_binaries(indices), nfc=self
@@ -789,7 +789,7 @@ class BetMixin:
 
     @_require_cache
     def make_bets_from_hash(
-        self, bets_hash: str, amounts_hash: Optional[str] = None
+        self, bets_hash: str, /, *, amounts_hash: Optional[str] = None
     ) -> Bets:
         """:class:`Bets`: Creates a Bets object by decoding from bets_hash (and optionally an amounts_hash)."""
         # Takes a bet hash and turns it into Bets
@@ -917,7 +917,7 @@ class NeoFoodClub(BetMixin):
 
         self._cache_bet_amount_dicts()
 
-    def get_arena(self, arena_id: int) -> Arena:
+    def get_arena(self, arena_id: int, /) -> Arena:
         """:class:Arena: Returns the desired Arena object."""
         from .arenas import Arena  # to prevent circular imports
 
@@ -984,7 +984,7 @@ class NeoFoodClub(BetMixin):
             and self._modifier.opening_odds is None
         )
 
-    def with_modifier(self, modifier: Optional[Modifier] = None):
+    def with_modifier(self, modifier: Optional[Modifier] = None, /):
         """Applies the supplied modifier to the NeoFoodClub object.
 
         Parameters
@@ -997,7 +997,7 @@ class NeoFoodClub(BetMixin):
         self.modifier = modifier
         return self
 
-    def to_dict(self, keep_custom: bool = False) -> RoundData:
+    def to_dict(self, *, keep_custom: bool = False) -> RoundData:
         """:class:`RoundData`: Returns the data used to make this NeoFoodClub object.
 
         Parameters
@@ -1130,7 +1130,7 @@ class NeoFoodClub(BetMixin):
         return self._data_dict["odds"][winning_bet_bins]
 
     @_require_cache
-    def get_win_units(self, bets: Bets) -> int:
+    def get_win_units(self, bets: Bets, /) -> int:
         """Returns the amount of units that won, given the provided bets.
 
         Parameters
@@ -1141,7 +1141,7 @@ class NeoFoodClub(BetMixin):
         return np.sum(self._get_winning_odds(bets)).astype(int)
 
     @_require_cache
-    def get_win_np(self, bets: Bets, use_bet_amount_if_none: bool = True) -> int:
+    def get_win_np(self, bets: Bets, /, *, use_bet_amount_if_none: bool = True) -> int:
         """Returns the amount of neopoints that won, given the provided bets.
         If the bets object has no bet amounts, you can opt to use the NeoFoodClub object's bet amount.
         Will return 0 otherwise.
@@ -1173,7 +1173,9 @@ class NeoFoodClub(BetMixin):
 
         return np.sum(np.clip(winnings[mask], 0, 1_000_000)).astype(int)
 
-    def make_url(self, bets: Optional[Bets] = None, all_data: bool = False) -> str:
+    def make_url(
+        self, bets: Optional[Bets] = None, /, *, all_data: bool = False
+    ) -> str:
         """:class:`str`: Returns an optionally-fully-loaded NeoFoodClub URL to describe the provided bets.
 
         Parameters
@@ -1226,6 +1228,7 @@ class NeoFoodClub(BetMixin):
     def from_url(
         cls,
         url: str,
+        /,
         *,
         bet_amount: Optional[int] = None,
         modifier: Optional[Modifier] = None,
