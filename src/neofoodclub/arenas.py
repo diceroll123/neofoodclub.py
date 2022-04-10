@@ -113,7 +113,7 @@ class Arenas:
             for idx, a in enumerate(nfc._data["pirates"])  # type: ignore
         ]
 
-    def get_pirate_by_id(self, pirate_id: int) -> Pirate:  # type: ignore
+    def get_pirate_by_id(self, pirate_id: int, /) -> Pirate:  # type: ignore
         """:class:`Pirate`: Returns a single pirate where their ID matches pirate_id."""
         for p in self.all_pirates:
             if p.id == pirate_id:
@@ -159,7 +159,7 @@ class Arenas:
         """List[:class:`Arena`]: Returns a list of positive arenas sorted from least to greatest odds."""
         return sorted([a for a in self._arenas if a.positive], key=lambda _a: _a._odds)  # type: ignore
 
-    def get_arena(self, arena_id: int) -> Arena:
+    def get_arena(self, arena_id: int, /) -> Arena:
         return self._arenas[arena_id]
 
     def __getitem__(self, key: int) -> Arena:
