@@ -456,7 +456,7 @@ class Bets:
         return None
 
     @bet_amounts.setter
-    def bet_amounts(self, val: Optional[Union[Sequence[int], np.ndarray]]):
+    def bet_amounts(self, val: Optional[Union[Sequence[Optional[int]], np.ndarray]]):
         if val is None:
             self._bet_amounts = None
             return
