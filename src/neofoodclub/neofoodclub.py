@@ -556,6 +556,28 @@ class Bets:
         return all(mask & bet for mask in NFCMath.BIT_MASKS for bet in self)
 
     @property
+    def is_gambit(self) -> bool:
+        """:class:`bool`: Returns whether or not this is a gambit set.
+
+        The rules for what a gambit is, is *somewhat* arbitrary:
+          - The largest integer in the binary representation of the bet set must have five 1's.
+          - All bets must be subsets of the largest integer.
+          - There must be at least 2 bets.
+        """
+
+        if len(self) < 2:
+            return False
+
+        int_bins = self.nfc._data_dict["bins"].astype(int)[self._indices]
+        highest = np.max(int_bins)
+
+        # make sure the highest has a population count of 5
+        if np.unpackbits(np.array([highest]).view("uint8")).sum() != 5:
+            return False
+
+        return np.all((highest & int_bins) == int_bins)
+
+    @property
     def is_guaranteed_win(self) -> bool:
         """:class:`bool`: Returns whether or not this set is guaranteed to profit."""
         amounts = self.bet_amounts

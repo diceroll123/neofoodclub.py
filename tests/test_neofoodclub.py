@@ -85,6 +85,19 @@ crazy_test_binaries: Tuple[int, ...] = (
     0x44242,
 )
 
+gambit_test_binaries: Tuple[int, ...] = (
+    0x11842,
+    0x11042,
+    0x1842,
+    0x11840,
+    0x11802,
+    0x1042,
+    0x10842,
+    0x11040,
+    0x11002,
+    0x1840,
+)
+
 test_expected_results = (crazy_test_bet_hash, crazy_test_indices, crazy_test_binaries)
 
 test_nfc = NeoFoodClub(test_round_data)
@@ -155,3 +168,16 @@ class CrazyBetsTest(unittest.TestCase):
 
     def test_not_crazy_bets(self):
         self.assertFalse(test_nfc.make_bets_from_binaries(0x1, 0x2, 0x4, 0x8).is_crazy)
+
+
+class GambitBetsTest(unittest.TestCase):
+    def test_gambit_bets(self):
+        self.assertTrue(
+            test_nfc.make_bets_from_binaries(*gambit_test_binaries).is_gambit
+        )
+
+    def test_not_gambit_bets(self):
+        self.assertFalse(crazy_bets_from_binaries.is_gambit)
+
+    def test_minimum_gambit_bets(self):
+        self.assertTrue(test_nfc.make_bets_from_binaries(0x88888, 0x8).is_gambit)
