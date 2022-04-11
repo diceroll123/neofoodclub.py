@@ -683,7 +683,11 @@ class NeoFoodClub:
                     self._data["customOdds"][k1][k2 + 1] = self._modifier.custom_odds[p]
 
     def _do_snapshot(self):
-        dt = self._get_round_time(self._modifier.time)
+        mod_time = self._modifier.time
+        if mod_time is None:
+            return
+
+        dt = self._get_round_time(mod_time)
         if dt is None:
             return
 
