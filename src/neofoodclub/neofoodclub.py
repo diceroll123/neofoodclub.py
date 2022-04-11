@@ -30,7 +30,7 @@ from . import utils
 from .errors import InvalidData, MissingData, NoPositiveArenas
 
 if TYPE_CHECKING:
-    from neofoodclub.types import OddsChangeDict, RoundData
+    from neofoodclub.types import OddsChangeDict
 
     from .arenas import Arena, Arenas
     from .pirates import PartialPirate, Pirate
@@ -75,7 +75,7 @@ class OddsChange:
         "_round_data",
     )
 
-    def __init__(self, *, index: int, data: OddsChangeDict, round_data: RoundData):
+    def __init__(self, *, index: int, data: OddsChangeDict, round_data: Dict[str, Any]):
         self._index = index
         self._data = data  # to check against each other
         self._round_data = round_data
@@ -648,7 +648,7 @@ class NeoFoodClub:
 
     def __init__(
         self,
-        data: RoundData,
+        data: Dict[str, Any],
         *,
         bet_amount: Optional[int] = None,
         modifier: Optional[Modifier] = None,
@@ -814,8 +814,8 @@ class NeoFoodClub:
         self.modifier = modifier
         return self
 
-    def to_dict(self, *, keep_custom: bool = False) -> RoundData:
-        """:class:`RoundData`: Returns the data used to make this NeoFoodClub object.
+    def to_dict(self, *, keep_custom: bool = False) -> Dict[str, Any]:
+        """:class:`Dict[str, Any]`: Returns the data used to make this NeoFoodClub object.
 
         Parameters
         -----------

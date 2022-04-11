@@ -106,7 +106,7 @@ test_nfc = NeoFoodClub(test_round_data)
 test_nfc_with_amounts = NeoFoodClub(test_round_data, bet_amount=8000)
 
 crazy_bets_from_hash = test_nfc.make_bets_from_hash(crazy_test_bet_hash)
-crazy_bets_from_indices = test_nfc.make_bets_from_indices(crazy_test_indices)  # type: ignore
+crazy_bets_from_indices = test_nfc.make_bets_from_indices(crazy_test_indices)
 crazy_bets_from_binaries = test_nfc.make_bets_from_binaries(*crazy_test_binaries)
 
 ########################################################################################################################
@@ -241,8 +241,7 @@ class MaxterBetsTest(unittest.TestCase):
     def test_mer_bet_amounts(self):
         # because the mer set for the test round we have happened to win 26 units
         bets = test_nfc_with_amounts.make_max_ter_bets()
-        self.assertTrue(bets.bet_amounts is not None)
-        self.assertTrue(bets.bet_amounts.sum() == 80000)  # type: ignore
+        self.assertEqual(bets.bet_amounts.sum(), 80000)
 
 
 class GambitBetsTest(unittest.TestCase):
