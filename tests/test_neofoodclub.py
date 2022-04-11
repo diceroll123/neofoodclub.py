@@ -4,6 +4,7 @@ from typing import Any, Dict, Tuple
 
 from neofoodclub import NeoFoodClub
 from neofoodclub.errors import InvalidData, NoPositiveArenas
+from neofoodclub.neofoodclub import Modifier
 
 # i picked the smallest round I could quickly find
 test_round_data: Dict[str, Any] = {
@@ -272,3 +273,38 @@ class BetsErrorsTest(unittest.TestCase):
     def test_too_many_bet_amounts_from_hash(self):
         with self.assertRaises(InvalidData):
             test_nfc.make_bets_from_hash("faa", amounts=[50, 50])
+
+
+class NeoFoodClubTest(unittest.TestCase):
+    def test_bet_amount(self):
+        new_nfc = NeoFoodClub(test_round_data)
+        new_nfc.bet_amount = 8000
+        self.assertEqual(new_nfc.bet_amount, 8000)
+
+    def test_modifier(self):
+        new_nfc = NeoFoodClub(test_round_data, cache=False)
+        new_nfc.modifier = Modifier(Modifier.REVERSE)
+        self.assertEqual(new_nfc.modifier, Modifier(Modifier.REVERSE))
+
+    def test_modified(self):
+        new_nfc = NeoFoodClub(test_round_data, cache=False)
+        new_nfc.modifier = Modifier(custom_odds={1: 2})
+        self.assertTrue(new_nfc.modified)
+
+    def test_round(self):
+        new_nfc = NeoFoodClub(test_round_data, cache=False)
+        self.assertEqual(new_nfc.round, 7956)
+
+    def test_is_over(self):
+        new_nfc = NeoFoodClub(test_round_data, cache=False)
+        self.assertTrue(new_nfc.is_over)
+
+    def test_changes_count(self):
+        new_nfc = NeoFoodClub(test_round_data, cache=False)
+        self.assertEqual(len(new_nfc.changes), 4)
+
+    def test_cc_perk(self):
+        new_nfc = NeoFoodClub(test_round_data)
+        new_nfc.modifier = Modifier(cc_perk=True)
+        bets = new_nfc.make_max_ter_bets()
+        self.assertEqual(len(bets), 15)
