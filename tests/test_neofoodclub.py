@@ -1,7 +1,7 @@
 import unittest
 from typing import Any, Dict, Tuple
 
-from neofoodclub import NeoFoodClub  # type: ignore
+from neofoodclub import NeoFoodClub
 
 # i picked the smallest round I could quickly find
 test_round_data: Dict[str, Any] = {
@@ -58,8 +58,9 @@ test_round_data: Dict[str, Any] = {
     ],
 }
 
-test_bet_hash = "ltqvqwgimhqtvrnywrwvijwnn"
-test_indices: Tuple[Tuple[int, ...], ...] = (
+# this is a crazy bet! (all arenas have a pirate bet)
+crazy_test_bet_hash = "ltqvqwgimhqtvrnywrwvijwnn"
+crazy_test_indices: Tuple[Tuple[int, ...], ...] = (
     (2, 1, 3, 4, 3),
     (1, 4, 1, 3, 1),
     (4, 2, 1, 1, 1),
@@ -71,7 +72,7 @@ test_indices: Tuple[Tuple[int, ...], ...] = (
     (1, 3, 1, 4, 4),
     (2, 2, 3, 2, 3),
 )
-test_binaries: Tuple[int, ...] = (
+crazy_test_binaries: Tuple[int, ...] = (
     0x48212,
     0x81828,
     0x14888,
@@ -84,40 +85,55 @@ test_binaries: Tuple[int, ...] = (
     0x44242,
 )
 
-test_expected_results = (test_bet_hash, test_indices, test_binaries)
+test_expected_results = (crazy_test_bet_hash, crazy_test_indices, crazy_test_binaries)
 
 test_nfc = NeoFoodClub(test_round_data)
 
-hash_bets = test_nfc.make_bets_from_hash(test_bet_hash)
-indices_bets = test_nfc.make_bets_from_indices(test_indices)  # type: ignore
-binaries_bets = test_nfc.make_bets_from_binaries(*test_binaries)
+crazy_bets_from_hash = test_nfc.make_bets_from_hash(crazy_test_bet_hash)
+crazy_bets_from_indices = test_nfc.make_bets_from_indices(crazy_test_indices)  # type: ignore
+crazy_bets_from_binaries = test_nfc.make_bets_from_binaries(*crazy_test_binaries)
 
 ########################################################################################################################
 
 
 class BetDecodingTest(unittest.TestCase):
-    def test_bet_hash_encoding(self):
+    def crazy_test_bet_hash_encoding(self):
         self.assertEqual(
-            (hash_bets.bets_hash, hash_bets.indices, tuple(hash_bets)),
+            (
+                crazy_bets_from_hash.bets_hash,
+                crazy_bets_from_hash.indices,
+                tuple(crazy_bets_from_hash),
+            ),
             test_expected_results,
         )
 
     def test_bet_indices_encoding(self):
         self.assertEqual(
-            (indices_bets.bets_hash, indices_bets.indices, tuple(indices_bets)),
+            (
+                crazy_bets_from_indices.bets_hash,
+                crazy_bets_from_indices.indices,
+                tuple(crazy_bets_from_indices),
+            ),
             test_expected_results,
         )
 
     def test_bet_binary_encoding(self):
         self.assertEqual(
-            (binaries_bets.bets_hash, binaries_bets.indices, tuple(binaries_bets)),
+            (
+                crazy_bets_from_binaries.bets_hash,
+                crazy_bets_from_binaries.indices,
+                tuple(crazy_bets_from_binaries),
+            ),
             test_expected_results,
         )
 
 
 class BetEquivalenceTest(unittest.TestCase):
     def test_bet_equivalence(self):
-        self.assertTrue(hash_bets == indices_bets and indices_bets == binaries_bets)
+        self.assertTrue(
+            crazy_bets_from_hash == crazy_bets_from_indices
+            and crazy_bets_from_indices == crazy_bets_from_binaries
+        )
 
 
 class BustproofTest(unittest.TestCase):
@@ -130,4 +146,12 @@ class BustproofTest(unittest.TestCase):
         self.assertFalse(test_nfc.make_bets_from_binaries(0x1).is_bustproof)
 
     def test_not_bustproof(self):
-        self.assertFalse(binaries_bets.is_bustproof)
+        self.assertFalse(crazy_bets_from_binaries.is_bustproof)
+
+
+class CrazyBetsTest(unittest.TestCase):
+    def test_crazy_bets(self):
+        self.assertTrue(crazy_bets_from_binaries.is_crazy)
+
+    def test_not_crazy_bets(self):
+        self.assertFalse(test_nfc.make_bets_from_binaries(0x1, 0x2, 0x4, 0x8).is_crazy)

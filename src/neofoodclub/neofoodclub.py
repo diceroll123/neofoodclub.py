@@ -551,6 +551,11 @@ class Bets:
         return self.odds.bust is None
 
     @property
+    def is_crazy(self) -> bool:
+        """:class:`bool`: Returns whether or not this set is "crazy". This returns True if all of the bets have all arenas filled. Mostly just for fun."""
+        return all(mask & bet for mask in NFCMath.BIT_MASKS for bet in self)
+
+    @property
     def is_guaranteed_win(self) -> bool:
         """:class:`bool`: Returns whether or not this set is guaranteed to profit."""
         amounts = self.bet_amounts
