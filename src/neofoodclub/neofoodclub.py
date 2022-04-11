@@ -443,10 +443,14 @@ class Bets:
             return np.sum(self.nfc._net_expected_cache[self._indices])
         return 0.0
 
+    ne = net_expected
+
     @property
-    def er(self) -> float:
+    def expected_ratio(self) -> float:
         """:class:`float`: Returns the total expected ratio of this bet set."""
         return np.sum(self.nfc._data_dict["ers"][self._indices])
+
+    er = expected_ratio
 
     @property
     def bet_amounts(self) -> np.ndarray:
@@ -504,7 +508,7 @@ class Bets:
     def __repr__(self):
         attrs = [
             ("ne", self.net_expected),
-            ("er", self.er),
+            ("er", self.expected_ratio),
             ("bets_hash", self.bets_hash),
             ("amounts_hash", self.amounts_hash),
         ]
