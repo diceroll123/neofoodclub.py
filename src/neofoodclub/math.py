@@ -249,7 +249,7 @@ def bets_hash_to_bets(bets_hash: str) -> Dict[int, Tuple[int, ...]]:
     bet_length = len(bets)
     if not 1 <= bet_length <= 15:
         # currently support 15 bets still for reverse-compatibility i guess
-        raise InvalidData("An invalid amount of bets was in bets_hash")
+        raise InvalidData("An invalid amount of bets was provided")
 
     return dict(zip(range(1, bet_length + 1), bets))
 
