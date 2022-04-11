@@ -57,7 +57,7 @@ def _require_cache(func):
 
     @functools.wraps(func)
     def wrapper(self: NeoFoodClub, *args, **kwargs):
-        if self._data_dict is None or self._stds is None:
+        if not self._data_dict or not self._stds:
             self.reset()
         return func(self, *args, **kwargs)
 
@@ -429,7 +429,7 @@ class Bets:
         This is equal to (bet_amount * expected_ratio - bet_amount) for each bet and its associated bet amount.
 
         Returns 0.0 if there is no bet amount set for the NeoFoodClub object, or the bets."""
-        if np.all(self.bet_amounts):
+        if np.all(self.bet_amounts > -1000):
             return np.sum(
                 self.bet_amounts * self.nfc._data_dict["ers"][self._indices]
                 - self.bet_amounts
@@ -489,12 +489,12 @@ class Bets:
     @property
     def amounts_hash(self) -> str:
         """:class:`str`: Returns a NeoFoodClub-compatible encoded hash of bet amounts."""
-        if self.bet_amounts is None:
-            return ""
+        if np.all(self.bet_amounts > -1000):
+            return NFCMath.bet_amounts_to_amounts_hash(
+                dict(zip(range(len(self.bet_amounts)), self.bet_amounts))
+            )
 
-        return NFCMath.bet_amounts_to_amounts_hash(
-            dict(zip(range(len(self.bet_amounts)), self.bet_amounts))
-        )
+        return ""
 
     def __repr__(self):
         attrs = [
@@ -658,9 +658,9 @@ class NeoFoodClub:
         self._data = json.loads(json.dumps(data))
         self._bet_amount = bet_amount
         self._data_dict = {}
+        self._stds = {}
         self._maxbet_odds_cache = np.array([])
         self._net_expected_cache = np.array([])
-        self._stds = np.array([])
 
         if modifier is None:
             modifier = Modifier()
@@ -1046,7 +1046,7 @@ class NeoFoodClub:
 
         if bets:
             url += "&b=" + bets.bets_hash
-            if np.sum(bets.bet_amounts):
+            if np.all(bets.bet_amounts > -1000):
                 url += "&a=" + bets.amounts_hash
 
         return url
