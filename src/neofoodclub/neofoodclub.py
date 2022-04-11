@@ -800,11 +800,16 @@ class NeoFoodClub:
         if self._modifier is None:
             return False
 
-        return (
-            self._modifier.custom_odds is None
-            and self._modifier.time is None
-            and self._modifier.opening_odds is None
-        )
+        if self._modifier.custom_odds is not None:
+            return True
+
+        if self._modifier.time is not None:
+            return True
+
+        if self._modifier.opening_odds:
+            return True
+
+        return False
 
     def with_modifier(self, modifier: Optional[Modifier] = None, /):
         """Applies the supplied modifier to the NeoFoodClub object.
