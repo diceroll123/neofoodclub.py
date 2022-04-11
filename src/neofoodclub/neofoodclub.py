@@ -370,8 +370,13 @@ class Odds:
                 bets.indices, self._odds_values, bets.nfc._stds  # type: ignore
             )
         ]
-        self.best = self._odds[-1]  # highest odds
-        self.bust: Optional[Chance] = self._odds[0] if self._odds[0].value == 0 else None  # lowest odds
+
+        # highest odds
+        self.best = self._odds[-1]
+
+        # bust chance, can be None
+        self.bust = self._odds[0] if self._odds[0].value == 0 else None
+
         self.most_likely_winner = max(
             self._odds[1 if self.bust else 0 :], key=lambda o: o.probability
         )
@@ -662,9 +667,7 @@ class NeoFoodClub:
         self._maxbet_odds_cache = np.array([])
         self._net_expected_cache = np.array([])
 
-        if modifier is None:
-            modifier = Modifier()
-        self._modifier = modifier
+        self._modifier = modifier or Modifier()
         self._modifier.nfc = self
 
         if cache:
@@ -816,12 +819,10 @@ class NeoFoodClub:
 
         Parameters
         -----------
-        modifier: :class:`Modifier`
+        modifier: Optional[:class:`Modifier`]
             The modifier object you'd like to add to this NeoFoodClub object."""
-        if modifier is None:
-            modifier = Modifier()
 
-        self.modifier = modifier
+        self.modifier = modifier or Modifier()
         return self
 
     def to_dict(self, *, keep_custom: bool = False) -> Dict[str, Any]:
