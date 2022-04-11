@@ -14,3 +14,9 @@ class MissingData(FoodClubException):
     """An exception that is thrown when no relevant data is found when creating NFC objects"""
 
     pass
+
+
+class NoPositiveArenas(FoodClubException):
+    """An exception that is thrown when there are no positive arenas while creating a bustproof set"""
+
+    pass

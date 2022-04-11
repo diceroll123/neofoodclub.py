@@ -27,7 +27,7 @@ from dateutil.tz import UTC, tzutc
 import neofoodclub.math as NFCMath
 
 from . import utils
-from .errors import InvalidData, MissingData
+from .errors import InvalidData, MissingData, NoPositiveArenas
 
 if TYPE_CHECKING:
     from neofoodclub.types import OddsChangeDict, RoundData
@@ -1262,16 +1262,22 @@ class NeoFoodClub:
         return Bets._from_generator(indices=self._unit_indices(units), nfc=self)
 
     @_require_cache
-    def make_bustproof_bets(self) -> Optional[Bets]:
-        """Optional[:class:`Bets`]: Creates a Bets object that consists of the bets made in such a way that with a given bet
+    def make_bustproof_bets(self) -> Bets:
+        """:class:`Bets`: Creates a Bets object that consists of the bets made in such a way that with a given bet
         amount, you will not bust.
 
-        This requires at least one positive arena, otherwise will return None."""
+        This requires at least one positive arena, otherwise will throw :class:`NoPositiveArenas`.
+
+        Raises
+        -------
+        ~neofoodclub.NoPositiveArenas
+            There are no positive arenas, so a bustproof set can not be made.
+        """
         arenas = self.arenas
         positives = arenas.positives
         if not positives:
             # nothing to do here!
-            return None
+            raise NoPositiveArenas
 
         if len(positives) == 1:
             # If only one arena is positive, we place 1 bet on each of the pirates of that arena. Total bets = 4.
