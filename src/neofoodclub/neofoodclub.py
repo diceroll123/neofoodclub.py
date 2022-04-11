@@ -420,7 +420,7 @@ class Bets:
         self.nfc = nfc
         self._indices = indices
 
-        self.bet_amounts = amounts or None
+        self.bet_amounts = amounts
 
     @property
     def net_expected(self) -> float:
@@ -429,12 +429,12 @@ class Bets:
         This is equal to (bet_amount * expected_ratio - bet_amount) for each bet and its associated bet amount.
 
         Returns 0.0 if there is no bet amount set for the NeoFoodClub object, or the bets."""
-        if self.bet_amounts is not None and np.any(self.bet_amounts):
+        if np.all(self.bet_amounts):
             return np.sum(
                 self.bet_amounts * self.nfc._data_dict["ers"][self._indices]
                 - self.bet_amounts
             )
-        if self.nfc._net_expected_cache is not None:
+        if self.nfc._net_expected_cache.size:
             return np.sum(self.nfc._net_expected_cache[self._indices])
         return 0.0
 
@@ -444,22 +444,22 @@ class Bets:
         return np.sum(self.nfc._data_dict["ers"][self._indices])
 
     @property
-    def bet_amounts(self) -> Optional[np.ndarray]:
-        """Optional[:class:`np.ndarray`]: Returns a numpy array of bet amounts corresponding by index to these bets.
+    def bet_amounts(self) -> np.ndarray:
+        """:class:`np.ndarray`: Returns a numpy array of bet amounts corresponding by index to these bets.
 
         These can be user-defined, and generated."""
-        if self._bet_amounts is not None:
+        if np.all(self._bet_amounts > -1000):
             return self._bet_amounts
 
-        if self.nfc._maxbet_odds_cache is not None:
+        if self.nfc._maxbet_odds_cache.size:
             return self.nfc._maxbet_odds_cache[self._indices].astype(int)
 
-        return None
+        return np.array([-1000] * self._indices.size)
 
     @bet_amounts.setter
     def bet_amounts(self, val: Optional[Union[Sequence[Optional[int]], np.ndarray]]):
         if val is None:
-            self._bet_amounts = None
+            self._bet_amounts = np.array([-1000] * self._indices.size)
             return
 
         # strictly enforcing amount of values provided
@@ -573,10 +573,10 @@ class Bets:
         highest = np.max(int_bins)
 
         # make sure the highest has a population count of 5
-        if np.unpackbits(np.array([highest]).view("uint8")).sum() != 5:
+        if np.array(np.unpackbits(np.array([highest]).view("uint8"))).sum() != 5:
             return False
 
-        return np.all((highest & int_bins) == int_bins)
+        return bool(np.all((highest & int_bins) == int_bins))
 
     @property
     def is_guaranteed_win(self) -> bool:
@@ -657,10 +657,10 @@ class NeoFoodClub:
         # so it's not changing old cache data around, have a deep copy (safety precaution for custom odds)
         self._data = json.loads(json.dumps(data))
         self._bet_amount = bet_amount
-        self._data_dict = None
-        self._maxbet_odds_cache = None
-        self._net_expected_cache = None
-        self._stds = None
+        self._data_dict = {}
+        self._maxbet_odds_cache = np.array([])
+        self._net_expected_cache = np.array([])
+        self._stds = np.array([])
 
         if modifier is None:
             modifier = Modifier()
@@ -977,7 +977,7 @@ class NeoFoodClub:
 
         use_backup_if_needed = use_bet_amount_if_none and self.bet_amount
 
-        if bets.bet_amounts is not None:
+        if np.all(bets.bet_amounts):
             multiplier = bets.bet_amounts
         elif use_backup_if_needed:
             multiplier = np.full(bets._indices.size, self.bet_amount)
@@ -1004,7 +1004,7 @@ class NeoFoodClub:
             Default = False.
         """
 
-        def encode(int_lists: List[List[int]]) -> str:
+        def encode(int_lists: List[Any]) -> str:
             return json.dumps(int_lists, separators=(",", ":"))
 
         use_15 = bets and 10 < len(bets) <= 15 or self._modifier._cc_perk
@@ -1142,7 +1142,7 @@ class NeoFoodClub:
     @_require_cache
     def _max_ter_indices(self) -> np.ndarray:
         # use net expected only if needed
-        if self._modifier.general or self._net_expected_cache is None:
+        if self._modifier.general or self._net_expected_cache.size == 0:
             return self._data_dict["ers"]
         else:
             return self._net_expected_cache
@@ -1225,7 +1225,7 @@ class NeoFoodClub:
 
         ers = (
             self._net_expected_cache
-            if self._net_expected_cache is not None
+            if self._net_expected_cache.size > 0
             else self._data_dict["ers"]
         )
 
