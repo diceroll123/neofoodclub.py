@@ -716,6 +716,11 @@ class NeoFoodClub:
     def _cache_bet_amount_dicts(self):
         # cache maxbets, we'll need these a lot later,
         # but only if we need them at all
+        if "maxbets" not in self._data_dict:
+            # the round dicts haven't been made, let's do that now since we need them
+            self._cache_dicts()  # this call will call this parent function again, so return!
+            return
+
         if bet_amount := self._bet_amount:
             mb_copy = self._data_dict["maxbets"].copy()
             mb_copy[mb_copy > bet_amount] = bet_amount
