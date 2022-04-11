@@ -1,8 +1,9 @@
+import copy
 import unittest
 from typing import Any, Dict, Tuple
 
 from neofoodclub import NeoFoodClub
-from neofoodclub.errors import InvalidData
+from neofoodclub.errors import InvalidData, NoPositiveArenas
 
 # i picked the smallest round I could quickly find
 test_round_data: Dict[str, Any] = {
@@ -102,6 +103,7 @@ gambit_test_binaries: Tuple[int, ...] = (
 test_expected_results = (crazy_test_bet_hash, crazy_test_indices, crazy_test_binaries)
 
 test_nfc = NeoFoodClub(test_round_data)
+test_nfc_with_amounts = NeoFoodClub(test_round_data, bet_amount=8000)
 
 crazy_bets_from_hash = test_nfc.make_bets_from_hash(crazy_test_bet_hash)
 crazy_bets_from_indices = test_nfc.make_bets_from_indices(crazy_test_indices)  # type: ignore
@@ -151,6 +153,22 @@ class BetEquivalenceTest(unittest.TestCase):
 
 
 class BustproofTest(unittest.TestCase):
+    def test_bustproof_generator(self):
+        self.assertTrue(test_nfc.make_bustproof_bets().is_bustproof)
+
+    def test_bustproof_generator_amount(self):
+        # for this round data we have, this makes 4 bets.
+        self.assertTrue(len(test_nfc.make_bustproof_bets()) == 4)
+
+    def test_bustproof_generator_no_positives(self):
+        with self.assertRaises(NoPositiveArenas):
+            # modify our round object to have no positives (just need to change the last arena for this one)
+            round_data = copy.deepcopy(test_round_data)
+            # will give the arena a -50% ratio
+            round_data["currentOdds"][-1] = [1, 2, 2, 2, 2]
+            no_positive_nfc = NeoFoodClub(round_data)
+            no_positive_nfc.make_bustproof_bets()
+
     def test_bustproof_minimal(self):
         self.assertTrue(
             test_nfc.make_bets_from_binaries(0x1, 0x2, 0x4, 0x8).is_bustproof
@@ -164,6 +182,9 @@ class BustproofTest(unittest.TestCase):
 
 
 class CrazyBetsTest(unittest.TestCase):
+    def test_crazy_bet_generator(self):
+        self.assertTrue(test_nfc.make_crazy_bets().is_crazy)
+
     def test_crazy_bets(self):
         self.assertTrue(crazy_bets_from_binaries.is_crazy)
 
@@ -171,7 +192,63 @@ class CrazyBetsTest(unittest.TestCase):
         self.assertFalse(test_nfc.make_bets_from_binaries(0x1, 0x2, 0x4, 0x8).is_crazy)
 
 
+class MaxterBetsTest(unittest.TestCase):
+    def test_mer_bets_no_bet_amount(self):
+        # make sure it creates the same bets, regardless of order
+        bets = test_nfc.make_max_ter_bets()
+
+        self.assertEqual(
+            set(bets),
+            {
+                0x104,
+                0x4,
+                0x80104,
+                0x1104,
+                0x10104,
+                0x80004,
+                0x101,
+                0x2104,
+                0x8104,
+                0x204,
+            },
+        )
+
+    def test_mer_bets_with_amounts(self):
+        # make sure it creates the same bets, regardless of order
+        bets = test_nfc_with_amounts.make_max_ter_bets()
+
+        self.assertEqual(
+            set(bets),
+            {
+                0x104,
+                0x4,
+                0x80104,
+                0x1104,
+                0x10104,
+                0x80004,
+                0x101,
+                0x2104,
+                0x8104,
+                0x204,
+            },
+        )
+
+    def test_mer_winning_odds(self):
+        # because the mer set for the test round we have happened to win 26 units
+        bets = test_nfc_with_amounts.make_max_ter_bets()
+        self.assertTrue(test_nfc_with_amounts.get_win_units(bets) == 26)
+
+    def test_mer_bet_amounts(self):
+        # because the mer set for the test round we have happened to win 26 units
+        bets = test_nfc_with_amounts.make_max_ter_bets()
+        self.assertTrue(bets.bet_amounts is not None)
+        self.assertTrue(bets.bet_amounts.sum() == 80000)  # type: ignore
+
+
 class GambitBetsTest(unittest.TestCase):
+    def test_gambit_bet_generator(self):
+        self.assertTrue(test_nfc.make_gambit_bets().is_gambit)
+
     def test_gambit_bets(self):
         self.assertTrue(
             test_nfc.make_bets_from_binaries(*gambit_test_binaries).is_gambit
