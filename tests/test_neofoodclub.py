@@ -2,6 +2,7 @@ import unittest
 from typing import Any, Dict, Tuple
 
 from neofoodclub import NeoFoodClub
+from neofoodclub.errors import InvalidData
 
 # i picked the smallest round I could quickly find
 test_round_data: Dict[str, Any] = {
@@ -181,3 +182,17 @@ class GambitBetsTest(unittest.TestCase):
 
     def test_minimum_gambit_bets(self):
         self.assertTrue(test_nfc.make_bets_from_binaries(0x88888, 0x8).is_gambit)
+
+
+class BetsErrorsTest(unittest.TestCase):
+    def test_too_many_bet_amounts_from_binaries(self):
+        with self.assertRaises(InvalidData):
+            test_nfc.make_bets_from_binaries(0x1, amounts=[50, 50])
+
+    def test_too_many_bet_amounts_from_indices(self):
+        with self.assertRaises(InvalidData):
+            test_nfc.make_bets_from_indices([(1, 0, 0, 0, 0)], amounts=[50, 50])
+
+    def test_too_many_bet_amounts_from_hash(self):
+        with self.assertRaises(InvalidData):
+            test_nfc.make_bets_from_hash("faa", amounts=[50, 50])

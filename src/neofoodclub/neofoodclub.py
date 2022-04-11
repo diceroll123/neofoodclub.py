@@ -16,6 +16,7 @@ from typing import (
     Sequence,
     Tuple,
     Union,
+    overload,
 )
 
 import dateutil
@@ -1314,27 +1315,110 @@ class NeoFoodClub:
         return bets
 
     # bet decoding methods
-    @_require_cache
+
+    @overload
     def make_bets_from_indices(self, indices: Sequence[Sequence[int]], /) -> Bets:
+        ...
+
+    @overload
+    def make_bets_from_indices(
+        self, indices: Sequence[Sequence[int]], /, *, amounts_hash: Optional[str] = None
+    ) -> Bets:
+        ...
+
+    @overload
+    def make_bets_from_indices(
+        self,
+        indices: Sequence[Sequence[int]],
+        /,
+        *,
+        amounts: Optional[List[int]] = None,
+    ) -> Bets:
+        ...
+
+    @_require_cache
+    def make_bets_from_indices(
+        self,
+        indices: Sequence[Sequence[int]],
+        /,
+        *,
+        amounts_hash: Optional[str] = None,
+        amounts: Optional[List[int]] = None,
+    ) -> Bets:
         """:class:`Bets`: Creates a Bets object made up of arena indices."""
-        return Bets.from_binary(
+        bets = Bets.from_binary(
             *NFCMath.bets_indices_to_bet_binaries(indices), nfc=self
         )
+        if amounts_hash:
+            bets.bet_amounts = NFCMath.amounts_hash_to_bet_amounts(amounts_hash)
+        if amounts:
+            bets.bet_amounts = amounts
+
+        return bets
+
+    @overload
+    def make_bets_from_hash(self, bets_hash: str, /) -> Bets:
+        ...
+
+    @overload
+    def make_bets_from_hash(
+        self, bets_hash: str, /, *, amounts_hash: Optional[str] = None
+    ) -> Bets:
+        ...
+
+    @overload
+    def make_bets_from_hash(
+        self, bets_hash: str, /, *, amounts: Optional[List[int]] = None
+    ) -> Bets:
+        ...
 
     @_require_cache
     def make_bets_from_hash(
-        self, bets_hash: str, /, *, amounts_hash: Optional[str] = None
+        self,
+        bets_hash: str,
+        /,
+        *,
+        amounts_hash: Optional[str] = None,
+        amounts: Optional[List[int]] = None,
     ) -> Bets:
         """:class:`Bets`: Creates a Bets object by decoding from bets_hash (and optionally an amounts_hash)."""
         # Takes a bet hash and turns it into Bets
         bets = Bets.from_binary(*NFCMath.bets_hash_to_bet_binaries(bets_hash), nfc=self)
         if amounts_hash:
-            amounts = NFCMath.amounts_hash_to_bet_amounts(amounts_hash)
+            bets.bet_amounts = NFCMath.amounts_hash_to_bet_amounts(amounts_hash)
+        if amounts:
             bets.bet_amounts = amounts
 
         return bets
 
-    @_require_cache
+    @overload
     def make_bets_from_binaries(self, *binaries: int) -> Bets:
+        ...
+
+    @overload
+    def make_bets_from_binaries(
+        self, *binaries: int, amounts_hash: Optional[str] = None
+    ) -> Bets:
+        ...
+
+    @overload
+    def make_bets_from_binaries(
+        self, *binaries: int, amounts: Optional[List[int]] = None
+    ) -> Bets:
+        ...
+
+    @_require_cache
+    def make_bets_from_binaries(
+        self,
+        *binaries: int,
+        amounts_hash: Optional[str] = None,
+        amounts: Optional[List[int]] = None,
+    ) -> Bets:
         """:class:`Bets`: Creates a Bets object made up of bet-compatible binary numbers."""
-        return Bets.from_binary(*binaries, nfc=self)
+        bets = Bets.from_binary(*binaries, nfc=self)
+        if amounts_hash:
+            bets.bet_amounts = NFCMath.amounts_hash_to_bet_amounts(amounts_hash)
+        if amounts:
+            bets.bet_amounts = amounts
+
+        return bets
