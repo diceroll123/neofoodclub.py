@@ -1126,12 +1126,13 @@ class NeoFoodClub:
 
         return cls(data, bet_amount=bet_amount, modifier=modifier)
 
-    def copy(self, keep_custom: bool = False) -> NeoFoodClub:
+    def copy(self, *, keep_custom: bool = False, cache: bool = True) -> NeoFoodClub:
         """:class:`NeoFoodClub`: Returns a deep copy of this NeoFoodClub instance."""
         return NeoFoodClub(
             self.to_dict(keep_custom=keep_custom),
             bet_amount=self._bet_amount,
             modifier=self._modifier,
+            cache=cache,
         )
 
     def __repr__(self):
