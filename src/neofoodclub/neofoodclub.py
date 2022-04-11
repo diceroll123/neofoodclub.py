@@ -601,17 +601,25 @@ class Bets:
 
         return highest_bet_amount < lowest_winning_bet_amount and self.is_bustproof
 
-    def make_url(self, *, all_data: bool = False) -> str:
+    def make_url(
+        self,
+        *,
+        all_data: bool = False,
+        include_domain: bool = True,
+    ) -> str:
         """:class:`str`: Returns an optionally-fully-loaded NeoFoodClub URL to describe these bets.
 
         Parameters
         -----------
         all_data: :class:`bool`
-            Whether or not you want the url with all pirates, odds, etc. included. Usually, this is not necessary.
+            Whether or not you want the URL with all pirates, odds, etc. included. Usually, this is not necessary.
             Default = False.
+        include_domain: :class:`bool`
+            Whether or not you want the output URL to include the preferred neofoodclub website's domain.
+            Default = True.
         """
 
-        return self.nfc.make_url(self, all_data=all_data)
+        return self.nfc.make_url(self, all_data=all_data, include_domain=include_domain)
 
     def _iterator(self) -> Generator[int, None, None]:
         int_bins = self.nfc._data_dict["bins"].astype(int)
@@ -1006,7 +1014,12 @@ class NeoFoodClub:
         return np.sum(np.clip(winnings[mask], 0, 1_000_000)).astype(int)
 
     def make_url(
-        self, bets: Optional[Bets] = None, /, *, all_data: bool = False
+        self,
+        bets: Optional[Bets] = None,
+        /,
+        *,
+        all_data: bool = False,
+        include_domain: bool = True,
     ) -> str:
         """:class:`str`: Returns an optionally-fully-loaded NeoFoodClub URL to describe the provided bets.
 
@@ -1015,8 +1028,11 @@ class NeoFoodClub:
         bets: :class:`Bets`
             The bets you'd like to make the URL for.
         all_data: :class:`bool`
-            Whether or not you want the url with all pirates, odds, etc. included. Usually, this is not necessary.
+            Whether or not you want the URL with all pirates, odds, etc. included. Usually, this is not necessary.
             Default = False.
+        include_domain: :class:`bool`
+            Whether or not you want the output URL to include the preferred neofoodclub website's domain.
+            Default = True.
         """
 
         def encode(int_lists: List[Any]) -> str:
@@ -1024,9 +1040,16 @@ class NeoFoodClub:
 
         use_15 = bets and 10 < len(bets) <= 15 or self._modifier._cc_perk
 
-        url = (
-            "https://neofood.club/" + ("15/" if use_15 else "") + f"#round={self.round}"
-        )
+        # begin building the URL!
+        url = ""
+
+        if include_domain:
+            url += "https://neofood.club"
+
+        if use_15:
+            url += "/15"
+
+        url += f"/#round={self.round}"
 
         if all_data:
             params: List[Tuple[str, str]] = [
