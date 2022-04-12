@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import datetime
 import functools
 import json
@@ -39,7 +40,12 @@ NEO_FC_REGEX = re.compile(
     r"(/(?P<perk>15/)?)#(?P<query>[a-zA-Z0-9=&\[\],%-:+]+)",
     re.IGNORECASE,
 )
-
+PIRATES_REGEX = re.compile(r"^\[((\[(\d+,){3}\d+\]),){4}(\[(\d+,){3}\d+\])\]$")
+ODDS_REGEX = re.compile(
+    r"^\[(\[1,(([2-9]|1[0-3]),){3}([2-9]|1[0-3])\],){4}\[1,(([2-9]|1[0-3]),){3}([2-9]|1[0-3])\]\]$"
+)
+WINNERS_REGEX = re.compile(r"^\[((([1-4],){4}[1-4])|(0,0,0,0,0))\]$")
+FOODS_REGEX = re.compile(r"^\[((\[(\d+,){9}\d+\]),){4}(\[(\d+,){9}\d+\])\]$")
 
 __all__ = (
     "NeoFoodClub",
@@ -1116,42 +1122,87 @@ class NeoFoodClub:
         olddata = urllib.parse.parse_qs(urllib.parse.unquote(querystring))
 
         # gather relevant variables from the query string
-        data = {
-            key: json.loads(olddata[key][0])
-            for key in [
-                "pirates",  # required
-                "openingOdds",  # required
-                "currentOdds",  # required
-                "round",
-                "winners",
-                "foods",
-            ]
-            if key in olddata
-        }
+        data = {}
 
-        # validate
+        # FOODS - OPTIONAL
+        if foods := olddata.get("foods"):
+            # optional! will ignore invalid foods.
+            # foods is a list[list[int]]
+            # with length of 5, but the inner tuples have a length of 10
+            # also each inner tuple has one unique int from 1 to 40
 
-        if data["round"] and type(data["round"]) is not int:
-            # we only need the round number to make a proper URL
-            # the actual value doesn't matter
-            raise InvalidData("Improper value for current round number")
+            foods_string = foods[0]
+            if FOODS_REGEX.match(foods_string):
+                foods = json.loads(foods_string)
 
-        has_proper_ids = sorted(set(sum(data["pirates"], []))) == [*range(1, 21)]
-        has_proper_shape = [len(row) for row in data["pirates"]] == [4, 4, 4, 4, 4]
-        if not all([has_proper_ids, has_proper_shape]):
-            raise InvalidData("Improper pirates array")
+                if set(sum(foods, [])) == set(range(1, 41)):
+                    data["foods"] = foods
 
+        # WINNERS - OPTIONAL
+        if winners := olddata.get("winners"):
+            # winners is a list[int] of length 5
+            # if there are no winners, it's [0, 0, 0, 0, 0]
+            # if there are winners, all ints any number from 1 to 4
+            winners_string = winners[0]
+
+            if not WINNERS_REGEX.match(winners_string):
+                # if we have SOMETHING, it better be right!
+                raise InvalidData("NeoFoodClub URL parameter `winners` is invalid.")
+
+            data["winners"] = json.loads(winners_string)
+        else:
+            # don't raise an error if it's missing, just assume no winners.
+            data["winners"] = [0, 0, 0, 0, 0]
+
+        # ROUND NUMBER - MANDATORY
+        # we only need the round number to make a proper URL
+        # the actual value doesn't matter as long as it's a positive integer
+        if not (bet_round := olddata.get("round")):
+            raise InvalidData("NeoFoodClub URL parameter `round` is missing.")
+
+        bet_number = bet_round[0]
+
+        if re.match(r"^\d+$", bet_number) is None:
+            raise InvalidData("NeoFoodClub URL parameter `round` is invalid.")
+
+        data["round"] = json.loads(bet_number)
+
+        # PIRATES - MANDATORY
+        if not (pirates := olddata.get("pirates")):
+            raise InvalidData("NeoFoodClub URL parameter `pirates` is missing.")
+
+        pirate_string = pirates[0]
+        if PIRATES_REGEX.match(pirate_string) is None:
+            raise InvalidData("NeoFoodClub URL parameter `pirates` is invalid.")
+
+        pirate_lists = json.loads(pirate_string)
+        has_proper_ids = set(sum(pirate_lists, [])) == set(range(1, 21))
+        if not has_proper_ids:
+            raise InvalidData("NeoFoodClub URL parameter `pirates` is invalid.")
+
+        data["pirates"] = pirate_lists
+
+        # ODDS - MANDATORY
+        # matches something like "[[1,2,2,2,2],[1,2,2,2,2],[1,2,2,2,2],[1,2,2,2,2],[1,2,2,2,2]]", the 2's can be any number from 2 to 13
         for odd_type in ["openingOdds", "currentOdds"]:
-            odds = data[odd_type]
-            for odd in odds:
-                first, *rest = odd
+            if odd_type not in olddata:
+                raise InvalidData(f"NeoFoodClub URL parameter `{odd_type}` is missing")
 
-                if first != 1:
-                    raise InvalidData("Improper odds passed")
+            odds = olddata[odd_type][0]
+            if ODDS_REGEX.match(odds) is None:
+                raise InvalidData(f"NeoFoodClub URL parameter `{odd_type}` is invalid")
 
-                for num in rest:
-                    if not 2 <= num <= 13:
-                        raise InvalidData("Improper odds passed")
+            data[odd_type] = json.loads(odds)
+
+        # START, TIMESTAMP - OPTIONAL
+        for key in ["start", "timestamp"]:
+            # optional! just need to be sure it doesn't break the parser.
+            if timestamp := olddata.get(key):
+                timestamp_string = timestamp[0]
+                with contextlib.suppress(dateutil.parser.ParserError):
+                    dateutil.parser.parse(timestamp_string).astimezone(UTC)
+                    # if it works, let it through.
+                    data[key] = timestamp_string
 
         return cls(data, bet_amount=bet_amount, modifier=modifier, cache=cache)
 
