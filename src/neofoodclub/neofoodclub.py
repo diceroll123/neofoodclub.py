@@ -666,6 +666,7 @@ class NeoFoodClub:
     def __init__(
         self,
         data: Dict[str, Any],
+        /,
         *,
         bet_amount: Optional[int] = None,
         modifier: Optional[Modifier] = None,
