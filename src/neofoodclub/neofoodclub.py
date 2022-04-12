@@ -27,7 +27,7 @@ from dateutil.tz import UTC, tzutc
 import neofoodclub.math as NFCMath
 
 from . import utils
-from .errors import InvalidData, MissingData, NoPositiveArenas
+from .errors import InvalidData, NoPositiveArenas
 
 if TYPE_CHECKING:
     from neofoodclub.types import OddsChangeDict
@@ -1101,7 +1101,7 @@ class NeoFoodClub:
         """
         neo_fc = NEO_FC_REGEX.search(url)
         if neo_fc is None:
-            raise MissingData("No relevant NeoFoodClub-like URL data found.")
+            raise InvalidData("No relevant NeoFoodClub-like URL data found.")
 
         if modifier is None:
             modifier = Modifier()
