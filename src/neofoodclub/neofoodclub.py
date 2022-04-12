@@ -1087,6 +1087,7 @@ class NeoFoodClub:
         *,
         bet_amount: Optional[int] = None,
         modifier: Optional[Modifier] = None,
+        cache: bool = True,
     ) -> NeoFoodClub:
         """:class:`NeoFoodClub`: Create a NeoFoodClub object using just a URL.
 
@@ -1151,7 +1152,7 @@ class NeoFoodClub:
                     if not 2 <= num <= 13:
                         raise InvalidData("Improper odds passed")
 
-        return cls(data, bet_amount=bet_amount, modifier=modifier)
+        return cls(data, bet_amount=bet_amount, modifier=modifier, cache=cache)
 
     def copy(self, *, keep_custom: bool = False, cache: bool = True) -> NeoFoodClub:
         """:class:`NeoFoodClub`: Returns a deep copy of this NeoFoodClub instance."""
