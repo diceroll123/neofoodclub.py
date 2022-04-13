@@ -246,6 +246,10 @@ class Modifier:
 
     @time.setter
     def time(self, val: datetime.time):
+        if not isinstance(val, datetime.time):
+            raise TypeError(
+                f"Expected datetime.time but received {val.__class__.__name__}"
+            )
         self._time = val
         if self._nfc:
             self._nfc.reset()
@@ -257,6 +261,9 @@ class Modifier:
 
     @cc_perk.setter
     def cc_perk(self, val: bool):
+        if not isinstance(val, bool):
+            raise TypeError(f"Expected bool but received {val.__class__.__name__}")
+
         self._cc_perk = val
 
     @property
@@ -268,6 +275,22 @@ class Modifier:
 
     @custom_odds.setter
     def custom_odds(self, val: Optional[Dict[int, int]]):
+        if not isinstance(val, dict):
+            raise TypeError(
+                f"Expected Dict[int, int] but received {val.__class__.__name__}"
+            )
+
+        for k, v in val.items():
+            if k not in range(1, 21):
+                raise TypeError(
+                    f"Expected int between 1 and 20 for Pirate ID but received {k}"
+                )
+
+            if v not in range(2, 14):
+                raise TypeError(
+                    f"Expected int between 2 and 13 for Pirate Odds but received {v}"
+                )
+
         self._custom_odds = val
         if self._nfc:
             self._nfc.reset()
@@ -317,6 +340,11 @@ class Modifier:
 
     @nfc.setter
     def nfc(self, value: NeoFoodClub):
+        if not isinstance(value, NeoFoodClub):
+            raise TypeError(
+                f"Expected NeoFoodClub but received {value.__class__.__name__}"
+            )
+
         self._nfc = value
 
 
