@@ -506,7 +506,7 @@ class Bets:
                 f"Invalid bet amounts provided. Expected length: {self._indices.size}, but received {len(val)}."
             )
 
-        amts = np.array([v or 50 for v in val])
+        amts = np.array([v or math.BET_AMOUNT_MIN for v in val])
 
         self._bet_amounts = utils.fix_bet_amounts(amts)
 
