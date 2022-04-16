@@ -37,6 +37,20 @@ def test_bets_without_bet_amount(nfc: NeoFoodClub):
     assert bets.bet_amounts.sum() == -10000
 
 
+def test_bets_set_bet_amount_below_50(nfc: NeoFoodClub):
+    # set bets externally to -1000 for each amount
+    # setting numerical values below 50 should min-max the amount to 50
+    bets = nfc.make_max_ter_bets()
+    bets.bet_amounts = [-1000] * 10
+    assert bets.bet_amounts.sum() == 500
+
+
+def test_bets_set_bet_amount_none(nfc: NeoFoodClub):
+    bets = nfc.make_max_ter_bets()
+    bets.bet_amounts = None
+    assert bets.amounts_hash == ""
+
+
 def test_bet_equivalence(
     nfc: NeoFoodClub,
     crazy_test_hash: str,
