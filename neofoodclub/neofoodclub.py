@@ -25,16 +25,13 @@ import dateutil.parser
 import numpy as np
 from dateutil.tz import UTC, tzutc
 
-import neofoodclub.math as NFCMath
-
-from . import utils
+from . import math, utils
+from .arenas import ARENA_NAMES, Arena, Arenas
 from .errors import InvalidData, NoPositiveArenas
+from .pirates import PartialPirate, Pirate
 
 if TYPE_CHECKING:
-    from neofoodclub.types import OddsChangeDict
-
-    from .arenas import Arena, Arenas
-    from .pirates import PartialPirate, Pirate
+    from .types import OddsChangeDict
 
 NEO_FC_REGEX = re.compile(
     r"(/(?P<perk>15/)?)#(?P<query>[a-zA-Z0-9=&\[\],%-:+]+)",
@@ -124,7 +121,6 @@ class OddsChange:
     @property
     def pirate(self) -> PartialPirate:
         """:class:`PartialPirate`: Returns a partial pirate object, which is a convenience object storing the pirate's ID."""
-        from .pirates import PartialPirate  # to prevent circular imports
 
         return PartialPirate(
             self._round_data["pirates"][self.arena_index][self.pirate_index - 1]
@@ -138,7 +134,6 @@ class OddsChange:
     @property
     def arena(self) -> str:
         """:class:`str`: Returns name of the arena that this change occurred in."""
-        from .arenas import ARENA_NAMES  # to prevent circular imports
 
         return ARENA_NAMES[self.arena_index]
 
@@ -400,7 +395,7 @@ class Odds:
         self._odds_values = bets.nfc._data_dict["odds"][bets._indices]
         self._odds = [
             Chance(**chance)
-            for chance in NFCMath.get_bet_odds_from_bets(
+            for chance in math.get_bet_odds_from_bets(
                 bets.indices, self._odds_values, bets.nfc._stds  # type: ignore
             )
         ]
@@ -520,20 +515,20 @@ class Bets:
         """Tuple[Tuple[:class:`int`, ...], ...]: Returns a nested array of the indices of the pirates in their arenas
         making up these bets."""
         return tuple(
-            NFCMath.binary_to_indices(binary)
+            math.binary_to_indices(binary)
             for binary in self.nfc._data_dict["bins"][self._indices].astype(int)
         )
 
     @property
     def bets_hash(self) -> str:
         """:class:`str`: Returns a NeoFoodClub-compatible encoded hash of bet indices."""
-        return NFCMath.bets_hash_value(self.indices)  # type: ignore
+        return math.bets_hash_value(self.indices)  # type: ignore
 
     @property
     def amounts_hash(self) -> str:
         """:class:`str`: Returns a NeoFoodClub-compatible encoded hash of bet amounts."""
         if np.all(self.bet_amounts > -1000):
-            return NFCMath.bet_amounts_to_amounts_hash(
+            return math.bet_amounts_to_amounts_hash(
                 dict(zip(range(len(self.bet_amounts)), self.bet_amounts))
             )
 
@@ -597,7 +592,7 @@ class Bets:
     @property
     def is_crazy(self) -> bool:
         """:class:`bool`: Returns whether or not this set is "crazy". This returns True if all of the bets have all arenas filled. Mostly just for fun."""
-        return all(mask & bet for mask in NFCMath.BIT_MASKS for bet in self)
+        return all(mask & bet for mask in math.BIT_MASKS for bet in self)
 
     @property
     def is_gambit(self) -> bool:
@@ -780,9 +775,9 @@ class NeoFoodClub:
             self._net_expected_cache = mb_copy * self._data_dict["ers"] - mb_copy
 
     def _cache_dicts(self):
-        self._stds = NFCMath.make_probabilities(self._data["openingOdds"])
+        self._stds = math.make_probabilities(self._data["openingOdds"])
         # most of the binary/odds/std data sits here
-        self._data_dict = NFCMath.make_round_dicts(
+        self._data_dict = math.make_round_dicts(
             tuple(tuple(row) for row in self._stds),
             tuple(tuple(row) for row in self._data["customOdds"]),
         )
@@ -791,7 +786,6 @@ class NeoFoodClub:
 
     def get_arena(self, arena_id: int, /) -> Arena:
         """:class:Arena: Returns the desired Arena object."""
-        from .arenas import Arena  # to prevent circular imports
 
         return Arena(
             nfc=self, arena_id=arena_id, pirate_ids=self._data["pirates"][arena_id]
@@ -800,7 +794,6 @@ class NeoFoodClub:
     @property
     def arenas(self) -> Arenas:
         """:class:`Arenas`: Returns the Arenas object for this round."""
-        from .arenas import Arenas  # to prevent circular imports
 
         return Arenas(self)
 
@@ -969,7 +962,7 @@ class NeoFoodClub:
     def winners_binary(self) -> int:
         """:class:`int`: Returns a bet-binary representation of the winning pirates, if applicable.
         0 if not applicable."""
-        return NFCMath.pirates_binary(tuple(self.winners))
+        return math.pirates_binary(tuple(self.winners))
 
     @property
     def winners_pirates(self) -> List[Pirate]:
@@ -1277,7 +1270,7 @@ class NeoFoodClub:
     @_require_cache
     def _crazy_bets_indices(self) -> np.ndarray:
         return np.random.choice(
-            NFCMath.FULL_BETS, size=self.max_amount_of_bets, replace=False
+            math.FULL_BETS, size=self.max_amount_of_bets, replace=False
         )
 
     @_require_cache
@@ -1318,14 +1311,14 @@ class NeoFoodClub:
         # these are lazy but they get the job done well enough
         if random:
             random_five_bet = self._data_dict["bins"][
-                np.random.choice(NFCMath.FULL_BETS, size=1)
+                np.random.choice(math.FULL_BETS, size=1)
             ]
             return self._gambit_indices(five_bet=random_five_bet.astype(int)[0])
 
         # get highest ER pirates
-        ers = self._max_ter_indices()[NFCMath.FULL_BETS]
+        ers = self._max_ter_indices()[math.FULL_BETS]
         highest_er = np.argsort(ers, kind="mergesort", axis=0)[::-1][0]
-        pirate_bin = self._data_dict["bins"][NFCMath.FULL_BETS[highest_er]]
+        pirate_bin = self._data_dict["bins"][math.FULL_BETS[highest_er]]
         return self._gambit_indices(five_bet=pirate_bin.astype(int))
 
     @_require_cache
@@ -1359,7 +1352,7 @@ class NeoFoodClub:
         that include between 1 and 3 selected pirates.
 
         There is a hard limit on 3 because any more is impossible."""
-        amount_of_pirates = sum(1 for mask in NFCMath.BIT_MASKS if pirate_binary & mask)
+        amount_of_pirates = sum(1 for mask in math.BIT_MASKS if pirate_binary & mask)
 
         if amount_of_pirates == 0:
             raise InvalidData("You must pick at least 1 pirate, and at most 3.")
@@ -1476,11 +1469,9 @@ class NeoFoodClub:
         amounts: Optional[List[int]] = None,
     ) -> Bets:
         """:class:`Bets`: Creates a Bets object made up of arena indices."""
-        bets = Bets.from_binary(
-            *NFCMath.bets_indices_to_bet_binaries(indices), nfc=self
-        )
+        bets = Bets.from_binary(*math.bets_indices_to_bet_binaries(indices), nfc=self)
         if amounts_hash:
-            bets.bet_amounts = NFCMath.amounts_hash_to_bet_amounts(amounts_hash)
+            bets.bet_amounts = math.amounts_hash_to_bet_amounts(amounts_hash)
         if amounts:
             bets.bet_amounts = amounts
 
@@ -1513,9 +1504,9 @@ class NeoFoodClub:
     ) -> Bets:
         """:class:`Bets`: Creates a Bets object by decoding from bets_hash (and optionally an amounts_hash)."""
         # Takes a bet hash and turns it into Bets
-        bets = Bets.from_binary(*NFCMath.bets_hash_to_bet_binaries(bets_hash), nfc=self)
+        bets = Bets.from_binary(*math.bets_hash_to_bet_binaries(bets_hash), nfc=self)
         if amounts_hash:
-            bets.bet_amounts = NFCMath.amounts_hash_to_bet_amounts(amounts_hash)
+            bets.bet_amounts = math.amounts_hash_to_bet_amounts(amounts_hash)
         if amounts:
             bets.bet_amounts = amounts
 
@@ -1547,7 +1538,7 @@ class NeoFoodClub:
         """:class:`Bets`: Creates a Bets object made up of bet-compatible binary numbers."""
         bets = Bets.from_binary(*binaries, nfc=self)
         if amounts_hash:
-            bets.bet_amounts = NFCMath.amounts_hash_to_bet_amounts(amounts_hash)
+            bets.bet_amounts = math.amounts_hash_to_bet_amounts(amounts_hash)
         if amounts:
             bets.bet_amounts = amounts
 

@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, List, Optional
 
-import neofoodclub.math as NFCMath
-
+from . import math
 from .food_adjustments import NEGATIVE_FOOD, POSITIVE_FOOD
 
 if TYPE_CHECKING:
@@ -160,7 +159,7 @@ class Pirate(PirateMixin):
     @property
     def binary(self) -> int:
         """:class:`int`: The pirate's bet-binary representation."""
-        return NFCMath.pirate_binary(self._index, self._arena)
+        return math.pirate_binary(self._index, self._arena)
 
     @property
     def positive_foods(self) -> List[int]:
@@ -177,7 +176,7 @@ class Pirate(PirateMixin):
         return []
 
     def __int__(self) -> int:
-        return NFCMath.pirate_binary(self._index, self._arena)
+        return math.pirate_binary(self._index, self._arena)
 
     def __eq__(self, other: Any) -> bool:
         return isinstance(other, self.__class__) and int(self) == int(other)

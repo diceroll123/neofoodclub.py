@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from typing import Generator, List, Sequence
+from typing import TYPE_CHECKING, Generator, List, Sequence
 
-import neofoodclub.math as NFCMath
-
-from .neofoodclub import NeoFoodClub
+from . import math
 from .pirates import Pirate
+
+if TYPE_CHECKING:
+    from .neofoodclub import NeoFoodClub
 
 __all__ = (
     "Arena",
@@ -28,9 +29,7 @@ class Arena:
         "_odds",
     )
 
-    def __init__(
-        self, *, nfc: NeoFoodClub, arena_id: int, pirate_ids: Sequence[int]
-    ):
+    def __init__(self, *, nfc: NeoFoodClub, arena_id: int, pirate_ids: Sequence[int]):
         self.nfc = nfc
         self._id = arena_id
         self._pirates = [  # adding 1 to index because the original list has a length of 4, but everything else has 5
@@ -135,7 +134,7 @@ class Arenas:
         """List[:class:`Pirate`]: Return a list of pirates based on their bet-binary representation."""
         return [
             self._arenas[arena][index - 1]  # type: ignore
-            for arena, index in enumerate(NFCMath.binary_to_indices(binary))
+            for arena, index in enumerate(math.binary_to_indices(binary))
             if index > 0
         ]
 
