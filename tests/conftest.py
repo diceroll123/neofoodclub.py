@@ -1,8 +1,7 @@
 from typing import Any, Dict, Tuple
 
 import pytest
-from neofoodclub import NeoFoodClub
-from neofoodclub.neofoodclub import Bets
+from neofoodclub import NeoFoodClub, Bets
 
 # I picked the smallest round I could quickly find.
 # Changing this object will require changing tests,
