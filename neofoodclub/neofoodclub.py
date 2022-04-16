@@ -806,7 +806,7 @@ class NeoFoodClub:
     def bet_amount(self, val: Optional[int]):
         if val != self._bet_amount:
             self._bet_amount = val
-            if self._data_dict is not None:
+            if self._data_dict:
                 self._cache_bet_amount_dicts()
             else:
                 self._cache_dicts()
