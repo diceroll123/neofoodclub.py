@@ -1,7 +1,12 @@
 import copy
 
 import pytest
-from neofoodclub.errors import InvalidData, NoPositiveArenas
+from neofoodclub.errors import (
+    InvalidAmountHash,
+    InvalidBetHash,
+    InvalidData,
+    NoPositiveArenas,
+)
 from neofoodclub.neofoodclub import NeoFoodClub
 
 
@@ -28,6 +33,16 @@ def test_too_many_bet_amounts_from_indices(nfc: NeoFoodClub):
 def test_too_many_bet_amounts_from_hash(nfc: NeoFoodClub):
     with pytest.raises(InvalidData):
         nfc.make_bets_from_hash("faa", amounts=[50, 50])
+
+
+def test_invalid_bet_hash(nfc: NeoFoodClub):
+    with pytest.raises(InvalidBetHash):
+        nfc.make_bets_from_hash("faz")
+
+
+def test_invalid_amounts_hash(nfc: NeoFoodClub):
+    with pytest.raises(InvalidAmountHash):
+        nfc.make_bets_from_hash("faa", amounts_hash="???")
 
 
 @pytest.mark.parametrize(
