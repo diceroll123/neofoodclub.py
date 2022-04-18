@@ -70,6 +70,41 @@ def test_bet_equivalence(
     assert crazy_from_hash == crazy_from_binaries
 
 
+def test_bet_equivalence_with_amount(
+    nfc: NeoFoodClub,
+):
+    mer_from_hash = nfc.make_bets_from_hash(
+        "aukacfukycuulacauutcbukdc", amounts_hash="CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS"
+    )
+    mer_from_indices = nfc.make_bets_from_indices(
+        (
+            (0, 0, 4, 0, 2),
+            (0, 0, 0, 0, 2),
+            (1, 0, 4, 0, 2),
+            (0, 4, 4, 0, 2),
+            (4, 0, 4, 0, 2),
+            (1, 0, 0, 0, 2),
+            (0, 0, 4, 0, 4),
+            (0, 3, 4, 0, 2),
+            (0, 1, 4, 0, 2),
+            (0, 0, 3, 0, 2),
+        ),
+        amounts_hash="CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS",
+    )
+    mer_from_binaries = nfc.make_bets_from_binaries(
+        *(0x104, 0x4, 0x80104, 0x1104, 0x10104, 0x80004, 0x101, 0x2104, 0x8104, 0x204),
+        amounts_hash="CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS",
+    )
+
+    mer_control = nfc.make_bets_from_hash(
+        "aukacfukycuulacauutcbukdc", amounts=[8000] * 10
+    )
+
+    assert mer_control == mer_from_hash
+    assert mer_control == mer_from_indices
+    assert mer_control == mer_from_binaries
+
+
 def test_bet_hash_encoding(nfc: NeoFoodClub, crazy_test_hash: str):
     assert nfc.make_bets_from_hash(crazy_test_hash).bets_hash == crazy_test_hash
 
