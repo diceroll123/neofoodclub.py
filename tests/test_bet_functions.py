@@ -31,6 +31,11 @@ def test_make_url(nfc_with_bet_amount: NeoFoodClub):
     )
 
 
+def test_short_hash(nfc: NeoFoodClub):
+    bets = nfc.make_bets_from_hash("f")
+    assert bets.bets_hash == "faa"
+
+
 def test_bets_without_bet_amount(nfc: NeoFoodClub):
     # when bets have no amounts set, they default to -1000 for each bet.
     bets = nfc.make_max_ter_bets()
