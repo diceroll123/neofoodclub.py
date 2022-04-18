@@ -100,9 +100,12 @@ def test_bet_equivalence_with_amount(
         "aukacfukycuulacauutcbukdc", amounts=[8000] * 10
     )
 
+    mer_control_two = nfc.make_bets_from_hash("aukacfukycuulacauutcbukdc", amount=8000)
+
     assert mer_control == mer_from_hash
     assert mer_control == mer_from_indices
     assert mer_control == mer_from_binaries
+    assert mer_control == mer_control_two
 
 
 def test_bet_hash_encoding(nfc: NeoFoodClub, crazy_test_hash: str):
