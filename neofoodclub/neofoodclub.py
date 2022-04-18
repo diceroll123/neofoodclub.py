@@ -1448,17 +1448,13 @@ class NeoFoodClub:
 
     @overload
     def make_bets_from_indices(
-        self, indices: Sequence[Sequence[int]], /, *, amounts_hash: Optional[str] = None
+        self, indices: Sequence[Sequence[int]], /, *, amounts_hash: str
     ) -> Bets:
         ...
 
     @overload
     def make_bets_from_indices(
-        self,
-        indices: Sequence[Sequence[int]],
-        /,
-        *,
-        amounts: Optional[List[int]] = None,
+        self, indices: Sequence[Sequence[int]], /, *, amounts: Sequence[int]
     ) -> Bets:
         ...
 
@@ -1469,7 +1465,7 @@ class NeoFoodClub:
         /,
         *,
         amounts_hash: Optional[str] = None,
-        amounts: Optional[List[int]] = None,
+        amounts: Optional[Sequence[int]] = None,
     ) -> Bets:
         """:class:`Bets`: Creates a Bets object made up of arena indices."""
 
@@ -1488,15 +1484,11 @@ class NeoFoodClub:
         ...
 
     @overload
-    def make_bets_from_hash(
-        self, bets_hash: str, /, *, amounts_hash: Optional[str] = None
-    ) -> Bets:
+    def make_bets_from_hash(self, bets_hash: str, /, *, amounts_hash: str) -> Bets:
         ...
 
     @overload
-    def make_bets_from_hash(
-        self, bets_hash: str, /, *, amounts: Optional[List[int]] = None
-    ) -> Bets:
+    def make_bets_from_hash(self, bets_hash: str, /, *, amounts: Sequence[int]) -> Bets:
         ...
 
     @_require_cache
@@ -1506,7 +1498,8 @@ class NeoFoodClub:
         /,
         *,
         amounts_hash: Optional[str] = None,
-        amounts: Optional[List[int]] = None,
+        amounts: Optional[Sequence[int]] = None,
+        amount: Optional[int] = None,
     ) -> Bets:
         """:class:`Bets`: Creates a Bets object by decoding from bets_hash (and optionally an amounts_hash)."""
 
@@ -1528,15 +1521,11 @@ class NeoFoodClub:
         ...
 
     @overload
-    def make_bets_from_binaries(
-        self, *binaries: int, amounts_hash: Optional[str] = None
-    ) -> Bets:
+    def make_bets_from_binaries(self, *binaries: int, amounts_hash: str) -> Bets:
         ...
 
     @overload
-    def make_bets_from_binaries(
-        self, *binaries: int, amounts: Optional[List[int]] = None
-    ) -> Bets:
+    def make_bets_from_binaries(self, *binaries: int, amounts: Sequence[int]) -> Bets:
         ...
 
     @_require_cache
@@ -1544,7 +1533,7 @@ class NeoFoodClub:
         self,
         *binaries: int,
         amounts_hash: Optional[str] = None,
-        amounts: Optional[List[int]] = None,
+        amounts: Optional[Sequence[int]] = None,
     ) -> Bets:
         """:class:`Bets`: Creates a Bets object made up of bet-compatible binary numbers."""
 
