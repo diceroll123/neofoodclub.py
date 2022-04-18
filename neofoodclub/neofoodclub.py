@@ -1458,6 +1458,12 @@ class NeoFoodClub:
     ) -> Bets:
         ...
 
+    @overload
+    def make_bets_from_indices(
+        self, indices: Sequence[Sequence[int]], /, *, amount: int
+    ) -> Bets:
+        ...
+
     @_require_cache
     def make_bets_from_indices(
         self,
@@ -1466,6 +1472,7 @@ class NeoFoodClub:
         *,
         amounts_hash: Optional[str] = None,
         amounts: Optional[Sequence[int]] = None,
+        amount: Optional[int] = None,
     ) -> Bets:
         """:class:`Bets`: Creates a Bets object made up of arena indices."""
 
@@ -1476,6 +1483,8 @@ class NeoFoodClub:
             bets.bet_amounts = math.amounts_hash_to_bet_amounts(amounts_hash)
         if amounts:
             bets.bet_amounts = amounts
+        if amount is not None:
+            bets.bet_amounts = [amount] * len(bets)
 
         return bets
 
@@ -1489,6 +1498,10 @@ class NeoFoodClub:
 
     @overload
     def make_bets_from_hash(self, bets_hash: str, /, *, amounts: Sequence[int]) -> Bets:
+        ...
+
+    @overload
+    def make_bets_from_hash(self, bets_hash: str, /, *, amount: int) -> Bets:
         ...
 
     @_require_cache
@@ -1513,6 +1526,8 @@ class NeoFoodClub:
             bets.bet_amounts = math.amounts_hash_to_bet_amounts(amounts_hash)
         if amounts:
             bets.bet_amounts = amounts
+        if amount is not None:
+            bets.bet_amounts = [amount] * len(bets)
 
         return bets
 
@@ -1528,12 +1543,17 @@ class NeoFoodClub:
     def make_bets_from_binaries(self, *binaries: int, amounts: Sequence[int]) -> Bets:
         ...
 
+    @overload
+    def make_bets_from_binaries(self, *binaries: int, amount: int) -> Bets:
+        ...
+
     @_require_cache
     def make_bets_from_binaries(
         self,
         *binaries: int,
         amounts_hash: Optional[str] = None,
         amounts: Optional[Sequence[int]] = None,
+        amount: Optional[int] = None,
     ) -> Bets:
         """:class:`Bets`: Creates a Bets object made up of bet-compatible binary numbers."""
 
@@ -1544,5 +1564,7 @@ class NeoFoodClub:
             bets.bet_amounts = math.amounts_hash_to_bet_amounts(amounts_hash)
         if amounts:
             bets.bet_amounts = amounts
+        if amount is not None:
+            bets.bet_amounts = [amount] * len(bets)
 
         return bets
