@@ -27,7 +27,7 @@ from dateutil.tz import UTC, tzutc
 
 from . import math, utils
 from .arenas import ARENA_NAMES, Arena, Arenas
-from .errors import InvalidData, NoPositiveArenas
+from .errors import InvalidAmountHash, InvalidBetHash, InvalidData, NoPositiveArenas
 from .pirates import PartialPirate, Pirate
 
 if TYPE_CHECKING:
@@ -43,6 +43,9 @@ ODDS_REGEX = re.compile(
 )
 WINNERS_REGEX = re.compile(r"^\[((([1-4],){4}[1-4])|(0,0,0,0,0))\]$")
 FOODS_REGEX = re.compile(r"^\[((\[(\d+,){9}\d+\]),){4}(\[(\d+,){9}\d+\])\]$")
+
+BET_HASH_REGEX = re.compile(r"^[a-y]+$")
+AMOUNT_HASH_REGEX = re.compile(r"^[a-zA-Z]+$")
 
 __all__ = (
     "NeoFoodClub",
@@ -1469,8 +1472,11 @@ class NeoFoodClub:
         amounts: Optional[List[int]] = None,
     ) -> Bets:
         """:class:`Bets`: Creates a Bets object made up of arena indices."""
+
         bets = Bets.from_binary(*math.bets_indices_to_bet_binaries(indices), nfc=self)
         if amounts_hash:
+            if not AMOUNT_HASH_REGEX.fullmatch(amounts_hash):
+                raise InvalidAmountHash
             bets.bet_amounts = math.amounts_hash_to_bet_amounts(amounts_hash)
         if amounts:
             bets.bet_amounts = amounts
@@ -1503,9 +1509,14 @@ class NeoFoodClub:
         amounts: Optional[List[int]] = None,
     ) -> Bets:
         """:class:`Bets`: Creates a Bets object by decoding from bets_hash (and optionally an amounts_hash)."""
-        # Takes a bet hash and turns it into Bets
+
+        if not BET_HASH_REGEX.fullmatch(bets_hash):
+            raise InvalidBetHash
+
         bets = Bets.from_binary(*math.bets_hash_to_bet_binaries(bets_hash), nfc=self)
         if amounts_hash:
+            if not AMOUNT_HASH_REGEX.fullmatch(amounts_hash):
+                raise InvalidAmountHash
             bets.bet_amounts = math.amounts_hash_to_bet_amounts(amounts_hash)
         if amounts:
             bets.bet_amounts = amounts
@@ -1536,8 +1547,11 @@ class NeoFoodClub:
         amounts: Optional[List[int]] = None,
     ) -> Bets:
         """:class:`Bets`: Creates a Bets object made up of bet-compatible binary numbers."""
+
         bets = Bets.from_binary(*binaries, nfc=self)
         if amounts_hash:
+            if not AMOUNT_HASH_REGEX.fullmatch(amounts_hash):
+                raise InvalidAmountHash
             bets.bet_amounts = math.amounts_hash_to_bet_amounts(amounts_hash)
         if amounts:
             bets.bet_amounts = amounts

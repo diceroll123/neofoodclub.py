@@ -14,3 +14,15 @@ class NoPositiveArenas(FoodClubException):
     """An exception that is thrown when there are no positive arenas while creating a bustproof set"""
 
     pass
+
+
+class InvalidBetHash(FoodClubException):
+    """An exception that is thrown when an improper string is used to create bets from a hash"""
+
+    pass
+
+
+class InvalidAmountHash(FoodClubException):
+    """An exception that is thrown when an improper string is used to create bet amounts from a hash"""
+
+    pass
