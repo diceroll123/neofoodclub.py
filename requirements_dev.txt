@@ -2,3 +2,4 @@ numba
 python-dateutil
 typing_extensions
 pytest
+pytest-asyncio
