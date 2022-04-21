@@ -395,7 +395,7 @@ class Odds:
     )
 
     def __init__(self, bets: Bets):
-        self._odds_values = bets.nfc._data_dict["odds"][bets._indices]
+        self._odds_values = bets.nfc._data_dict["odds"][bets._indices].astype(int)
         self._odds = [
             Chance(**chance)
             for chance in math.get_bet_odds_from_bets(
