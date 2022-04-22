@@ -118,7 +118,7 @@ class Arenas:
             if p.id == pirate_id:
                 return p
 
-    def get_pirates_by_id(self, *pirate_ids: Sequence[int]) -> List[Pirate]:
+    def get_pirates_by_id(self, *pirate_ids: int) -> List[Pirate]:
         """List[:class:`Pirate`]: Returns a list of pirates where their IDs match IDs in pirate_ids."""
         return [p for p in self.all_pirates if p.id in pirate_ids]
 
