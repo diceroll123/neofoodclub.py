@@ -1,7 +1,8 @@
 from typing import Any, Dict, Tuple
 
 import pytest
-from neofoodclub import NeoFoodClub, Bets
+from neofoodclub import Bets, NeoFoodClub
+from neofoodclub.math import precompile
 
 # I picked the smallest round I could quickly find.
 # Changing this object will require changing tests,
@@ -140,11 +141,6 @@ def nfc_from_url(test_round_url) -> NeoFoodClub:
 
 
 @pytest.fixture
-def nfc_from_url_with_bet_amount(test_round_url) -> NeoFoodClub:
-    return NeoFoodClub.from_url(test_round_url)
-
-
-@pytest.fixture
 def crazy_bets(nfc: NeoFoodClub, crazy_test_hash: str) -> Bets:
     return nfc.make_bets_from_hash(crazy_test_hash)
 
@@ -152,3 +148,6 @@ def crazy_bets(nfc: NeoFoodClub, crazy_test_hash: str) -> Bets:
 @pytest.fixture
 def gambit_bets(nfc: NeoFoodClub, gambit_test_binaries: Tuple[int, ...]) -> Bets:
     return nfc.make_bets_from_binaries(*gambit_test_binaries)
+
+
+precompile()
