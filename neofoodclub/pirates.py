@@ -67,7 +67,7 @@ class PartialPirate(PirateMixin):
         self._id = _id
 
     @property
-    def id(self) -> int:  # type: ignore
+    def id(self) -> int:
         return self._id
 
     def __repr__(self):
@@ -103,21 +103,22 @@ class Pirate(PirateMixin):
         self._arena = arena
         self._index = index
         self._odds: int = nfc._data["customOdds"][arena][index]  # type: ignore
-        self._opening_odds: int = nfc._data["openingOdds"][arena][index]  # type: ignore
-        if nfc._stds:  # type: ignore
-            self._std = nfc._stds[arena][index]  # type: ignore
+        self._opening_odds: int = nfc._data["openingOdds"][arena][index]
+        if nfc._stds:
+            self._std = nfc._stds[arena][index]
             self._er = self._std * self._odds
         else:
             self._std = None
             self._er = None
         self._fa = None
 
-        if "foods" in nfc._data:  # type: ignore
-            foods = nfc._data["foods"][arena]  # type: ignore
-            self._fa = sum(-NEGATIVE_FOOD[id][f] + POSITIVE_FOOD[id][f] for f in foods)
+        if foods := nfc._data.get("foods", None):
+            self._fa = sum(
+                -NEGATIVE_FOOD[id][f] + POSITIVE_FOOD[id][f] for f in foods[arena]
+            )
 
     @property
-    def id(self) -> int:  # type: ignore
+    def id(self) -> int:
         """:class:`int`: The pirate's ID."""
         return self._id
 

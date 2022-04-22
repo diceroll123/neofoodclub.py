@@ -25,6 +25,8 @@ import dateutil.parser
 import numpy as np
 from dateutil.tz import UTC, tzutc
 
+from neofoodclub.types import RoundData
+
 from . import math, utils
 from .arenas import ARENA_NAMES, Arena, Arenas
 from .errors import InvalidAmountHash, InvalidBetHash, InvalidData, NoPositiveArenas
@@ -525,7 +527,7 @@ class Bets:
     @property
     def bets_hash(self) -> str:
         """:class:`str`: Returns a NeoFoodClub-compatible encoded hash of bet indices."""
-        return math.bets_hash_value(self.indices)  # type: ignore
+        return math.bets_hash_value(self.indices)
 
     @property
     def amounts_hash(self) -> str:
@@ -705,7 +707,7 @@ class NeoFoodClub:
         cache: bool = True,
     ):
         # so it's not changing old cache data around, have a deep copy (safety precaution for custom odds)
-        self._data = json.loads(json.dumps(data))
+        self._data: RoundData = json.loads(json.dumps(data))
         self._bet_amount = bet_amount
         self._data_dict = {}
         self._stds = {}

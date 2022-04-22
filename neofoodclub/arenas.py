@@ -36,7 +36,7 @@ class Arena:
             Pirate(nfc=nfc, id=p_id, arena=arena_id, index=idx + 1)
             for idx, p_id in enumerate(pirate_ids)
         ]
-        self._odds = sum(1 / p._odds for p in self._pirates)  # type: ignore
+        self._odds = sum(1 / p._odds for p in self._pirates)
 
     @property
     def id(self) -> int:
@@ -51,7 +51,7 @@ class Arena:
     @property
     def best(self) -> List[Pirate]:
         """List[:class:`Pirate`]: Returns a list of the pirates in this arena sorted from least to greatest odds."""
-        return sorted(self._pirates, key=lambda a: a._odds)  # type: ignore
+        return sorted(self._pirates, key=lambda a: a._odds)
 
     @property
     def ids(self) -> List[int]:
@@ -108,8 +108,8 @@ class Arenas:
 
     def __init__(self, nfc: NeoFoodClub):
         self._arenas = [
-            Arena(nfc=nfc, arena_id=idx, pirate_ids=a)  # type: ignore
-            for idx, a in enumerate(nfc._data["pirates"])  # type: ignore
+            Arena(nfc=nfc, arena_id=idx, pirate_ids=a)
+            for idx, a in enumerate(nfc._data["pirates"])
         ]
 
     def get_pirate_by_id(self, pirate_id: int, /) -> Pirate:  # type: ignore
@@ -135,7 +135,7 @@ class Arenas:
 
         Note: This will only provide the left-most filled pirate per-arena."""
         return [
-            self._arenas[arena][index - 1]  # type: ignore
+            self._arenas[arena][index - 1]
             for arena, index in enumerate(math.binary_to_indices(binary))
             if index > 0
         ]
@@ -148,7 +148,7 @@ class Arenas:
     @property
     def best(self) -> List[Arena]:
         """List[:class:`Arena`]: Returns a list of the arenas sorted from least to greatest odds."""
-        return sorted(self._arenas, key=lambda a: a._odds)  # type: ignore
+        return sorted(self._arenas, key=lambda a: a._odds)
 
     @property
     def pirate_ids(self) -> List[List[int]]:
@@ -158,7 +158,7 @@ class Arenas:
     @property
     def positives(self) -> List[Arena]:
         """List[:class:`Arena`]: Returns a list of positive arenas sorted from least to greatest odds."""
-        return sorted([a for a in self._arenas if a.positive], key=lambda _a: _a._odds)  # type: ignore
+        return sorted([a for a in self._arenas if a.positive], key=lambda _a: _a._odds)
 
     def get_arena(self, arena_id: int, /) -> Arena:
         return self._arenas[arena_id]
