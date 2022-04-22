@@ -131,7 +131,9 @@ class Arenas:
         return pirates
 
     def get_pirates_from_binary(self, binary: int) -> List[Pirate]:
-        """List[:class:`Pirate`]: Return a list of pirates based on their bet-binary representation."""
+        """List[:class:`Pirate`]: Return a list of pirates based on their bet-binary representation.
+
+        Note: This will only provide the left-most filled pirate per-arena."""
         return [
             self._arenas[arena][index - 1]  # type: ignore
             for arena, index in enumerate(math.binary_to_indices(binary))
