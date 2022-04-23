@@ -4,3 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [tool.pytest.ini_options]
 asyncio_mode = "strict"
+
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "@njit",
+    "@overload",
+    '^ *\.\.\.$',
+    "if (False|TYPE_CHECKING):",
+    "def __repr__"
+]
