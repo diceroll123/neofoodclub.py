@@ -473,8 +473,6 @@ class Bets:
                 self.bet_amounts * self.nfc._data_dict["ers"][self._indices]
                 - self.bet_amounts
             )
-        if self.nfc._net_expected_cache.size:
-            return np.sum(self.nfc._net_expected_cache[self._indices])
         return 0.0
 
     ne = net_expected
