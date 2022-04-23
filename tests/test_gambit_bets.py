@@ -18,3 +18,13 @@ def test_not_gambit_bets(crazy_bets: Bets):
 def test_minimum_gambit_bets(nfc: NeoFoodClub):
     # the very arbitrary rules, bare minimum.
     assert nfc.make_bets_from_binaries(0x88888, 0x8).is_gambit is True
+
+
+def test_gambit_bets_for_one_bet(nfc: NeoFoodClub):
+    # the very arbitrary rules, bare minimum.
+    assert nfc.make_bets_from_binaries(0x88888).is_gambit is False
+
+
+def test_gambit_bets_for_non_full_arena(nfc: NeoFoodClub):
+    # the very arbitrary rules, bare minimum.
+    assert nfc.make_bets_from_binaries(0x8888, 0x8).is_gambit is False
