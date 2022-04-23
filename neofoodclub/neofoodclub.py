@@ -572,7 +572,7 @@ class Bets:
             )
 
         if intersection.size != np_bins.size:
-            diff = np.setdiff1d(np_bins, np_bins[intersection])
+            diff = np.setxor1d(np_bins, intersection)
             raise InvalidData(
                 f"Invalid bet binaries entered: {', '.join([hex(b) for b in diff])}"
             )
