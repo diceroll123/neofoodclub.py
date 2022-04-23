@@ -1,6 +1,6 @@
-import pytest
+from typing import Any, Dict
+
 from neofoodclub import NeoFoodClub
-from neofoodclub.errors import InvalidData
 from neofoodclub.neofoodclub import Modifier
 
 
@@ -86,3 +86,15 @@ def test_mer_winning_odds(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub):
 
     bets = nfc_from_url.make_max_ter_bets()
     assert nfc_from_url.get_win_units(bets) == 26
+
+
+def test_changes(nfc_no_cache: NeoFoodClub, test_round_data: Dict[str, Any]):
+    # doing it all at once since it's literally one object
+    assert nfc_no_cache.changes[0].index == 0
+    assert nfc_no_cache.changes[0].data == test_round_data["changes"][0]
+    assert nfc_no_cache.changes[0].old == 5
+    assert nfc_no_cache.changes[0].new == 6
+    assert nfc_no_cache.changes[0].pirate_index == 4
+    assert nfc_no_cache.changes[0].arena_index == 1
+    assert nfc_no_cache.changes[0].pirate.name == "Squire"
+    assert nfc_no_cache.changes[0].arena == "Lagoon"
