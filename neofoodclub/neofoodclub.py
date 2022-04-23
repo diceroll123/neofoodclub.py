@@ -771,10 +771,6 @@ class NeoFoodClub:
     def _cache_bet_amount_dicts(self):
         # cache maxbets, we'll need these a lot later,
         # but only if we need them at all
-        if "maxbets" not in self._data_dict:
-            # the round dicts haven't been made, let's do that now since we need them
-            self._cache_dicts()  # this call will call this parent function again, so return!
-            return
 
         if bet_amount := self._bet_amount:
             mb_copy = self._data_dict["maxbets"].copy()
@@ -850,8 +846,6 @@ class NeoFoodClub:
     def modified(self) -> bool:
         """:class:`bool`: Whether or not this NeoFoodClub object has been modified heavily enough that it does not
         resemble the original data."""
-        if self._modifier is None:
-            return False
 
         if self._modifier.custom_odds:
             return True
@@ -1036,12 +1030,8 @@ class NeoFoodClub:
             # these bets lost
             return 0
 
-        use_backup_if_needed = use_bet_amount_if_none and self.bet_amount
-
         if np.all(bets.bet_amounts):
             multiplier = bets.bet_amounts
-        elif use_backup_if_needed:
-            multiplier = np.full(bets._indices.size, self.bet_amount)
         else:
             return 0
 
