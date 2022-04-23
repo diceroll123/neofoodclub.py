@@ -731,28 +731,31 @@ class NeoFoodClub:
                 if p in self._modifier.custom_odds:
                     self._data["customOdds"][k1][k2 + 1] = self._modifier.custom_odds[p]
 
-    def _do_snapshot(self):
-        mod_time = self._modifier.time
-        if mod_time is None:
-            return
-
-        dt = self._get_round_time(mod_time)
-        if dt is None:
-            return
-
-        for change in self.changes:
-            if change.timestamp < dt:
-                self._data["customOdds"][change.arena_index][
-                    change.pirate_index
-                ] = change.new
-
     def soft_reset(self):
         """Resets the custom odds used internally."""
+        # the way custom odds + custom time works: (sorry!)
+        # we determine if we have opening odds set,
+        # if we do, our custom odds will start from there, otherwise current odds
+        # if there's a custom time set, then we start from opening odds, and seek
+        # changes up to the custom time
+        # after that, we add custom odds.
         key = "openingOdds" if self._modifier.opening_odds else "currentOdds"
+
+        # this is where customOdds gets set, which the rest of the NFC object is
+        # based on.
         self._data["customOdds"] = json.loads(json.dumps(self._data[key]))
 
         if self._modifier.time:
-            self._do_snapshot()
+            if dt := self._get_round_time(self._modifier.time):
+                # start custom odds from opening odds and add from there
+                self._data["customOdds"] = json.loads(
+                    json.dumps(self._data["openingOdds"])
+                )
+                for change in self.changes:
+                    if change.timestamp < dt:
+                        self._data["customOdds"][change.arena_index][
+                            change.pirate_index
+                        ] = change.new
 
         self._add_custom_odds()
 
