@@ -1030,7 +1030,7 @@ class NeoFoodClub:
             # these bets lost
             return 0
 
-        if np.all(bets.bet_amounts):
+        if np.all(bets.bet_amounts > -1000):
             multiplier = bets.bet_amounts
         else:
             return 0
