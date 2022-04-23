@@ -1160,14 +1160,10 @@ class NeoFoodClub:
             # optional! will ignore invalid foods.
             # foods is a list[list[int]]
             # with length of 5, but the inner tuples have a length of 10
-            # also each inner tuple has one unique int from 1 to 40
 
             foods_string = foods[0]
             if FOODS_REGEX.match(foods_string):
-                foods = json.loads(foods_string)
-
-                if set(sum(foods, [])) == set(range(1, 41)):
-                    data["foods"] = foods
+                data["foods"] = json.loads(foods_string)
 
         # WINNERS - OPTIONAL
         if winners := olddata.get("winners"):
