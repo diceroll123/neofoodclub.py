@@ -2,7 +2,13 @@ from typing import Tuple
 
 import pytest
 from neofoodclub.errors import InvalidData
-from neofoodclub.neofoodclub import Bets, NeoFoodClub
+from neofoodclub.neofoodclub import Bets, Modifier, NeoFoodClub
+
+
+def test_odds_iter(nfc_with_bet_amount: NeoFoodClub):
+    # bet amounts are NEEDED to make bustproof + guaranteed wins
+    bets = nfc_with_bet_amount.make_bustproof_bets()
+    assert len(list(bets.odds)) == 4
 
 
 def test_guaranteed_win_true(nfc_with_bet_amount: NeoFoodClub):
@@ -31,6 +37,13 @@ def test_make_url(nfc_with_bet_amount: NeoFoodClub):
         bets.make_url(include_domain=False)
         == "/#round=7956&b=eukucjuoycaulucepkyrtukyw&a=CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS"
     )
+
+
+def test_make_url_all_data(nfc: NeoFoodClub, test_max_ter_15_bets: str):
+    new_nfc = NeoFoodClub(nfc.to_dict())
+    new_nfc.modifier = Modifier(cc_perk=True)
+    bets = new_nfc.make_max_ter_bets()
+    assert bets.make_url(all_data=True) == f"https://neofood.club{test_max_ter_15_bets}"
 
 
 def test_short_hash(nfc: NeoFoodClub):
@@ -170,3 +183,41 @@ def test_net_expected_equality_with_amount(
 def test_bets_from_binary_error(nfc: NeoFoodClub, bet_binaries: Tuple[int, ...]):
     with pytest.raises(InvalidData):
         Bets.from_binary(*bet_binaries, nfc=nfc)
+
+
+def test_random_bets(nfc: NeoFoodClub):
+    bets = nfc.make_random_bets()
+    assert len(bets) == 10
+
+
+def test_random_gambit_bets(nfc: NeoFoodClub):
+    bets = nfc.make_gambit_bets(random=True)
+    assert bets.is_gambit is True
+    assert len(bets) == 10
+
+
+def test_random_unit_bets_empty(nfc: NeoFoodClub):
+    bets = nfc.make_units_bets(400000)  # higher than possible
+    assert len(bets) == 0
+
+
+def test_random_unit_bets(nfc: NeoFoodClub):
+    bets = nfc.make_units_bets(20)
+    assert len(bets) == 10
+
+
+def test_bustproof_with_two_positives(nfc: NeoFoodClub):
+    new_nfc = nfc.copy()
+    # setting Buck to 4 sets arena to positive, giving us 2 positives
+    new_nfc.modifier = Modifier(custom_odds={19: 4})
+    bets = new_nfc.make_bustproof_bets()
+    assert bets.is_bustproof is True
+
+
+def test_bustproof_with_three_positives(nfc: NeoFoodClub):
+    new_nfc = nfc.copy()
+    # setting Buck to 4 sets arena to positive, giving us 2 positives
+    # setting Crossblades to 12 sets arena to positive, giving us 3 positives
+    new_nfc.modifier = Modifier(custom_odds={19: 4, 11: 12})
+    bets = new_nfc.make_bustproof_bets()
+    assert bets.is_bustproof is True
