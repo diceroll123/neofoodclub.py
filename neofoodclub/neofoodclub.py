@@ -327,6 +327,7 @@ class Modifier:
     def __eq__(self, other: Any):
         return (
             isinstance(other, self.__class__)
+            and self.value == other.value
             and self.opening_odds == other.opening_odds
             and self.custom_odds == other.custom_odds
             and self.time == other.time
