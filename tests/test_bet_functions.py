@@ -1,5 +1,7 @@
 from typing import Tuple
 
+import pytest
+from neofoodclub.errors import InvalidData
 from neofoodclub.neofoodclub import Bets, NeoFoodClub
 
 
@@ -145,3 +147,15 @@ def test_net_expected_equality_with_amount(
 
     crazy_bets = nfc_with_bet_amount.make_bets_from_hash(crazy_test_hash)
     assert crazy_bets.net_expected == -3632.7030091926185
+
+
+@pytest.mark.parametrize(
+    "bet_binaries",
+    [
+        (0x3,),
+        (0x1, 0x3, 0x4),
+    ],
+)
+def test_bets_from_binary_error(nfc: NeoFoodClub, bet_binaries: Tuple[int, ...]):
+    with pytest.raises(InvalidData):
+        Bets.from_binary(*bet_binaries, nfc=nfc)
