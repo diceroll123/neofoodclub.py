@@ -721,7 +721,7 @@ class NeoFoodClub:
             self.soft_reset()
 
     def _add_custom_odds(self):
-        if self._modifier.custom_odds is None:
+        if not self._modifier.custom_odds:
             return
 
         for k1, a in enumerate(self._data["pirates"]):
@@ -846,7 +846,7 @@ class NeoFoodClub:
         if self._modifier is None:
             return False
 
-        if self._modifier.custom_odds is not None:
+        if self._modifier.custom_odds:
             return True
 
         if self._modifier.time is not None:
