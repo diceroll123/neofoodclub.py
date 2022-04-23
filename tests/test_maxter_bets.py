@@ -6,16 +6,16 @@ def test_mer_bets_binaries_no_bet_amount(nfc: NeoFoodClub):
     bets = nfc.make_max_ter_bets()
 
     assert set(bets) == {
-        0x104,
-        0x4,
-        0x80104,
         0x1104,
-        0x10104,
-        0x80004,
-        0x101,
-        0x2104,
-        0x8104,
-        0x204,
+        0x1004,
+        0x81104,
+        0x11104,
+        0x104,
+        0x81004,
+        0x1204,
+        0x1124,
+        0x1114,
+        0x21104,
     }
 
 
@@ -24,16 +24,16 @@ def test_mer_bets_binaries_with_amounts(nfc_with_bet_amount: NeoFoodClub):
     bets = nfc_with_bet_amount.make_max_ter_bets()
 
     assert set(bets) == {
-        0x104,
-        0x4,
-        0x80104,
         0x1104,
-        0x10104,
-        0x80004,
-        0x101,
-        0x2104,
-        0x8104,
-        0x204,
+        0x1004,
+        0x81104,
+        0x11104,
+        0x104,
+        0x81004,
+        0x1204,
+        0x1124,
+        0x21104,
+        0x1114,
     }
 
 

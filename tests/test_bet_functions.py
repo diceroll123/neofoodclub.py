@@ -21,7 +21,7 @@ def test_make_url_no_bet_amount(nfc: NeoFoodClub):
     bets = nfc.make_max_ter_bets()
     assert (
         bets.make_url(include_domain=False)
-        == "/#round=7956&b=aukacfukycuulacauutcbukdc"
+        == "/#round=7956&b=eukucjuoycaulucepkyreynyc"
     )
 
 
@@ -29,7 +29,7 @@ def test_make_url(nfc_with_bet_amount: NeoFoodClub):
     bets = nfc_with_bet_amount.make_max_ter_bets()
     assert (
         bets.make_url(include_domain=False)
-        == "/#round=7956&b=aukacfukycuulacauutcbukdc&a=CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS"
+        == "/#round=7956&b=eukucjuoycaulucepkyrtukyw&a=CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS"
     )
 
 
@@ -76,33 +76,44 @@ def test_bet_equivalence_with_amount(
     nfc: NeoFoodClub,
 ):
     mer_from_hash = nfc.make_bets_from_hash(
-        "aukacfukycuulacauutcbukdc", amounts_hash="CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS"
+        "eukucjuoycaulucepkyrtukyw", amounts_hash="CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS"
     )
     mer_from_indices = nfc.make_bets_from_indices(
         (
-            (0, 0, 4, 0, 2),
-            (0, 0, 0, 0, 2),
-            (1, 0, 4, 0, 2),
             (0, 4, 4, 0, 2),
-            (4, 0, 4, 0, 2),
-            (1, 0, 0, 0, 2),
-            (0, 0, 4, 0, 4),
-            (0, 3, 4, 0, 2),
-            (0, 1, 4, 0, 2),
-            (0, 0, 3, 0, 2),
+            (0, 4, 0, 0, 2),
+            (1, 4, 4, 0, 2),
+            (4, 4, 4, 0, 2),
+            (0, 0, 4, 0, 2),
+            (1, 4, 0, 0, 2),
+            (0, 4, 3, 0, 2),
+            (0, 4, 4, 3, 2),
+            (3, 4, 4, 0, 2),
+            (0, 4, 4, 4, 2),
         ),
         amounts_hash="CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS",
     )
     mer_from_binaries = nfc.make_bets_from_binaries(
-        *(0x104, 0x4, 0x80104, 0x1104, 0x10104, 0x80004, 0x101, 0x2104, 0x8104, 0x204),
+        *(
+            0x1104,
+            0x1004,
+            0x81104,
+            0x11104,
+            0x104,
+            0x81004,
+            0x1204,
+            0x1124,
+            0x21104,
+            0x1114,
+        ),
         amounts_hash="CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS",
     )
 
     mer_control = nfc.make_bets_from_hash(
-        "aukacfukycuulacauutcbukdc", amounts=[8000] * 10
+        "eukucjuoycaulucepkyrtukyw", amounts=[8000] * 10
     )
 
-    mer_control_two = nfc.make_bets_from_hash("aukacfukycuulacauutcbukdc", amount=8000)
+    mer_control_two = nfc.make_bets_from_hash("eukucjuoycaulucepkyrtukyw", amount=8000)
 
     assert mer_control == mer_from_hash
     assert mer_control == mer_from_indices
@@ -135,7 +146,7 @@ def test_expected_ratio_equality(crazy_bets: Bets):
     # When it comes to expected ratio and net expected, the inconsistent
     # floating point accuracy across different programming languages shows.
 
-    assert crazy_bets.expected_ratio == 4.749039403822004
+    assert crazy_bets.expected_ratio == 3.419054697690152
 
 
 def test_net_expected_equality_with_amount(
@@ -146,7 +157,7 @@ def test_net_expected_equality_with_amount(
     # floating point accuracy across different programming languages shows.
 
     crazy_bets = nfc_with_bet_amount.make_bets_from_hash(crazy_test_hash)
-    assert crazy_bets.net_expected == -3632.7030091926185
+    assert crazy_bets.net_expected == -4742.560161024547
 
 
 @pytest.mark.parametrize(

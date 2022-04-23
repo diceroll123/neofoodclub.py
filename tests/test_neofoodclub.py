@@ -104,12 +104,12 @@ def test_cc_perk(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub):
 
 
 def test_mer_winning_odds(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub):
-    # because the mer set for the test round we have happened to win 26 units
-    bets = nfc.make_max_ter_bets()
-    assert nfc.get_win_units(bets) == 26
+    # this set wins 24 units
+    bets = nfc.make_bets_from_hash("aukacfukycuulacauutcbukdc")
+    assert nfc.get_win_units(bets) == 24
 
-    bets = nfc_from_url.make_max_ter_bets()
-    assert nfc_from_url.get_win_units(bets) == 26
+    bets = nfc_from_url.make_bets_from_hash("aukacfukycuulacauutcbukdc")
+    assert nfc_from_url.get_win_units(bets) == 24
 
 
 def test_changes(nfc_no_cache: NeoFoodClub, test_round_data: Dict[str, Any]):
