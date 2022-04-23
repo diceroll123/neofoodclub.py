@@ -1470,11 +1470,11 @@ class NeoFoodClub:
         """:class:`Bets`: Creates a Bets object made up of arena indices."""
 
         bets = Bets.from_binary(*math.bets_indices_to_bet_binaries(indices), nfc=self)
-        if amounts_hash:
+        if amounts_hash is not None:
             if not AMOUNT_HASH_REGEX.fullmatch(amounts_hash):
                 raise InvalidAmountHash
             bets.bet_amounts = math.amounts_hash_to_bet_amounts(amounts_hash)
-        if amounts:
+        if amounts is not None:
             bets.bet_amounts = amounts
         if amount is not None:
             bets.bet_amounts = [amount] * len(bets)
@@ -1513,11 +1513,11 @@ class NeoFoodClub:
             raise InvalidBetHash
 
         bets = Bets.from_binary(*math.bets_hash_to_bet_binaries(bets_hash), nfc=self)
-        if amounts_hash:
+        if amounts_hash is not None:
             if not AMOUNT_HASH_REGEX.fullmatch(amounts_hash):
                 raise InvalidAmountHash
             bets.bet_amounts = math.amounts_hash_to_bet_amounts(amounts_hash)
-        if amounts:
+        if amounts is not None:
             bets.bet_amounts = amounts
         if amount is not None:
             bets.bet_amounts = [amount] * len(bets)
@@ -1551,11 +1551,11 @@ class NeoFoodClub:
         """:class:`Bets`: Creates a Bets object made up of bet-compatible binary numbers."""
 
         bets = Bets.from_binary(*binaries, nfc=self)
-        if amounts_hash:
+        if amounts_hash is not None:
             if not AMOUNT_HASH_REGEX.fullmatch(amounts_hash):
                 raise InvalidAmountHash
             bets.bet_amounts = math.amounts_hash_to_bet_amounts(amounts_hash)
-        if amounts:
+        if amounts is not None:
             bets.bet_amounts = amounts
         if amount is not None:
             bets.bet_amounts = [amount] * len(bets)
