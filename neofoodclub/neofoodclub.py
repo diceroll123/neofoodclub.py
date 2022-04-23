@@ -143,7 +143,7 @@ class OddsChange:
         return ARENA_NAMES[self.arena_index]
 
     def __repr__(self):
-        return f"<OddsChange index={self.index} pirate={self.pirate} old={self.old} new={self.new} timestamp={self.timestamp}>"
+        return f"<OddsChange arena={self.arena_index} index={self.index} pirate={self.pirate} old={self.old} new={self.new} timestamp={self.timestamp}>"
 
     def __eq__(self, other: Any):
         return isinstance(other, self.__class__) and self._data == other.data
