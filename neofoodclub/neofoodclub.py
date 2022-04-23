@@ -489,7 +489,10 @@ class Bets:
     def bet_amounts(self) -> np.ndarray:
         """:class:`np.ndarray`: Returns a numpy array of bet amounts corresponding by index to these bets.
 
-        These can be user-defined, and generated."""
+        These can be user-defined, and generated.
+
+        If the NeoFoodClub object has a bet_amount set, and this bet object has no bet amounts, we will
+        fall back to using the NeoFoodClub object's amount, capped at the max bet amount per bet."""
         if np.all(self._bet_amounts > -1000):
             return self._bet_amounts
 
