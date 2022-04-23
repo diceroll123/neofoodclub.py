@@ -144,9 +144,27 @@ def test_bet_indices_encoding(
     assert nfc.make_bets_from_indices(crazy_test_indices).indices == crazy_test_indices
 
 
+def test_bet_indices_with_amount(
+    nfc: NeoFoodClub, crazy_test_indices: Tuple[Tuple[int, ...], ...]
+):
+    assert (
+        nfc.make_bets_from_indices(crazy_test_indices, amount=8000).indices
+        == crazy_test_indices
+    )
+
+
 def test_bet_binaries_encoding(nfc: NeoFoodClub, crazy_test_binaries: Tuple[int, ...]):
     assert (
         tuple(nfc.make_bets_from_binaries(*crazy_test_binaries)) == crazy_test_binaries
+    )
+
+
+def test_bet_binaries_with_amount(
+    nfc: NeoFoodClub, crazy_test_binaries: Tuple[int, ...]
+):
+    assert (
+        tuple(nfc.make_bets_from_binaries(*crazy_test_binaries, amount=8000))
+        == crazy_test_binaries
     )
 
 
