@@ -69,6 +69,11 @@ def test_round_url() -> str:
     return "/#round=7956&pirates=[[2,8,14,11],[20,7,6,10],[19,4,12,15],[3,1,5,13],[17,16,18,9]]&openingOdds=[[1,2,13,3,5],[1,4,2,4,6],[1,3,13,7,2],[1,13,2,3,3],[1,8,2,4,12]]&currentOdds=[[1,2,13,3,5],[1,4,2,4,6],[1,3,13,7,2],[1,13,2,3,3],[1,8,2,4,13]]&foods=[[26,25,4,9,21,1,33,11,7,10],[12,9,14,35,25,6,21,19,40,37],[17,30,21,39,37,15,29,40,31,10],[10,18,35,9,34,23,27,32,28,12],[11,20,9,33,7,14,4,23,31,26]]&winners=[1,3,4,2,4]&timestamp=2021-02-16T23:47:37+00:00"
 
 
+@pytest.fixture
+def test_round_url_no_food() -> str:
+    return "/#round=7956&pirates=[[2,8,14,11],[20,7,6,10],[19,4,12,15],[3,1,5,13],[17,16,18,9]]&openingOdds=[[1,2,13,3,5],[1,4,2,4,6],[1,3,13,7,2],[1,13,2,3,3],[1,8,2,4,12]]&currentOdds=[[1,2,13,3,5],[1,4,2,4,6],[1,3,13,7,2],[1,13,2,3,3],[1,8,2,4,13]]&winners=[1,3,4,2,4]&timestamp=2021-02-16T23:47:37+00:00"
+
+
 # crazy bets mean(all arenas have a pirate bet)
 # the crazy bet methods here all correspond to the exact same set!
 @pytest.fixture
@@ -131,6 +136,11 @@ def nfc() -> NeoFoodClub:
 
 
 @pytest.fixture
+def nfc_no_cache() -> NeoFoodClub:
+    return NeoFoodClub(test_round_data, cache=False)
+
+
+@pytest.fixture
 def nfc_with_bet_amount() -> NeoFoodClub:
     return NeoFoodClub(test_round_data, bet_amount=8000)
 
@@ -138,6 +148,11 @@ def nfc_with_bet_amount() -> NeoFoodClub:
 @pytest.fixture
 def nfc_from_url(test_round_url) -> NeoFoodClub:
     return NeoFoodClub.from_url(test_round_url)
+
+
+@pytest.fixture
+def nfc_no_foods(test_round_url_no_food: str) -> NeoFoodClub:
+    return NeoFoodClub.from_url(test_round_url_no_food)
 
 
 @pytest.fixture
