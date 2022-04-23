@@ -1,3 +1,4 @@
+import datetime
 from typing import Any, Dict
 
 from neofoodclub import NeoFoodClub
@@ -44,6 +45,29 @@ def test_modified(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub):
 
     modify(nfc)
     modify(nfc_from_url)
+
+
+def test_not_modified(nfc: NeoFoodClub):
+    new_nfc = nfc.copy(cache=False)
+    assert new_nfc.modified is False
+
+
+def test_modified_opening_odds(nfc: NeoFoodClub):
+    new_nfc = nfc.copy(cache=False)
+    new_nfc.modifier = Modifier(Modifier.OPENING)
+    assert new_nfc.modified is True
+
+
+def test_modified_time(nfc: NeoFoodClub):
+    new_nfc = nfc.copy(cache=False)
+    new_nfc.modifier = Modifier(custom_time=datetime.time(hour=12, minute=0))
+    assert new_nfc.modified is True
+
+
+def test_with_modifier(nfc: NeoFoodClub):
+    new_nfc = nfc.copy(cache=False)
+    m = Modifier(Modifier.ALL_MODIFIERS)
+    assert new_nfc.with_modifier(m).modifier == m
 
 
 def test_round(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub):
