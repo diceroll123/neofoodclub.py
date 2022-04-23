@@ -282,12 +282,12 @@ class Modifier:
 
         for k, v in val.items():
             if k not in range(1, 21):
-                raise TypeError(
+                raise ValueError(
                     f"Expected int between 1 and 20 for Pirate ID but received {k}"
                 )
 
             if v not in range(2, 14):
-                raise TypeError(
+                raise ValueError(
                     f"Expected int between 2 and 13 for Pirate Odds but received {v}"
                 )
 
