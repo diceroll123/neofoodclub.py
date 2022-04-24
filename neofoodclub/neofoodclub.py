@@ -214,9 +214,11 @@ class Modifier:
     ):
         self.value = flags
         self._custom_odds = custom_odds or {}
-        self._nfc = None
         self._time = custom_time
         self._cc_perk = cc_perk
+
+        # the _nfc var will only be written to by the NeoFoodClub object.
+        self._nfc = None
 
     def __repr__(self):
         return f"<Modifier value={self.value} letters={self.letters} time={self.time}>"
@@ -336,17 +338,8 @@ class Modifier:
 
     @property
     def nfc(self) -> Optional[NeoFoodClub]:
-        """:class:`NeoFoodClub`: The NeoFoodClub round that this modifier is connected to. Can be None if not set yet."""
+        """Optional[:class:`NeoFoodClub`:] The NeoFoodClub round that this modifier is connected to. Can be None if not set yet."""
         return self._nfc
-
-    @nfc.setter
-    def nfc(self, value: NeoFoodClub):
-        if not isinstance(value, NeoFoodClub):
-            raise TypeError(
-                f"Expected NeoFoodClub but received {value.__class__.__name__}"
-            )
-
-        self._nfc = value
 
 
 @dataclass
@@ -712,12 +705,12 @@ class NeoFoodClub:
         self._data: RoundData = json.loads(json.dumps(data))
         self._bet_amount = bet_amount
         self._data_dict = {}
-        self._stds = {}
+        self._stds: List[List[float]] = []
         self._maxbet_odds_cache = np.array([])
         self._net_expected_cache = np.array([])
 
         self._modifier = modifier or Modifier()
-        self._modifier.nfc = self
+        self._modifier._nfc = self  # type: ignore
 
         if cache:
             self.reset()
@@ -824,20 +817,12 @@ class NeoFoodClub:
 
     @modifier.setter
     def modifier(self, val: Optional[Modifier]):
+        """Sets this NeoFoodClub object's modifier as a copy of the passed-in modifier."""
         val = val or Modifier()
 
-        # data is only changed with differing opening odds, custom odds, or custom time
-        reset = (
-            self._modifier.opening_odds,
-            self._modifier.custom_odds,
-            self._modifier.time,
-        ) != (
-            val.opening_odds,
-            val.custom_odds,
-            val.time,
-        )
+        reset = self._modifier != val
         self._modifier = val
-        self._modifier.nfc = self
+        self._modifier._nfc = self  # type: ignore
 
         if reset:
             self.reset()
@@ -866,7 +851,7 @@ class NeoFoodClub:
         modifier: Optional[:class:`Modifier`]
             The modifier object you'd like to add to this NeoFoodClub object."""
 
-        self.modifier = modifier or Modifier()
+        self.modifier = modifier
         return self
 
     def to_dict(self, *, keep_custom: bool = False) -> Dict[str, Any]:
