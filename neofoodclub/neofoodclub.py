@@ -1426,7 +1426,7 @@ class NeoFoodClub:
 
     @overload
     def make_bets_from_indices(
-        self, indices: Sequence[Sequence[int]], /, *, amounts_hash: str
+        self, indices: Sequence[Sequence[int]], /, *, amounts_hash: Optional[str]
     ) -> Bets:
         ...
 
@@ -1455,7 +1455,7 @@ class NeoFoodClub:
         """:class:`Bets`: Creates a Bets object made up of arena indices."""
 
         bets = Bets.from_binary(*math.bets_indices_to_bet_binaries(indices), nfc=self)
-        if amounts_hash is not None:
+        if amounts_hash is not None and amounts_hash != "":
             if not AMOUNT_HASH_REGEX.fullmatch(amounts_hash):
                 raise InvalidAmountHash
             bets.bet_amounts = math.amounts_hash_to_bet_amounts(amounts_hash)
@@ -1471,7 +1471,9 @@ class NeoFoodClub:
         ...
 
     @overload
-    def make_bets_from_hash(self, bets_hash: str, /, *, amounts_hash: str) -> Bets:
+    def make_bets_from_hash(
+        self, bets_hash: str, /, *, amounts_hash: Optional[str]
+    ) -> Bets:
         ...
 
     @overload
@@ -1498,7 +1500,7 @@ class NeoFoodClub:
             raise InvalidBetHash
 
         bets = Bets.from_binary(*math.bets_hash_to_bet_binaries(bets_hash), nfc=self)
-        if amounts_hash is not None:
+        if amounts_hash is not None and amounts_hash != "":
             if not AMOUNT_HASH_REGEX.fullmatch(amounts_hash):
                 raise InvalidAmountHash
             bets.bet_amounts = math.amounts_hash_to_bet_amounts(amounts_hash)
@@ -1514,7 +1516,9 @@ class NeoFoodClub:
         ...
 
     @overload
-    def make_bets_from_binaries(self, *binaries: int, amounts_hash: str) -> Bets:
+    def make_bets_from_binaries(
+        self, *binaries: int, amounts_hash: Optional[str]
+    ) -> Bets:
         ...
 
     @overload
@@ -1536,7 +1540,7 @@ class NeoFoodClub:
         """:class:`Bets`: Creates a Bets object made up of bet-compatible binary numbers."""
 
         bets = Bets.from_binary(*binaries, nfc=self)
-        if amounts_hash is not None:
+        if amounts_hash is not None and amounts_hash != "":
             if not AMOUNT_HASH_REGEX.fullmatch(amounts_hash):
                 raise InvalidAmountHash
             bets.bet_amounts = math.amounts_hash_to_bet_amounts(amounts_hash)
