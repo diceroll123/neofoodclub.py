@@ -39,15 +39,15 @@ PIRATE_NAMES = {
 
 
 class PirateMixin:
-    id: int
+    _id: int
 
     @property
-    def name(self):
-        return PIRATE_NAMES[self.id]
+    def name(self) -> str:
+        return PIRATE_NAMES[self._id]
 
     @property
-    def image(self):
-        return f"http://images.neopets.com/pirates/fc/fc_pirate_{self.id}.gif"
+    def image(self) -> str:
+        return f"http://images.neopets.com/pirates/fc/fc_pirate_{self._id}.gif"
 
 
 class PartialPirate(PirateMixin):
@@ -70,7 +70,7 @@ class PartialPirate(PirateMixin):
     def id(self) -> int:
         return self._id
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<NaivePirate name={self.name}>"
 
 
@@ -182,7 +182,7 @@ class Pirate(PirateMixin):
     def __eq__(self, other: Any) -> bool:
         return isinstance(other, self.__class__) and int(self) == int(other)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         attrs = [
             ("name", self.name),
             ("arena", self.arena),

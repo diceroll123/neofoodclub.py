@@ -402,8 +402,8 @@ def get_bet_odds_from_bets(
     pir_ib = [0x88888, 0x44444, 0x22222, 0x11111]
 
     # checks if there are possible winning combinations for ib
-    def ib_doable(_ib) -> bool:
-        return (
+    def ib_doable(_ib: int) -> bool:
+        return bool(
             _ib & BIT_MASKS[0]
             and _ib & BIT_MASKS[1]
             and _ib & BIT_MASKS[2]
@@ -417,7 +417,7 @@ def get_bet_odds_from_bets(
     # - two different bets in "res" will have 0 common accepted winning combinations
     # - all winning combinations are accepted by a bet in "res" (giving the value 0 to combinations that busts)
     # It's done so that the probability distribution becomes easy to compute.
-    def expand_ib_object(ib_obj) -> Dict[int, int]:
+    def expand_ib_object(ib_obj: Dict[int, int]) -> Dict[int, int]:
         res = {all_ib: 0}
         for ib_bet, winnings in sorted(ib_obj.items()):
             for ib_key in list(res.keys()):

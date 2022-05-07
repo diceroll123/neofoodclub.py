@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from typing import (
     TYPE_CHECKING,
     Any,
+    Callable,
     Dict,
     Generator,
     List,
@@ -24,6 +25,7 @@ import dateutil
 import dateutil.parser
 import numpy as np
 from dateutil.tz import UTC, tzutc
+from typing_extensions import Self
 
 from neofoodclub.types import RoundData
 
@@ -59,7 +61,7 @@ __all__ = (
 )
 
 
-def _require_cache(func):
+def _require_cache(func: Callable[..., Any]):
     # for internal use only.
     # if the NFC object has no cache, it will after this runs.
 
@@ -220,7 +222,7 @@ class Modifier:
         # the _nfc var will only be written to by the NeoFoodClub object.
         self._nfc = None
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Modifier value={self.value} letters={self.letters} time={self.time}>"
 
     def _has_flag(self, o: int) -> bool:
@@ -415,13 +417,13 @@ class Odds:
             o.probability for o in self._odds if 0 < int(o.value) < amount_of_bets
         )
 
-    def _iterator(self):
+    def _iterator(self) -> Generator[int, None, None]:
         yield from self._odds_values
 
-    def __iter__(self):
+    def __iter__(self) -> Generator[int, None, None]:
         return self._iterator()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         attrs = [
             ("best", self.best),
             ("bust", self.bust),
@@ -534,7 +536,7 @@ class Bets:
 
         return ""
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         attrs = [
             ("ne", self.net_expected),
             ("er", self.expected_ratio),
@@ -576,7 +578,7 @@ class Bets:
 
         return cls(nfc=nfc, indices=intersection)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return self._indices.size
 
     @property
@@ -657,7 +659,7 @@ class Bets:
     def __iter__(self) -> Generator[int, None, None]:
         return self._iterator()
 
-    def __eq__(self, other: Any):
+    def __eq__(self, other: Any) -> bool:
         return (
             isinstance(other, self.__class__)
             and self.bets_hash == other.bets_hash
@@ -717,7 +719,7 @@ class NeoFoodClub:
         else:
             self.soft_reset()
 
-    def _add_custom_odds(self):
+    def _add_custom_odds(self) -> None:
         if not self._modifier.custom_odds:
             return
 
@@ -727,7 +729,7 @@ class NeoFoodClub:
                 if p in self._modifier.custom_odds:
                     self._data["customOdds"][k1][k2 + 1] = self._modifier.custom_odds[p]
 
-    def soft_reset(self):
+    def soft_reset(self) -> None:
         """Resets the custom odds used internally."""
         # the way custom odds + custom time works: (sorry!)
         # we determine if we have opening odds set,
@@ -755,13 +757,13 @@ class NeoFoodClub:
 
         self._add_custom_odds()
 
-    def reset(self):
+    def reset(self) -> None:
         """Recalculates the odds used to create bets with."""
         self.soft_reset()
 
         self._cache_dicts()
 
-    def _cache_bet_amount_dicts(self):
+    def _cache_bet_amount_dicts(self) -> None:
         # cache maxbets, we'll need these a lot later,
         # but only if we need them at all
 
@@ -773,7 +775,7 @@ class NeoFoodClub:
             # for making maxter faster...
             self._net_expected_cache = mb_copy * self._data_dict["ers"] - mb_copy
 
-    def _cache_dicts(self):
+    def _cache_dicts(self) -> None:
         self._stds = math.make_probabilities(self._data["openingOdds"])
         # most of the binary/odds/std data sits here
         self._data_dict = math.make_round_dicts(
@@ -843,7 +845,7 @@ class NeoFoodClub:
 
         return False
 
-    def with_modifier(self, modifier: Optional[Modifier] = None, /):
+    def with_modifier(self, modifier: Optional[Modifier] = None, /) -> Self:
         """Applies the supplied modifier to the NeoFoodClub object.
 
         Parameters
@@ -998,7 +1000,7 @@ class NeoFoodClub:
         return np.sum(self._get_winning_odds(bets)).astype(int)
 
     @_require_cache
-    def get_win_np(self, bets: Bets, /, *, use_bet_amount_if_none: bool = True) -> int:
+    def get_win_np(self, bets: Bets, /) -> int:
         """Returns the amount of neopoints that won, given the provided bets.
         If the bets object has no bet amounts, you can opt to use the NeoFoodClub object's bet amount.
         Will return 0 otherwise.
@@ -1217,7 +1219,7 @@ class NeoFoodClub:
             cache=cache,
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         attrs = [
             ("round", self.round),
             ("bet_amount", self._bet_amount),
