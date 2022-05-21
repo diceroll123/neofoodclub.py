@@ -3,7 +3,6 @@ from __future__ import annotations
 import contextlib
 import datetime
 import functools
-import json
 import re
 import urllib.parse
 from dataclasses import dataclass
@@ -24,6 +23,7 @@ from typing import (
 import dateutil
 import dateutil.parser
 import numpy as np
+import orjson
 from dateutil.tz import UTC, tzutc
 from typing_extensions import Self
 
@@ -704,7 +704,7 @@ class NeoFoodClub:
         cache: bool = True,
     ):
         # so it's not changing old cache data around, have a deep copy (safety precaution for custom odds)
-        self._data: RoundData = json.loads(json.dumps(data))
+        self._data: RoundData = orjson.loads(orjson.dumps(data))
         self._bet_amount = bet_amount
         self._data_dict = {}
         self._stds: List[List[float]] = []
@@ -741,13 +741,13 @@ class NeoFoodClub:
 
         # this is where customOdds gets set, which the rest of the NFC object is
         # based on.
-        self._data["customOdds"] = json.loads(json.dumps(self._data[key]))
+        self._data["customOdds"] = orjson.loads(orjson.dumps(self._data[key]))
 
         if self._modifier.time:
             if dt := self._get_round_time(self._modifier.time):
                 # start custom odds from opening odds and add from there
-                self._data["customOdds"] = json.loads(
-                    json.dumps(self._data["openingOdds"])
+                self._data["customOdds"] = orjson.loads(
+                    orjson.dumps(self._data["openingOdds"])
                 )
                 for change in self.changes:
                     if change.timestamp < dt:
@@ -865,7 +865,7 @@ class NeoFoodClub:
             Whether or not you'd like to keep the customOdds data key. False by default.
         """
         # return a deep copy of this round's dict
-        data = json.loads(json.dumps(self._data))
+        data = orjson.loads(orjson.dumps(self._data))
         if not keep_custom:
             data.pop("customOdds", None)
         return data
@@ -1051,7 +1051,7 @@ class NeoFoodClub:
         """
 
         def encode(int_lists: List[Any]) -> str:
-            return json.dumps(int_lists, separators=(",", ":"))
+            return orjson.dumps(int_lists).decode("utf-8")
 
         use_15 = bets and 10 < len(bets) <= 15 or self._modifier._cc_perk
 
@@ -1140,7 +1140,7 @@ class NeoFoodClub:
 
             foods_string = foods[0]
             if FOODS_REGEX.match(foods_string):
-                data["foods"] = json.loads(foods_string)
+                data["foods"] = orjson.loads(foods_string)
 
         # WINNERS - OPTIONAL
         if winners := olddata.get("winners"):
@@ -1153,7 +1153,7 @@ class NeoFoodClub:
                 # if we have SOMETHING, it better be right!
                 raise InvalidData("NeoFoodClub URL parameter `winners` is invalid.")
 
-            data["winners"] = json.loads(winners_string)
+            data["winners"] = orjson.loads(winners_string)
         else:
             # don't raise an error if it's missing, just assume no winners.
             data["winners"] = [0, 0, 0, 0, 0]
@@ -1169,7 +1169,7 @@ class NeoFoodClub:
         if re.match(r"^\d+$", bet_number) is None:
             raise InvalidData("NeoFoodClub URL parameter `round` is invalid.")
 
-        data["round"] = json.loads(bet_number)
+        data["round"] = orjson.loads(bet_number)
 
         # PIRATES - MANDATORY
         if not (pirates := olddata.get("pirates")):
@@ -1179,7 +1179,7 @@ class NeoFoodClub:
         if PIRATES_REGEX.match(pirate_string) is None:
             raise InvalidData("NeoFoodClub URL parameter `pirates` is invalid.")
 
-        pirate_lists = json.loads(pirate_string)
+        pirate_lists = orjson.loads(pirate_string)
         has_proper_ids = set(sum(pirate_lists, [])) == set(range(1, 21))
         if not has_proper_ids:
             raise InvalidData("NeoFoodClub URL parameter `pirates` is invalid.")
@@ -1196,7 +1196,7 @@ class NeoFoodClub:
             if ODDS_REGEX.match(odds) is None:
                 raise InvalidData(f"NeoFoodClub URL parameter `{odd_type}` is invalid")
 
-            data[odd_type] = json.loads(odds)
+            data[odd_type] = orjson.loads(odds)
 
         # START, TIMESTAMP - OPTIONAL
         for key in ["start", "timestamp"]:
