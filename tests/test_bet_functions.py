@@ -203,6 +203,12 @@ def test_bets_from_binary_error(nfc: NeoFoodClub, bet_binaries: Tuple[int, ...])
         Bets.from_binary(*bet_binaries, nfc=nfc)
 
 
+def test_repeating_bets_from_binary(nfc: NeoFoodClub):
+    # duplicates are removed in from_binary, we're making sure of this
+    repeating = Bets.from_binary(0x1, 0x1, 0x2, nfc=nfc)
+    assert len(repeating) == 2
+
+
 def test_random_bets(nfc: NeoFoodClub):
     bets = nfc.make_random_bets()
     assert len(bets) == 10
