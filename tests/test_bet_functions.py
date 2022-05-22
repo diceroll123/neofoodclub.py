@@ -215,9 +215,18 @@ def test_too_many_bet_amounts_from_binaries(nfc: NeoFoodClub):
         nfc.make_bets_from_binaries(0x1, amounts=[50, 50])
 
 
-def test_invalid_bet_amounts_from_binaries(nfc: NeoFoodClub):
-    with pytest.raises(InvalidAmountHash):
-        nfc.make_bets_from_binaries(0x1, amounts_hash="???")
+@pytest.mark.parametrize(
+    "five_bet,bets_hash",
+    [
+        (0x88888, "ggfgggbgbgbbggfaggaggffgf"),
+        (0x44444, "mmmcmmkmmkkkmmakmccacmmkm"),
+        (0x22222, "ssssddsssppsspsdppspspads"),
+        (0x11111, "yyyuyyuuyyyayeyeeyyuueuye"),
+    ],
+)
+def test_gambit_bets_equivalence(nfc: NeoFoodClub, five_bet: int, bets_hash: str):
+    bets = nfc.make_gambit_bets(five_bet=five_bet)
+    assert bets.bets_hash == bets_hash
 
 
 def test_too_many_bet_amounts_from_indices(nfc: NeoFoodClub):
