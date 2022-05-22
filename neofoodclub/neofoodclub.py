@@ -16,6 +16,7 @@ from typing import (
     Optional,
     Sequence,
     Tuple,
+    TypeVar,
     Union,
     overload,
 )
@@ -25,7 +26,7 @@ import dateutil.parser
 import numpy as np
 import orjson
 from dateutil.tz import UTC, tzutc
-from typing_extensions import Self
+from typing_extensions import ParamSpec, Self
 
 from neofoodclub.types import RoundData
 
@@ -60,16 +61,20 @@ __all__ = (
     "NEO_FC_REGEX",
 )
 
+P = ParamSpec("P")
+R = TypeVar("R")
 
-def _require_cache(func: Callable[..., Any]):
+
+def _require_cache(func: Callable[P, R]) -> Callable[P, R]:
     # for internal use only.
     # if the NFC object has no cache, it will after this runs.
 
     @functools.wraps(func)
-    def wrapper(self: NeoFoodClub, *args, **kwargs):
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+        self: NeoFoodClub = args[0]  # type: ignore
         if not self._data_dict or not self._stds:
             self.reset()
-        return func(self, *args, **kwargs)
+        return func(*args, **kwargs)
 
     return wrapper
 
