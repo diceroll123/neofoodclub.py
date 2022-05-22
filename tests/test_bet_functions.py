@@ -1,7 +1,7 @@
 from typing import Tuple
 
 import pytest
-from neofoodclub.errors import InvalidData
+from neofoodclub.errors import InvalidAmountHash, InvalidBetHash, InvalidData
 from neofoodclub.neofoodclub import Bets, Modifier, NeoFoodClub
 
 
@@ -168,10 +168,6 @@ def test_bet_binaries_with_amount(
     )
 
 
-def test_net_expected_equality_no_amount(crazy_bets: Bets):
-    assert crazy_bets.net_expected == 0.0
-
-
 def test_expected_ratio_equality(crazy_bets: Bets):
     # There's a discrepancy between what the website says vs what this says.
     # When it comes to expected ratio and net expected, the inconsistent
@@ -214,59 +210,36 @@ def test_random_bets(nfc: NeoFoodClub):
     assert len(bets) == 10
 
 
-def test_random_gambit_bets(nfc: NeoFoodClub):
-    bets = nfc.make_gambit_bets(random=True)
-    assert bets.is_gambit is True
-    assert len(bets) == 10
+def test_too_many_bet_amounts_from_binaries(nfc: NeoFoodClub):
+    with pytest.raises(InvalidData):
+        nfc.make_bets_from_binaries(0x1, amounts=[50, 50])
 
 
-@pytest.mark.parametrize(
-    "five_bet,bets_hash",
-    [
-        (0x88888, "ggfgggbgbgbbggfaggaggffgf"),
-        (0x44444, "mmmmckmmmkkkmmakmccamckmm"),
-        (0x22222, "ssssddsssppsspsdpssadsddd"),
-        (0x11111, "yyyuyyuuyyyayeyeeyyuueuye"),
-    ],
-)
-def test_gambit_bets_equivalence(nfc: NeoFoodClub, five_bet: int, bets_hash: str):
-    bets = nfc.make_gambit_bets(five_bet=five_bet)
-    assert bets.bets_hash == bets_hash
+def test_invalid_bet_amounts_from_binaries(nfc: NeoFoodClub):
+    with pytest.raises(InvalidAmountHash):
+        nfc.make_bets_from_binaries(0x1, amounts_hash="???")
 
 
-def test_unit_bets_empty(nfc: NeoFoodClub):
-    bets = nfc.make_units_bets(400000)  # higher than possible
-    assert len(bets) == 0
+def test_too_many_bet_amounts_from_indices(nfc: NeoFoodClub):
+    with pytest.raises(InvalidData):
+        nfc.make_bets_from_indices([(1, 0, 0, 0, 0)], amounts=[50, 50])
 
 
-def test_unit_bets_equivalence(nfc: NeoFoodClub):
-    bets = nfc.make_units_bets(20)  # higher than possible
-    assert bets.bets_hash == "uukycjalewfxoamecokcsanfc"
+def test_invalid_bet_amounts_from_indices(nfc: NeoFoodClub):
+    with pytest.raises(InvalidAmountHash):
+        nfc.make_bets_from_indices([(1, 0, 0, 0, 0)], amounts_hash="???")
 
 
-def test_unit_bets(nfc: NeoFoodClub):
-    bets = nfc.make_units_bets(20)
-    assert len(bets) == 10
+def test_too_many_bet_amounts_from_hash(nfc: NeoFoodClub):
+    with pytest.raises(InvalidData):
+        nfc.make_bets_from_hash("faa", amounts=[50, 50])
 
 
-def test_bustproof_with_two_positives(nfc: NeoFoodClub):
-    new_nfc = nfc.copy()
-    # setting Buck to 4 sets arena to positive, giving us 2 positives
-    new_nfc.modifier = Modifier(custom_odds={19: 4})
-    bets = new_nfc.make_bustproof_bets()
-    assert bets.is_bustproof is True
+def test_invalid_bet_hash(nfc: NeoFoodClub):
+    with pytest.raises(InvalidBetHash):
+        nfc.make_bets_from_hash("faz")
 
 
-def test_bustproof_with_three_positives(nfc: NeoFoodClub):
-    new_nfc = nfc.copy()
-    # setting Buck to 4 sets arena to positive, giving us 2 positives
-    # setting Crossblades to 12 sets arena to positive, giving us 3 positives
-    new_nfc.modifier = Modifier(custom_odds={19: 4, 11: 12})
-    bets = new_nfc.make_bustproof_bets()
-    assert bets.is_bustproof is True
-
-
-def test_bustproof_equivalence(nfc_with_bet_amount: NeoFoodClub):
-    # bet amounts are NEEDED to make bustproof + guaranteed wins
-    bets = nfc_with_bet_amount.make_bustproof_bets()
-    assert bets.bets_hash == "aafacaapae"
+def test_invalid_amounts_hash(nfc: NeoFoodClub):
+    with pytest.raises(InvalidAmountHash):
+        nfc.make_bets_from_hash("faa", amounts_hash="???")
