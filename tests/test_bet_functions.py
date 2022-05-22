@@ -235,7 +235,7 @@ def test_unit_bets_equivalence(nfc: NeoFoodClub):
     assert bets.bets_hash == "uukycjalewfxoamecokcsanfc"
 
 
-def test_random_unit_bets(nfc: NeoFoodClub):
+def test_unit_bets(nfc: NeoFoodClub):
     bets = nfc.make_units_bets(20)
     assert len(bets) == 10
 
