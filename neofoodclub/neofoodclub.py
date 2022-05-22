@@ -1266,9 +1266,9 @@ class NeoFoodClub:
 
     @_require_cache
     def _crazy_bets_indices(self) -> np.ndarray:
-        return np.random.choice(
-            math.FULL_BETS, size=self.max_amount_of_bets, replace=False
-        )
+        return math.FULL_BETS[
+            np.random.randint(math.FULL_BETS.size, size=self.max_amount_of_bets)
+        ]
 
     @_require_cache
     def make_crazy_bets(self) -> Bets:
@@ -1279,7 +1279,7 @@ class NeoFoodClub:
 
     @_require_cache
     def _random_indices(self) -> np.ndarray:
-        return np.random.choice(3124, size=self.max_amount_of_bets, replace=False)
+        return np.random.randint(3125, size=self.max_amount_of_bets)
 
     @_require_cache
     def make_random_bets(self) -> Bets:
@@ -1308,7 +1308,7 @@ class NeoFoodClub:
         # these are lazy but they get the job done well enough
         if random:
             random_five_bet = self._data_dict["bins"][
-                np.random.choice(math.FULL_BETS, size=1)
+                math.FULL_BETS[np.random.randint(math.FULL_BETS.size, size=1)]
             ]
             return self._gambit_indices(five_bet=random_five_bet[0])
 
