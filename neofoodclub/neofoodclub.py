@@ -1389,14 +1389,18 @@ class NeoFoodClub:
         if len(positives) == 1:
             # If only one arena is positive, we place 1 bet on each of the pirates of that arena. Total bets = 4.
             best_arena = arenas.best[0]
-            bets = Bets.from_binary(*[p.binary for p in best_arena.pirates], nfc=self)
+            bets = Bets.from_binary(*(p.binary for p in best_arena.pirates), nfc=self)
         elif len(positives) == 2:
             # If two arenas are positive, we place 1 bet on each of the three worst pirates of the best arena and
             # 1 bet on each of the pirates of the second arena + the best pirate of the best arena. Total bets = 7
             best_arena, second_arena = arenas.best[:2]
+
+            best_arena_sorted = best_arena.best
+
+            best_pirate_binary = best_arena_sorted[0].binary
             bets = Bets.from_binary(
-                *[p.binary for p in best_arena.best[-3:]],
-                *[p.binary | best_arena.best[0].binary for p in second_arena.pirates],
+                *(p.binary for p in best_arena_sorted[-3:]),
+                *(p.binary | best_pirate_binary for p in second_arena.pirates),
                 nfc=self,
             )
         else:
@@ -1407,20 +1411,24 @@ class NeoFoodClub:
             # of the second arena. Total bets = 10.
             best_arena, second_arena, third_arena = arenas.best[:3]
 
+            best_arena_sorted = best_arena.best
+            second_best_arena_sorted = second_arena.best
+            best_pirate_binary = best_arena_sorted[0].binary
+            second_best_pirate_binary = second_best_arena_sorted[0].binary
+
             bets = Bets.from_binary(
-                *[p.binary for p in best_arena.best[-3:]],
-                *[p.binary | best_arena.best[0].binary for p in second_arena.best[-3:]],
-                *[
-                    p.binary | best_arena.best[0].binary | second_arena.best[0].binary
+                *(p.binary for p in best_arena_sorted[-3:]),
+                *(p.binary | best_pirate_binary for p in second_best_arena_sorted[-3:]),
+                *(
+                    p.binary | best_pirate_binary | second_best_pirate_binary
                     for p in third_arena.best
-                ],
+                ),
                 nfc=self,
             )
 
         if bet_amount := self.bet_amount:
             current_odds = self._data_dict["odds"][bets._indices]
-            lowest_odds_index = np.argmin(current_odds)
-            lowest_odds = current_odds[lowest_odds_index]
+            lowest_odds = current_odds[np.argmin(current_odds)]
 
             new_bet_amounts = bet_amount * lowest_odds // current_odds
             bets.bet_amounts = new_bet_amounts
