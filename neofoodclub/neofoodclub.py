@@ -393,7 +393,7 @@ class Odds:
     )
 
     def __init__(self, bets: Bets):
-        self._odds_values = bets.nfc._data_dict["odds"][bets._indices].astype(int)
+        self._odds_values = bets.nfc._data_dict["odds"][bets._indices]
         self._odds = [
             Chance(**chance)
             for chance in math.get_bet_odds_from_bets(
@@ -492,7 +492,7 @@ class Bets:
             return self._bet_amounts
 
         if self.nfc._maxbet_odds_cache.size:
-            return self.nfc._maxbet_odds_cache[self._indices].astype(int)
+            return self.nfc._maxbet_odds_cache[self._indices]
 
         return np.array([-1000] * self._indices.size)
 
@@ -518,7 +518,7 @@ class Bets:
         making up these bets."""
         return tuple(
             math.binary_to_indices(binary)
-            for binary in self.nfc._data_dict["bins"][self._indices].astype(int)
+            for binary in self.nfc._data_dict["bins"][self._indices]
         )
 
     @property
@@ -558,12 +558,13 @@ class Bets:
 
     @classmethod
     def from_binary(cls, *bins: int, nfc: NeoFoodClub) -> Bets:
-        # duplicate bins are removed
-        int_bins = nfc._data_dict["bins"].astype(int)
-        np_bins = np.array(list(dict.fromkeys(bins)))
+        np_bins = np.array(bins)
+        # duplicate bins are removed here
+        _, idx = np.unique(np_bins, return_index=True)
+        np_bins = np_bins[np.sort(idx)]
 
         # thanks @mikeshardmind
-        intersection = np.where(np_bins[:, np.newaxis] == int_bins)[1]
+        intersection = np.where(np_bins[:, np.newaxis] == nfc._data_dict["bins"])[1]
 
         if intersection.size == 0:
             raise InvalidData(
@@ -609,7 +610,7 @@ class Bets:
         if len(self) < 2:
             return False
 
-        int_bins = self.nfc._data_dict["bins"].astype(int)[self._indices]
+        int_bins = self.nfc._data_dict["bins"][self._indices]
         highest = np.max(int_bins)
 
         # make sure the highest has a population count of 5
@@ -653,7 +654,7 @@ class Bets:
         return self.nfc.make_url(self, all_data=all_data, include_domain=include_domain)
 
     def _iterator(self) -> Generator[int, None, None]:
-        int_bins = self.nfc._data_dict["bins"].astype(int)
+        int_bins = self.nfc._data_dict["bins"]
         yield from int_bins[self._indices]
 
     def __iter__(self) -> Generator[int, None, None]:
@@ -778,10 +779,16 @@ class NeoFoodClub:
     def _cache_dicts(self) -> None:
         self._stds = math.make_probabilities(self._data["openingOdds"])
         # most of the binary/odds/std data sits here
-        self._data_dict = math.make_round_dicts(
+        data_dict = math.make_round_dicts(
             tuple(tuple(row) for row in self._stds),
             tuple(tuple(row) for row in self._data["customOdds"]),
         )
+        # convert the dict items to shapes we'll need:
+        self._data_dict["std"] = data_dict["std"]
+        self._data_dict["ers"] = data_dict["ers"]
+        self._data_dict["bins"] = data_dict["bins"].astype(int)
+        self._data_dict["odds"] = data_dict["odds"].astype(int)
+        self._data_dict["maxbets"] = data_dict["maxbets"].astype(int)
 
         self._cache_bet_amount_dicts()
 
@@ -979,7 +986,7 @@ class NeoFoodClub:
 
     @_require_cache
     def _get_winning_bet_indices(self, bets: Bets) -> np.ndarray:
-        bet_bins = self._data_dict["bins"][bets._indices].astype(int)
+        bet_bins = self._data_dict["bins"][bets._indices]
         winning_bet_indices = np.where(bet_bins & self.winners_binary == bet_bins)[0]
         return bets._indices[winning_bet_indices]
 
@@ -997,7 +1004,7 @@ class NeoFoodClub:
         bets: :class:`Bets`
             The bets you'd like to find the amount of winning units for.
         """
-        return np.sum(self._get_winning_odds(bets)).astype(int)
+        return np.sum(self._get_winning_odds(bets))
 
     @_require_cache
     def get_win_np(self, bets: Bets, /) -> int:
@@ -1026,7 +1033,7 @@ class NeoFoodClub:
         bets_odds = self._data_dict["odds"][bets._indices]
         winnings = bets_odds * multiplier
 
-        return np.sum(np.clip(winnings[mask], 0, 1_000_000)).astype(int)
+        return np.sum(np.clip(winnings[mask], 0, 1_000_000))
 
     def make_url(
         self,
@@ -1279,7 +1286,7 @@ class NeoFoodClub:
         self, *, five_bet: Optional[int] = None, random: bool = False
     ) -> np.ndarray:
         if five_bet is not None:
-            bins = self._data_dict["bins"].astype(int)
+            bins = self._data_dict["bins"]
             possible_indices = np.where(bins & five_bet == bins)[0]
 
             odds = (
@@ -1296,13 +1303,13 @@ class NeoFoodClub:
             random_five_bet = self._data_dict["bins"][
                 np.random.choice(math.FULL_BETS, size=1)
             ]
-            return self._gambit_indices(five_bet=random_five_bet.astype(int)[0])
+            return self._gambit_indices(five_bet=random_five_bet[0])
 
         # get highest ER pirates
         ers = self._max_ter_indices()[math.FULL_BETS]
         highest_er = np.argsort(ers, kind="mergesort", axis=0)[::-1][0]
         pirate_bin = self._data_dict["bins"][math.FULL_BETS[highest_er]]
-        return self._gambit_indices(five_bet=pirate_bin.astype(int))
+        return self._gambit_indices(five_bet=pirate_bin)
 
     @_require_cache
     def make_gambit_bets(
@@ -1316,7 +1323,7 @@ class NeoFoodClub:
 
     @_require_cache
     def _tenbet_indices(self, pirate_binary: int) -> np.ndarray:
-        bins = self._data_dict["bins"].astype(int)
+        bins = self._data_dict["bins"]
         possible_indices = np.where(bins & pirate_binary == pirate_binary)[0]
 
         ers = (
@@ -1415,7 +1422,7 @@ class NeoFoodClub:
             lowest_odds_index = np.argmin(current_odds)
             lowest_odds = current_odds[lowest_odds_index]
 
-            new_bet_amounts = (bet_amount * lowest_odds // current_odds).astype(int)
+            new_bet_amounts = bet_amount * lowest_odds // current_odds
             bets.bet_amounts = new_bet_amounts
 
         return bets
