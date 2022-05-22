@@ -1250,22 +1250,24 @@ class NeoFoodClub:
     @_require_cache
     def _max_ter_indices(self) -> np.ndarray:
         # use net expected only if needed
+        values = self._net_expected_cache
         if self._modifier.general or self._net_expected_cache.size == 0:
-            indices = self._data_dict["ers"]
-        else:
-            indices = self._net_expected_cache
+            values = self._data_dict["ers"]
 
-        if self._modifier.reverse:
-            indices = indices[::-1]
+        if not self._modifier.reverse:
+            values = -values
+
+        indices = np.argpartition(values, kth=self.max_amount_of_bets, axis=0)[
+            : self.max_amount_of_bets
+        ]
+        indices = indices[np.argsort(values[indices])]
 
         return indices
 
     @_require_cache
     def make_max_ter_bets(self) -> Bets:
         """:class:`Bets`: Creates a Bets object that consists of the highest ERs."""
-        return Bets._from_generator(
-            indices=np.argsort(self._max_ter_indices()), nfc=self
-        )
+        return Bets._from_generator(indices=self._max_ter_indices(), nfc=self)
 
     @_require_cache
     def _crazy_bets_indices(self) -> np.ndarray:
@@ -1304,7 +1306,10 @@ class NeoFoodClub:
                 + self._data_dict["std"][possible_indices]
                 # this gives us the highest ER bets first
             )
-            sorted_odds = np.argsort(odds, kind="mergesort", axis=0)
+            sorted_odds = np.argpartition(-odds, kth=self.max_amount_of_bets, axis=0)[
+                : self.max_amount_of_bets
+            ]
+            sorted_odds = sorted_odds[np.argsort(-odds[sorted_odds], axis=0)]
 
             return possible_indices[sorted_odds]
 
@@ -1316,8 +1321,13 @@ class NeoFoodClub:
             return self._gambit_indices(five_bet=random_five_bet[0])
 
         # get highest ER pirates
-        ers = self._max_ter_indices()[math.FULL_BETS]
-        highest_er = np.argsort(ers, kind="mergesort", axis=0)[::-1][0]
+        if self._modifier.general or self._net_expected_cache.size == 0:
+            values = self._data_dict["ers"]
+        else:
+            values = self._net_expected_cache
+
+        ers = values[math.FULL_BETS]
+        highest_er = np.argpartition(-ers, kth=1, axis=0)[0]
         pirate_bin = self._data_dict["bins"][math.FULL_BETS[highest_er]]
         return self._gambit_indices(five_bet=pirate_bin)
 
@@ -1376,7 +1386,8 @@ class NeoFoodClub:
     def _unit_indices(self, units: int) -> np.ndarray:
         sorted_std = np.argsort(self._data_dict["std"], kind="mergesort", axis=0)
         possible_indices = np.where(self._data_dict["odds"][sorted_std] >= units)[0]
-        return sorted_std[possible_indices]
+        indices = sorted_std[possible_indices][::-1]
+        return indices[:self.max_amount_of_bets]
 
     @_require_cache
     def make_units_bets(self, units: int, /) -> Bets:
