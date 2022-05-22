@@ -1318,6 +1318,14 @@ class NeoFoodClub:
         pirate_bin = self._data_dict["bins"][math.FULL_BETS[highest_er]]
         return self._gambit_indices(five_bet=pirate_bin)
 
+    @overload
+    def make_gambit_bets(self, *, five_bet: Optional[int] = None) -> Bets:
+        ...
+
+    @overload
+    def make_gambit_bets(self, *, random: bool = False) -> Bets:
+        ...
+
     @_require_cache
     def make_gambit_bets(
         self, *, five_bet: Optional[int] = None, random: bool = False
