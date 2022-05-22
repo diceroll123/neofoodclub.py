@@ -708,7 +708,7 @@ class NeoFoodClub:
         self._data: RoundData = orjson.loads(orjson.dumps(data))
         self._bet_amount = bet_amount
         self._data_dict = {}
-        self._stds: List[List[float]] = []
+        self._stds: Tuple[Tuple[float, ...], ...] = tuple()
         self._maxbet_odds_cache = np.array([])
         self._net_expected_cache = np.array([])
 
@@ -777,10 +777,12 @@ class NeoFoodClub:
             self._net_expected_cache = mb_copy * self._data_dict["ers"] - mb_copy
 
     def _cache_dicts(self) -> None:
-        self._stds = math.make_probabilities(self._data["openingOdds"])
+        self._stds = tuple(
+            tuple(row) for row in math.make_probabilities(self._data["openingOdds"])
+        )
         # most of the binary/odds/std data sits here
         data_dict = math.make_round_dicts(
-            tuple(tuple(row) for row in self._stds),
+            self._stds,
             tuple(tuple(row) for row in self._data["customOdds"]),
         )
         # convert the dict items to shapes we'll need:
@@ -951,10 +953,10 @@ class NeoFoodClub:
         return bool(self.winners[0])
 
     @property
-    def winners(self) -> List[int]:
-        """List[:class:`int`]: Returns the winning pirates, if applicable.
+    def winners(self) -> Tuple[int, ...]:
+        """Tuple[:class:`int`]: Returns the winning pirates, if applicable.
         A list of 5 zeroes if not applicable."""
-        return self._data.get("winners") or [0, 0, 0, 0, 0]
+        return tuple(self._data.get("winners") or [0, 0, 0, 0, 0])
 
     @property
     def winners_binary(self) -> int:
@@ -963,7 +965,7 @@ class NeoFoodClub:
         return math.pirates_binary(tuple(self.winners))
 
     @property
-    def winners_pirates(self) -> List[Pirate]:
+    def winners_pirates(self) -> Tuple[Pirate, ...]:
         """:class:`int`: Returns a list of the winning pirates, as Pirate objects, if applicable.
         Empty list if not applicable."""
         return self.arenas.get_pirates_from_binary(self.winners_binary)
@@ -1057,7 +1059,7 @@ class NeoFoodClub:
             Default = True.
         """
 
-        def encode(int_lists: List[Any]) -> str:
+        def encode(int_lists: Sequence[Any]) -> str:
             return orjson.dumps(int_lists).decode("utf-8")
 
         use_15 = bets and 10 < len(bets) <= 15 or self._modifier._cc_perk

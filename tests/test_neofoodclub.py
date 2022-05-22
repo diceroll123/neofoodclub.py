@@ -238,7 +238,7 @@ def test_winners_pirates(nfc: NeoFoodClub):
 def test_winners_pirates_empty(nfc: NeoFoodClub):
     data = nfc.to_dict()
     # monkeypatching in no winners
-    data["winners"] = [0, 0, 0, 0, 0]
+    data["winners"] = (0, 0, 0, 0, 0)
 
     new_nfc = NeoFoodClub(data)
     assert len(new_nfc.winners_pirates) == 0
@@ -256,7 +256,7 @@ def test_from_url_with_cc_perk(test_max_ter_15_bets: str):
 
 def test_from_url_without_winners(test_round_url_no_winners: str):
     nfc = NeoFoodClub.from_url(test_round_url_no_winners)
-    assert nfc.winners == [0, 0, 0, 0, 0]
+    assert nfc.winners == (0, 0, 0, 0, 0)
 
 
 def test_from_url_without_round_exception(test_round_url_no_round: str):

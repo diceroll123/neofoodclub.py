@@ -25,7 +25,7 @@ def test_arenas_pirates(nfc: NeoFoodClub):
 
 
 def test_arenas_pirate_ids(nfc: NeoFoodClub):
-    assert nfc.arenas.pirate_ids[0] == [2, 8, 14, 11]
+    assert nfc.arenas.pirate_ids[0] == (2, 8, 14, 11)
 
 
 def test_arenas_get_arena(nfc: NeoFoodClub):

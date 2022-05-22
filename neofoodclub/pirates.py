@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, List, Optional
+from typing import TYPE_CHECKING, Any, List, Optional, Tuple
 
 from . import math
 from .food_adjustments import NEGATIVE_FOOD, POSITIVE_FOOD
@@ -165,18 +165,22 @@ class Pirate(PirateMixin):
         return self._bin
 
     @property
-    def positive_foods(self) -> List[int]:
-        """List[:class:`int`]: Returns a list of the positive Food IDs for this pirate's arena that affect this pirate, where applicable."""
+    def positive_foods(self) -> Tuple[int, ...]:
+        """Tuple[:class:`int`]: Returns a tuple of the positive Food IDs for this pirate's arena that affect this pirate, where applicable."""
         if foods := self.nfc.foods:
-            return [f for f in foods[self._arena] if POSITIVE_FOOD[self._id][f] != 0]
-        return []
+            return tuple(
+                f for f in foods[self._arena] if POSITIVE_FOOD[self._id][f] != 0
+            )
+        return tuple()
 
     @property
-    def negative_foods(self) -> List[int]:
-        """List[:class:`int`]: Returns a list of the negative Food IDs for this pirate's arena that affect this pirate, where applicable."""
+    def negative_foods(self) -> Tuple[int, ...]:
+        """Tuple[:class:`int`]: Returns a tuple of the negative Food IDs for this pirate's arena that affect this pirate, where applicable."""
         if foods := self.nfc.foods:
-            return [f for f in foods[self._arena] if NEGATIVE_FOOD[self._id][f] != 0]
-        return []
+            return tuple(
+                f for f in foods[self._arena] if NEGATIVE_FOOD[self._id][f] != 0
+            )
+        return tuple()
 
     def __int__(self) -> int:
         return self._bin

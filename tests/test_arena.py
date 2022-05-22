@@ -20,7 +20,7 @@ def test_first_arena_best(nfc: NeoFoodClub):
 
 
 def test_first_arena_pirate_ids(nfc: NeoFoodClub):
-    pirate_ids = [2, 8, 14, 11]  # Sproggie, Puffo, Fairfax, Crossblades
+    pirate_ids = (2, 8, 14, 11)  # Sproggie, Puffo, Fairfax, Crossblades
     assert pirate_ids == nfc.arenas[0].ids
 
 
@@ -37,7 +37,7 @@ def test_first_arena_negative(nfc: NeoFoodClub):
 
 
 def test_first_arena_foods(nfc: NeoFoodClub):
-    assert nfc.arenas[0].foods == [26, 25, 4, 9, 21, 1, 33, 11, 7, 10]
+    assert nfc.arenas[0].foods == (26, 25, 4, 9, 21, 1, 33, 11, 7, 10)
 
 
 def test_first_arena_get_pirate_using_getitem(nfc: NeoFoodClub):

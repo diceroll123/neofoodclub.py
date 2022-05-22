@@ -26,11 +26,11 @@ def test_pirate_opening_odds(nfc: NeoFoodClub):
 
 
 def test_pirate_positive_foods(nfc: NeoFoodClub):
-    assert nfc.arenas[0].pirates[0].positive_foods == [4, 1, 33, 7, 10]
+    assert nfc.arenas[0].pirates[0].positive_foods == (4, 1, 33, 7, 10)
 
 
 def test_pirate_negative_foods(nfc: NeoFoodClub):
-    assert nfc.arenas[0].pirates[0].negative_foods == [25, 11]
+    assert nfc.arenas[0].pirates[0].negative_foods == (25, 11)
 
 
 def test_pirate_std_and_er(nfc: NeoFoodClub):
@@ -47,5 +47,5 @@ def test_pirate_without_data(nfc_no_cache: NeoFoodClub):
 
 def test_pirate_without_foods(nfc_no_foods: NeoFoodClub):
     pirate = nfc_no_foods.arenas[0].pirates[0]
-    assert pirate.positive_foods == []
-    assert pirate.negative_foods == []
+    assert pirate.positive_foods == tuple()
+    assert pirate.negative_foods == tuple()
