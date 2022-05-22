@@ -220,9 +220,19 @@ def test_random_gambit_bets(nfc: NeoFoodClub):
     assert len(bets) == 10
 
 
-def test_random_unit_bets_empty(nfc: NeoFoodClub):
+def test_gambit_bets_equivalence(nfc: NeoFoodClub):
+    bets = nfc.make_gambit_bets(five_bet=0x88888)
+    assert bets.bets_hash == "ggfgggbgbgbbggfaggaggffgf"
+
+
+def test_unit_bets_empty(nfc: NeoFoodClub):
     bets = nfc.make_units_bets(400000)  # higher than possible
     assert len(bets) == 0
+
+
+def test_unit_bets_equivalence(nfc: NeoFoodClub):
+    bets = nfc.make_units_bets(20)  # higher than possible
+    assert bets.bets_hash == "uukycjalewfxoamecokcsanfc"
 
 
 def test_random_unit_bets(nfc: NeoFoodClub):
@@ -245,3 +255,9 @@ def test_bustproof_with_three_positives(nfc: NeoFoodClub):
     new_nfc.modifier = Modifier(custom_odds={19: 4, 11: 12})
     bets = new_nfc.make_bustproof_bets()
     assert bets.is_bustproof is True
+
+
+def test_bustproof_equivalence(nfc_with_bet_amount: NeoFoodClub):
+    # bet amounts are NEEDED to make bustproof + guaranteed wins
+    bets = nfc_with_bet_amount.make_bustproof_bets()
+    assert bets.bets_hash == "aafacaapae"
