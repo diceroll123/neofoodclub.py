@@ -95,6 +95,7 @@ class Pirate(PirateMixin):
         "_std",
         "_er",
         "_fa",
+        "_bin",
     )
 
     def __init__(self, *, nfc: NeoFoodClub, id: int, arena: int, index: int):
@@ -104,6 +105,7 @@ class Pirate(PirateMixin):
         self._index = index
         self._odds: int = nfc._data["customOdds"][arena][index]  # type: ignore
         self._opening_odds: int = nfc._data["openingOdds"][arena][index]
+        self._bin = math.pirate_binary(self._index, self._arena)
         if nfc._stds:
             self._std = nfc._stds[arena][index]
             self._er = self._std * self._odds
@@ -160,7 +162,7 @@ class Pirate(PirateMixin):
     @property
     def binary(self) -> int:
         """:class:`int`: The pirate's bet-binary representation."""
-        return math.pirate_binary(self._index, self._arena)
+        return self._bin
 
     @property
     def positive_foods(self) -> List[int]:
@@ -177,7 +179,7 @@ class Pirate(PirateMixin):
         return []
 
     def __int__(self) -> int:
-        return math.pirate_binary(self._index, self._arena)
+        return self._bin
 
     def __eq__(self, other: Any) -> bool:
         return isinstance(other, self.__class__) and int(self) == int(other)
