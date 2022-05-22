@@ -265,7 +265,9 @@ def bets_hash_value(bets_indices: Sequence[Sequence[int]]) -> str:
     flat = itertools.chain.from_iterable(bets_indices)
     return "".join(
         ascii_lowercase[multiplier * 5 + adder]
-        for multiplier, adder in itertools.zip_longest(*[iter(flat)] * 2, fillvalue=0)
+        for multiplier, adder in itertools.zip_longest(
+            iter(flat), iter(flat), fillvalue=0
+        )
     )
 
 
