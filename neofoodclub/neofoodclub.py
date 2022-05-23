@@ -555,10 +555,8 @@ class Bets:
     def _from_generator(cls, *, indices: np.ndarray, nfc: NeoFoodClub) -> Bets:
         # here is where we will take indices and sort as needed
         # to avoid confusion with "manually" making bets
-        if not nfc._modifier.reverse:
-            indices = indices[::-1]
 
-        indices = indices[: nfc.max_amount_of_bets]
+        indices = indices[::-1][: nfc.max_amount_of_bets]
         return cls(nfc=nfc, indices=indices)
 
     @classmethod
@@ -1253,9 +1251,14 @@ class NeoFoodClub:
     def _max_ter_indices(self) -> np.ndarray:
         # use net expected only if needed
         if self._modifier.general or self._net_expected_cache.size == 0:
-            return self._data_dict["ers"]
+            indices = self._data_dict["ers"]
         else:
-            return self._net_expected_cache
+            indices = self._net_expected_cache
+
+        if self._modifier.reverse:
+            indices = indices[::-1]
+
+        return indices
 
     @_require_cache
     def make_max_ter_bets(self) -> Bets:
