@@ -402,7 +402,7 @@ class Odds:
         self._odds = [
             Chance(**chance)
             for chance in math.get_bet_odds_from_bets(
-                bets.indices, self._odds_values, bets.nfc._stds  # type: ignore
+                bets.indices, self._odds_values, bets.nfc._stds
             )
         ]
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, List, Optional, Tuple
+from typing import TYPE_CHECKING, Any, Optional, Tuple
 
 from . import math
 from .food_adjustments import NEGATIVE_FOOD, POSITIVE_FOOD

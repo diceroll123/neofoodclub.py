@@ -5,6 +5,10 @@ build-backend = "setuptools.build_meta"
 [tool.pytest.ini_options]
 asyncio_mode = "strict"
 
+[tool.coverage.run]
+omit = [
+    "neofoodclub/types/*",
+]
 
 [tool.coverage.report]
 exclude_lines = [
@@ -15,3 +19,16 @@ exclude_lines = [
     "if (False|TYPE_CHECKING):",
     "def __repr__"
 ]
+
+[tool.pyright]
+include = [
+    "neofoodclub",
+    "neofoodclub/types",
+]
+exclude = [
+    "**/__pycache__",
+]
+reportUnnecessaryTypeIgnoreComment = "warning"
+reportUnusedImport = "error"
+pythonVersion = "3.8"
+typeCheckingMode = "basic"
