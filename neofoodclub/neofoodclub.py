@@ -795,6 +795,9 @@ class NeoFoodClub:
         )
         # convert the dict items to shapes we'll need:
         self._data_dict["std"] = data_dict["std"]
+        self._data_dict["std_sorted"] = data_dict["std"].argsort(
+            kind="mergesort", axis=0
+        )
         self._data_dict["ers"] = data_dict["ers"]
         self._data_dict["ers_sorted"] = data_dict["ers"].argsort(axis=0)
         self._data_dict["bins"] = data_dict["bins"].astype(int)
@@ -1378,9 +1381,10 @@ class NeoFoodClub:
 
     @_require_cache
     def _unit_indices(self, units: int) -> np.ndarray:
-        sorted_std = np.argsort(self._data_dict["std"], kind="mergesort", axis=0)
-        possible_indices = np.where(self._data_dict["odds"][sorted_std] >= units)[0]
-        return sorted_std[possible_indices]
+        possible_indices = np.where(
+            self._data_dict["odds"][self._data_dict["std_sorted"]] >= units
+        )[0]
+        return self._data_dict["std_sorted"][possible_indices]
 
     @_require_cache
     def make_units_bets(self, units: int, /) -> Bets:
