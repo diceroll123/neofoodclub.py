@@ -696,6 +696,7 @@ class NeoFoodClub:
         "_data_dict",
         "_maxbet_odds_cache",
         "_net_expected_cache",
+        "_net_expected_cache_sorted",
     )
 
     def __init__(
@@ -714,6 +715,7 @@ class NeoFoodClub:
         self._stds: Tuple[Tuple[float, ...], ...] = tuple()
         self._maxbet_odds_cache = np.array([])
         self._net_expected_cache = np.array([])
+        self._net_expected_cache_sorted = np.array([])
 
         self._modifier = modifier or Modifier()
         self._modifier._nfc = self  # type: ignore
@@ -776,8 +778,11 @@ class NeoFoodClub:
             mb_copy[mb_copy > bet_amount] = bet_amount
             self._maxbet_odds_cache = utils.fix_bet_amounts(mb_copy)
 
+            self._net_expected_cache: np.ndarray = (
+                mb_copy * self._data_dict["ers"] - mb_copy
+            )
             # for making maxter faster...
-            self._net_expected_cache = mb_copy * self._data_dict["ers"] - mb_copy
+            self._net_expected_cache_sorted = self._net_expected_cache.argsort(axis=0)
 
     def _cache_dicts(self) -> None:
         self._stds = tuple(
@@ -791,6 +796,7 @@ class NeoFoodClub:
         # convert the dict items to shapes we'll need:
         self._data_dict["std"] = data_dict["std"]
         self._data_dict["ers"] = data_dict["ers"]
+        self._data_dict["ers_sorted"] = data_dict["ers"].argsort(axis=0)
         self._data_dict["bins"] = data_dict["bins"].astype(int)
         self._data_dict["odds"] = data_dict["odds"].astype(int)
         self._data_dict["maxbets"] = data_dict["maxbets"].astype(int)
@@ -1250,10 +1256,10 @@ class NeoFoodClub:
     @_require_cache
     def _max_ter_indices(self) -> np.ndarray:
         # use net expected only if needed
-        if self._modifier.general or self._net_expected_cache.size == 0:
-            indices = self._data_dict["ers"]
+        if self._modifier.general or self._net_expected_cache_sorted.size == 0:
+            indices = self._data_dict["ers_sorted"]
         else:
-            indices = self._net_expected_cache
+            indices = self._net_expected_cache_sorted
 
         if self._modifier.reverse:
             indices = indices[::-1]
@@ -1263,9 +1269,7 @@ class NeoFoodClub:
     @_require_cache
     def make_max_ter_bets(self) -> Bets:
         """:class:`Bets`: Creates a Bets object that consists of the highest ERs."""
-        return Bets._from_generator(
-            indices=np.argsort(self._max_ter_indices()), nfc=self
-        )
+        return Bets._from_generator(indices=self._max_ter_indices(), nfc=self)
 
     @_require_cache
     def _crazy_bets_indices(self) -> np.ndarray:
