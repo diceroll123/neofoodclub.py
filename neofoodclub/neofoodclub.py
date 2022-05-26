@@ -1260,7 +1260,7 @@ class NeoFoodClub:
         indices = np.argpartition(values, kth=self.max_amount_of_bets, axis=0)[
             : self.max_amount_of_bets
         ]
-        indices = indices[np.argsort(values[indices])]
+        indices = indices[np.argsort(values[indices])][::-1]
 
         return indices
 
@@ -1309,7 +1309,7 @@ class NeoFoodClub:
             sorted_odds = np.argpartition(-odds, kth=self.max_amount_of_bets, axis=0)[
                 : self.max_amount_of_bets
             ]
-            sorted_odds = sorted_odds[np.argsort(-odds[sorted_odds], axis=0)]
+            sorted_odds = sorted_odds[np.argsort(-odds[sorted_odds], axis=0)][::-1]
 
             return possible_indices[sorted_odds]
 
@@ -1387,7 +1387,7 @@ class NeoFoodClub:
         sorted_std = np.argsort(self._data_dict["std"], kind="mergesort", axis=0)
         possible_indices = np.where(self._data_dict["odds"][sorted_std] >= units)[0]
         indices = sorted_std[possible_indices][::-1]
-        return indices[:self.max_amount_of_bets]
+        return indices[: self.max_amount_of_bets][::-1]
 
     @_require_cache
     def make_units_bets(self, units: int, /) -> Bets:
