@@ -1,4 +1,4 @@
-from typing import List
+from typing import Sequence
 
 import pytest
 
@@ -22,7 +22,7 @@ from neofoodclub.math import (
         (0x00000, [0, 0, 0, 0, 0]),
     ],
 )
-def test_binary_to_indices_numba(bet_binary: int, expected: List[int]):
+def test_binary_to_indices_numba(bet_binary: int, expected: Sequence[int]):
     assert expected == binary_to_indices_numba(bet_binary)
 
 
@@ -33,7 +33,7 @@ def test_binary_to_indices_numba(bet_binary: int, expected: List[int]):
         ("BAQBAQBAQBAQBAQBAQBAQBAQBAQBAQ", [4098] * 10),
     ],
 )
-def test_amounts_hash_to_bet_amounts_numba(amount_hash: str, expected: List[int]):
+def test_amounts_hash_to_bet_amounts_numba(amount_hash: str, expected: Sequence[int]):
     assert expected == amounts_hash_to_bet_amounts_numba(amount_hash)
 
 
