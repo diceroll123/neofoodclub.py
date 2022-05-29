@@ -181,7 +181,7 @@ class Pirate(PirateMixin):
                 f for f in foods[self._arena] if NEGATIVE_FOOD[self._id][f] != 0
             )
         return tuple()
-    
+
     @property
     def won(self) -> bool:
         """:class:`bool`: Returns whether the pirate won the round."""

@@ -5,7 +5,7 @@ import itertools
 import math
 from collections import defaultdict
 from string import ascii_lowercase, ascii_uppercase
-from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, DefaultDict, Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 from numba import njit
@@ -44,7 +44,7 @@ BET_AMOUNT_MAX = 70304
 # this fixed number is the max that NeoFoodClub can encode,
 # given the current bet (and bet amount) encoding specification
 
-BIT_MASKS = (0xF0000, 0xF000, 0xF00, 0xF0, 0xF)
+BIT_MASKS: Tuple[int, ...] = (0xF0000, 0xF000, 0xF00, 0xF0, 0xF)
 
 float_array = types.float64[:]
 
@@ -477,7 +477,7 @@ def get_bet_odds_from_bets(
         return sorted_e
 
     convert_pir_ib = [all_ib] + pir_ib
-    bets_to_ib: Dict[int, int] = defaultdict(int)
+    bets_to_ib: DefaultDict[int, int] = defaultdict(int)
     for key, bet_value in enumerate(bets):
         ib = 0
         for _x in range(5):
