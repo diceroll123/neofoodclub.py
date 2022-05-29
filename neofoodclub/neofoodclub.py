@@ -781,7 +781,10 @@ class NeoFoodClub:
 
     def _cache_dicts(self) -> None:
         self._stds = tuple(
-            tuple(row) for row in math.make_probabilities(self._data["openingOdds"])
+            tuple(row)
+            for row in math.make_probabilities(
+                tuple(tuple(x) for x in self._data["openingOdds"])
+            )
         )
         # most of the binary/odds/std data sits here
         data_dict = math.make_round_dicts(

@@ -1,7 +1,6 @@
 from typing import Sequence
 
 import pytest
-
 from neofoodclub.errors import InvalidData
 from neofoodclub.math import (
     amounts_hash_to_bet_amounts_numba,
@@ -78,13 +77,13 @@ def test_bets_hash_to_bets_(bets_hash: str, expected: int):
 def test_make_probabilities():
     # this is more for code coverage purposes, to hit the `if std_total == 1: break`
     # line in the make_probabilities method
-    make_probabilities(
-        [
-            [1, 11, 4, 2, 3],
-            [1, 12, 8, 5, 2],
-            [1, 11, 13, 2, 2],
-            [1, 2, 13, 13, 11],
-            [1, 5, 11, 7, 2],
-        ]
+    probs = make_probabilities(
+        (
+            (1, 11, 4, 2, 3),
+            (1, 12, 8, 5, 2),
+            (1, 11, 13, 2, 2),
+            (1, 2, 13, 13, 11),
+            (1, 5, 11, 7, 2),
+        )
     )
-    assert True
+    assert len(probs) == 5
