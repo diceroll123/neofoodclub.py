@@ -969,7 +969,7 @@ class NeoFoodClub:
 
     @property
     def winners_pirates(self) -> Tuple[Pirate, ...]:
-        """:class:`int`: Returns a list of the winning pirates, as Pirate objects, if applicable.
+        """Tuple[:class:`Pirate`]: Returns a list of the winning pirates, as Pirate objects, if applicable.
         Empty list if not applicable."""
         return self.arenas.get_pirates_from_binary(self.winners_binary)
 
