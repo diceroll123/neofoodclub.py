@@ -181,6 +181,11 @@ class Pirate(PirateMixin):
                 f for f in foods[self._arena] if NEGATIVE_FOOD[self._id][f] != 0
             )
         return tuple()
+    
+    @property
+    def won(self) -> bool:
+        """:class:`bool`: Returns whether the pirate won the round."""
+        return self.nfc.winners[self.arena] == self.index
 
     def __int__(self) -> int:
         return self._bin
@@ -197,6 +202,7 @@ class Pirate(PirateMixin):
             ("fa", self.fa),
             ("opening_odds", self.opening_odds),
             ("binary", self.binary),
+            ("won", self.won),
         ]
         joined = " ".join("%s=%r" % t for t in attrs)
         return f"<Pirate {joined}>"

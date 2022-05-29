@@ -49,3 +49,16 @@ def test_pirate_without_foods(nfc_no_foods: NeoFoodClub):
     pirate = nfc_no_foods.arenas[0].pirates[0]
     assert pirate.positive_foods == tuple()
     assert pirate.negative_foods == tuple()
+
+
+def test_pirate_won(nfc: NeoFoodClub):
+    shipwreck = nfc.arenas[0]
+    sproggie = shipwreck.pirates[0]
+    puffo = shipwreck.pirates[1]
+    fairfax = shipwreck.pirates[2]
+    crossblades = shipwreck.pirates[3]
+
+    assert sproggie.won == True
+    assert puffo.won == False
+    assert fairfax.won == False
+    assert crossblades.won == False
