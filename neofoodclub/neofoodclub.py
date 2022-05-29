@@ -1282,7 +1282,7 @@ class NeoFoodClub:
 
     @_require_cache
     def _random_indices(self) -> np.ndarray:
-        return np.random.randint(3125, size=self.max_amount_of_bets)
+        return np.random.randint(3124, size=self.max_amount_of_bets)
 
     @_require_cache
     def make_random_bets(self) -> Bets:
