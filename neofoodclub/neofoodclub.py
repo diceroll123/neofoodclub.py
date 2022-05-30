@@ -447,6 +447,7 @@ class Bets:
     __slots__ = (
         "_indices",
         "_bet_amounts",
+        "_odds",
         "nfc",
     )
 
@@ -461,6 +462,7 @@ class Bets:
         self._indices = indices
 
         self.bet_amounts = amounts
+        self._odds = None
 
     @property
     def net_expected(self) -> float:
@@ -588,7 +590,10 @@ class Bets:
     @property
     def odds(self) -> Odds:
         """:class:`Odds`: Creates an Odds object of this bet set."""
-        return Odds(self)
+        if self._odds is None:
+            # this is a somewhat expensive operation, so we cache it
+            self._odds = Odds(self)
+        return self._odds
 
     @property
     def is_bustproof(self) -> bool:
