@@ -3,7 +3,7 @@ from typing import Sequence
 import pytest
 from neofoodclub.errors import InvalidData
 from neofoodclub.math import (
-    amounts_hash_to_bet_amounts_numba,
+    amounts_hash_to_bet_amounts,
     bets_hash_to_bets,
     bets_hash_to_bets_count,
     binary_to_indices,
@@ -28,12 +28,12 @@ def test_binary_to_indices(bet_binary: int, expected: Sequence[int]):
 @pytest.mark.parametrize(
     "amount_hash,expected",
     [
-        ("CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS", [8000] * 10),
-        ("BAQBAQBAQBAQBAQBAQBAQBAQBAQBAQ", [4098] * 10),
+        ("CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS", (8000,) * 10),
+        ("BAQBAQBAQBAQBAQBAQBAQBAQBAQBAQ", (4098,) * 10),
     ],
 )
-def test_amounts_hash_to_bet_amounts_numba(amount_hash: str, expected: Sequence[int]):
-    assert expected == amounts_hash_to_bet_amounts_numba(amount_hash)
+def test_amounts_hash_to_bet_amounts(amount_hash: str, expected: Sequence[int]):
+    assert expected == amounts_hash_to_bet_amounts(amount_hash)
 
 
 @pytest.mark.parametrize(
