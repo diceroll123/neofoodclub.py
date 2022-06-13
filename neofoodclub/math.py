@@ -9,14 +9,13 @@ from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 from numba import njit
-from numba.core import types
-from numba.typed import Dict as TypedDict
 
 from .neofoodclub import (
     binary_to_indices_rust,
     expand_ib_object_rust,
     ib_prob_rust,
     make_probabilities_rust,
+    make_round_dicts_rust,
 )
 
 from .errors import InvalidData
@@ -57,8 +56,6 @@ BIT_MASKS: Tuple[int, ...] = (0xF0000, 0xF000, 0xF00, 0xF0, 0xF)
 # 0x88888 = (1, 1, 1, 1, 1), which is the first pirate in each arena, and so on.
 PIR_IB: Tuple[int, ...] = (0x88888, 0x44444, 0x22222, 0x11111)
 
-float_array = types.float64[:]
-
 binary_to_indices = binary_to_indices_rust
 make_probabilities = make_probabilities_rust
 ib_prob = ib_prob_rust
@@ -68,10 +65,7 @@ def precompile():
     # run the numba methods to compile, and fill some caches so they're speedier
     # using garbage data is fine for compiling with.
     amounts_hash_to_bet_amounts("aaa")
-    make_round_dicts(
-        tuple((1.0, 1.0, 1.0, 1.0, 1.0) for _ in range(5)),
-        tuple((1.0, 1.0, 1.0, 1.0, 1.0) for _ in range(5)),
-    )
+make_round_dicts = make_round_dicts_rust
 
 
 @functools.lru_cache(maxsize=None)
@@ -295,61 +289,6 @@ def get_bet_odds_from_bets(
         return sorted_e
 
     return compute_win_table(expand_ib_object_rust(bets, bet_odds))
-
-
-@njit()
-def make_round_dicts(
-    stds: Tuple[Tuple[types.float32, ...], ...],
-    odds: Tuple[Tuple[types.int8, ...], ...],
-):
-    _dict = TypedDict.empty(
-        key_type=types.unicode_type,
-        value_type=float_array,
-    )
-
-    _bins = np.zeros(3124)
-    _stds = np.zeros(3124)
-    _odds = np.zeros(3124)
-    _ers = np.zeros(3124)
-    _maxbets = np.zeros(3124)
-
-    arr_index = 0
-
-    # do NOT replace this with itertools.product, etc. numba does not understand itertools.
-    for _a in range(5):
-        for _b in range(5):
-            for _c in range(5):
-                for _d in range(5):
-                    for _e in range(5):
-                        total_bin = 0
-                        total_stds = 1.0
-                        total_odds = 1.0
-
-                        for arena, index in enumerate((_a, _b, _c, _d, _e)):
-                            if index == 0:
-                                continue
-                            total_bin += 1 << (19 - (index - 1 + arena * 4))
-                            total_stds *= stds[arena][index]
-                            total_odds *= odds[arena][index]
-
-                        if total_bin == 0:
-                            continue
-
-                        _bins[arr_index] = total_bin
-                        _stds[arr_index] = total_stds
-                        _odds[arr_index] = total_odds
-                        _ers[arr_index] = total_stds * total_odds
-                        _maxbets[arr_index] = math.ceil(1_000_000 / total_odds)
-
-                        arr_index += 1
-
-    _dict["bins"] = _bins
-    _dict["std"] = _stds
-    _dict["odds"] = _odds
-    _dict["ers"] = _ers
-    _dict["maxbets"] = _maxbets
-
-    return _dict
 
 
 # fmt: off

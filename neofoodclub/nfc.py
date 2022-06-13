@@ -792,16 +792,16 @@ class NeoFoodClub:
             )
         )
         # most of the binary/odds/std data sits here
-        data_dict = math.make_round_dicts(
+        (_bins, _stds, _odds, _ers, _maxbets) = math.make_round_dicts(
             self._stds,
             tuple(tuple(row) for row in self._data["customOdds"]),
         )
         # convert the dict items to shapes we'll need:
-        self._data_dict["std"] = data_dict["std"]
-        self._data_dict["ers"] = data_dict["ers"]
-        self._data_dict["bins"] = data_dict["bins"].astype(int)
-        self._data_dict["odds"] = data_dict["odds"].astype(int)
-        self._data_dict["maxbets"] = data_dict["maxbets"].astype(int)
+        self._data_dict["std"] = np.array(_stds)
+        self._data_dict["ers"] = np.array(_ers)
+        self._data_dict["bins"] = np.array(_bins)
+        self._data_dict["odds"] = np.array(_odds)
+        self._data_dict["maxbets"] = np.array(_maxbets)
 
         self._cache_bet_amount_dicts()
 

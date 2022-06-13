@@ -197,11 +197,64 @@ fn expand_ib_object_rust(bets: Vec<Vec<u8>>, bet_odds: Vec<u32>) -> PyResult<Has
     Ok(res)
 }
 
+#[pyfunction]
+fn make_round_dicts_rust(
+    stds: Vec<Vec<f64>>,
+    odds: Vec<Vec<u32>>,
+) -> PyResult<(Vec<u32>, Vec<f64>, Vec<u32>, Vec<f64>, Vec<u32>)> {
+    let mut _bins: Vec<u32> = vec![0; 3124];
+    let mut _stds: Vec<f64> = vec![0.0; 3124];
+    let mut _odds: Vec<u32> = vec![0; 3124];
+    let mut _ers: Vec<f64> = vec![0.0; 3124];
+    let mut _maxbets: Vec<u32> = vec![0; 3124];
+
+    let mut arr_index = 0;
+
+    for a in 0..5 {
+        for b in 0..5 {
+            for c in 0..5 {
+                for d in 0..5 {
+                    for e in 0..5 {
+                        let mut total_bin: u32 = 0;
+                        let mut total_stds: f64 = 1.0;
+                        let mut total_odds: u32 = 1;
+
+                        let nums = vec![a, b, c, d, e];
+                        for (arena, index) in nums.iter().enumerate() {
+                            if *index == 0 {
+                                continue;
+                            }
+                            total_bin += 1 << (19 - (index - 1 + arena * 4));
+                            total_stds *= stds[arena][*index];
+                            total_odds *= odds[arena][*index];
+                        }
+
+                        if total_bin == 0 {
+                            continue;
+                        }
+
+                        _bins[arr_index] = total_bin;
+                        _stds[arr_index] = total_stds;
+                        _odds[arr_index] = total_odds;
+                        _ers[arr_index] = total_stds * total_odds as f64;
+                        _maxbets[arr_index] = (1_000_000.0 / total_odds as f64).ceil() as u32;
+
+                        arr_index += 1;
+                    }
+                }
+            }
+        }
+    }
+
+    return Ok((_bins, _stds, _odds, _ers, _maxbets));
+}
+
 #[pymodule]
 fn neofoodclub(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(binary_to_indices_rust, m)?)?;
     m.add_function(wrap_pyfunction!(make_probabilities_rust, m)?)?;
     m.add_function(wrap_pyfunction!(ib_prob_rust, m)?)?;
     m.add_function(wrap_pyfunction!(expand_ib_object_rust, m)?)?;
+    m.add_function(wrap_pyfunction!(make_round_dicts_rust, m)?)?;
     Ok(())
 }
