@@ -6,7 +6,7 @@ from . import math
 from .food_adjustments import NEGATIVE_FOOD, POSITIVE_FOOD
 
 if TYPE_CHECKING:
-    from .neofoodclub import NeoFoodClub
+    from .nfc import NeoFoodClub
 
 __all__ = (
     "Pirate",

@@ -2,9 +2,8 @@ import datetime
 from typing import Any, Dict, Optional
 
 import pytest
-from neofoodclub import NeoFoodClub
+from neofoodclub import NeoFoodClub, Modifier
 from neofoodclub.errors import InvalidData
-from neofoodclub.neofoodclub import Modifier
 
 
 def test_nfc_reset(nfc: NeoFoodClub):

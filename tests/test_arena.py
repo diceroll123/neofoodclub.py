@@ -1,6 +1,6 @@
 from typing import List, Tuple
 
-from neofoodclub.neofoodclub import NeoFoodClub
+from neofoodclub.nfc import NeoFoodClub
 
 
 def test_first_arena_name_and_id(nfc: NeoFoodClub):

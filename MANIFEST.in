@@ -1,1 +1,3 @@
 include neofoodclub/py.typed
+include Cargo.toml
+recursive-include src *

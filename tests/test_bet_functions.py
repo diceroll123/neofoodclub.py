@@ -2,7 +2,7 @@ from typing import Tuple
 
 import pytest
 from neofoodclub.errors import InvalidAmountHash, InvalidBetHash, InvalidData
-from neofoodclub.neofoodclub import Bets, Modifier, NeoFoodClub
+from neofoodclub.nfc import Bets, Modifier, NeoFoodClub
 
 
 def test_odds_iter(nfc_with_bet_amount: NeoFoodClub):

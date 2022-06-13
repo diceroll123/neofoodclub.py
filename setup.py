@@ -56,6 +56,7 @@ setup(
     packages=packages,
     python_requires=">=3.8.0",
     classifiers=[
+        "Programming Language :: Rust",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",

@@ -26,9 +26,17 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip setuptools wheel pytest pytest-asyncio
-          pip install -U -r requirements.txt
+          python -m venv venv
+          source ./venv/bin/activate
+          pip install --upgrade pip setuptools wheel pytest
+          pip install -U -r requirements_dev.txt
+      - name: Installing distribution (dev mode)
+        # this adds the .so to the inner lib files so we can test
+        run: |
+          source ./venv/bin/activate
+          maturin develop --release
       - name: Run tests
         shell: bash
         run: |
+          source ./venv/bin/activate
           PYTHONPATH="$(pwd)" pytest

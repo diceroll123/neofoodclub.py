@@ -1,4 +1,4 @@
-from neofoodclub.neofoodclub import NeoFoodClub
+from neofoodclub.nfc import NeoFoodClub
 from neofoodclub.pirates import PartialPirate
 
 

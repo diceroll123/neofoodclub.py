@@ -1,4 +1,4 @@
-from neofoodclub.neofoodclub import Modifier, NeoFoodClub
+from neofoodclub.nfc import Modifier, NeoFoodClub
 
 
 def test_mer_bets_binaries_no_bet_amount(nfc: NeoFoodClub):

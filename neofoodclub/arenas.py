@@ -6,7 +6,7 @@ from . import math
 from .pirates import Pirate
 
 if TYPE_CHECKING:
-    from .neofoodclub import NeoFoodClub
+    from .nfc import NeoFoodClub
 
 __all__ = (
     "Arena",

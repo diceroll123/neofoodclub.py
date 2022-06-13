@@ -1,4 +1,4 @@
-from neofoodclub.neofoodclub import NeoFoodClub
+from neofoodclub.nfc import NeoFoodClub
 
 
 def test_arenas_get_pirate_by_id(nfc: NeoFoodClub):

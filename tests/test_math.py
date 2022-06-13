@@ -6,7 +6,7 @@ from neofoodclub.math import (
     amounts_hash_to_bet_amounts_numba,
     bets_hash_to_bets,
     bets_hash_to_bets_count,
-    binary_to_indices_numba,
+    binary_to_indices,
     make_probabilities,
 )
 
@@ -14,15 +14,15 @@ from neofoodclub.math import (
 @pytest.mark.parametrize(
     "bet_binary,expected",
     [
-        (0x88888, [1, 1, 1, 1, 1]),
-        (0x44444, [2, 2, 2, 2, 2]),
-        (0x22222, [3, 3, 3, 3, 3]),
-        (0x11111, [4, 4, 4, 4, 4]),
-        (0x00000, [0, 0, 0, 0, 0]),
+        (0x88888, (1, 1, 1, 1, 1)),
+        (0x44444, (2, 2, 2, 2, 2)),
+        (0x22222, (3, 3, 3, 3, 3)),
+        (0x11111, (4, 4, 4, 4, 4)),
+        (0x00000, (0, 0, 0, 0, 0)),
     ],
 )
-def test_binary_to_indices_numba(bet_binary: int, expected: Sequence[int]):
-    assert expected == binary_to_indices_numba(bet_binary)
+def test_binary_to_indices(bet_binary: int, expected: Sequence[int]):
+    assert expected == binary_to_indices(bet_binary)
 
 
 @pytest.mark.parametrize(

@@ -1,6 +1,6 @@
 import pytest
 from neofoodclub import InvalidData
-from neofoodclub.neofoodclub import NeoFoodClub
+from neofoodclub.nfc import NeoFoodClub
 
 
 @pytest.mark.parametrize("pirate_binary", [0x8, 0x88, 0x888])

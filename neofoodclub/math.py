@@ -5,19 +5,25 @@ import itertools
 import math
 from collections import defaultdict
 from string import ascii_lowercase, ascii_uppercase
-from typing import TYPE_CHECKING, DefaultDict, Dict, List, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 from numba import njit
 from numba.core import types
 from numba.typed import Dict as TypedDict
 
+from .neofoodclub import (
+    binary_to_indices_rust,
+    expand_ib_object_rust,
+    ib_prob_rust,
+    make_probabilities_rust,
+)
+
 from .errors import InvalidData
 
 if TYPE_CHECKING:
     from .types import BetOdds
 
-# at least for now, we won't be exposing the numba methods.
 __all__ = (
     "precompile",
     "pirate_binary",
@@ -53,46 +59,19 @@ PIR_IB: Tuple[int, ...] = (0x88888, 0x44444, 0x22222, 0x11111)
 
 float_array = types.float64[:]
 
+binary_to_indices = binary_to_indices_rust
+make_probabilities = make_probabilities_rust
+ib_prob = ib_prob_rust
+
 
 def precompile():
     # run the numba methods to compile, and fill some caches so they're speedier
     # using garbage data is fine for compiling with.
-    ib_doable(1)
-    ib_prob(
-        1,
-        (
-            (1.0, 0.47500000000000014, 0.05, 0.29166666666666663, 0.18333333333333335),
-            (1.0, 0.225, 0.3666666666666667, 0.225, 0.18333333333333335),
-            (1.0, 0.29166666666666663, 0.05, 0.13392857142857142, 0.5244047619047619),
-            (1.0, 0.05, 0.3666666666666668, 0.29166666666666663, 0.29166666666666663),
-            (1.0, 0.08012820512820512, 0.7151098901098901, 0.15476190476190477, 0.05),
-        ),
-    )
-    expand_ib_object(
-        (
-            (3, 3, 3, 3, 3),
-            (3, 3, 3, 0, 3),
-            (0, 3, 3, 3, 3),
-            (3, 3, 3, 3, 0),
-            (3, 0, 3, 3, 3),
-            (3, 3, 0, 3, 3),
-            (0, 3, 3, 0, 3),
-            (3, 3, 3, 0, 0),
-            (0, 3, 3, 3, 0),
-            (3, 0, 3, 0, 3),
-        ),
-        (1008, 336, 336, 252, 252, 144, 112, 84, 84, 84),
-    )
     amounts_hash_to_bet_amounts("aaa")
     make_round_dicts(
         tuple((1.0, 1.0, 1.0, 1.0, 1.0) for _ in range(5)),
         tuple((1.0, 1.0, 1.0, 1.0, 1.0) for _ in range(5)),
     )
-    make_probabilities(tuple((1, 1, 1, 1, 1) for _ in range(5)))
-
-    for a, b, c, d, e in itertools.product(range(5), repeat=5):
-        bet_binary = pirates_binary((a, b, c, d, e))
-        binary_to_indices(bet_binary)
 
 
 @functools.lru_cache(maxsize=None)
@@ -123,38 +102,6 @@ def pirates_binary(bets_indices: Sequence[int]) -> int:
         A sequence of integers from 0 to 4 to represent a bet.
     """
     return sum(pirate_binary(index, arena) for arena, index in enumerate(bets_indices))
-
-
-@njit()
-def binary_to_indices_numba(bet_binary: int) -> List[int]:
-    # thanks @mikeshardmind
-    # the inverse of pirates_binary
-    ret = [1 for _ in range(0)]
-    for mask in (0xF0000, 0xF000, 0xF00, 0xF0, 0xF):
-        val = mask & bet_binary
-        if val:
-            # bit length intentionally offset here
-            # numba doesn't implement .bit_length for int
-            bit_length, v2 = -1, val
-            while v2:
-                v2 >>= 1
-                bit_length += 1
-            val = 4 - (bit_length % 4)
-        ret.append(val)
-    return ret
-
-
-@functools.lru_cache(maxsize=3125)
-def binary_to_indices(bet_binary: int) -> Tuple[int, ...]:
-    """Tuple[int, ...]: Returns the bet indices of a bet-binary value.
-
-    Parameters
-    -----------
-    bet_binary: :class:`int`
-        An integer representing a bet.
-    """
-    # this is a convenience method to cache the list as a tuple because i don't think Numba can *do* tuples.
-    return tuple(binary_to_indices_numba(bet_binary))
 
 
 def bet_amounts_to_amounts_hash(bet_amounts: Dict[int, int]) -> str:
@@ -303,189 +250,6 @@ def bets_hash_value(bets_indices: Sequence[Sequence[int]]) -> str:
     )
 
 
-@njit()
-def make_probabilities(
-    opening_odds: Sequence[Sequence[int]],
-) -> List[List[float]]:
-
-    _min = [
-        [1.0, 0.0, 0.0, 0.0, 0.0],
-        [1.0, 0.0, 0.0, 0.0, 0.0],
-        [1.0, 0.0, 0.0, 0.0, 0.0],
-        [1.0, 0.0, 0.0, 0.0, 0.0],
-        [1.0, 0.0, 0.0, 0.0, 0.0],
-    ]
-
-    _max = [
-        [1.0, 0.0, 0.0, 0.0, 0.0],
-        [1.0, 0.0, 0.0, 0.0, 0.0],
-        [1.0, 0.0, 0.0, 0.0, 0.0],
-        [1.0, 0.0, 0.0, 0.0, 0.0],
-        [1.0, 0.0, 0.0, 0.0, 0.0],
-    ]
-
-    _std = [
-        [1.0, 0.0, 0.0, 0.0, 0.0],
-        [1.0, 0.0, 0.0, 0.0, 0.0],
-        [1.0, 0.0, 0.0, 0.0, 0.0],
-        [1.0, 0.0, 0.0, 0.0, 0.0],
-        [1.0, 0.0, 0.0, 0.0, 0.0],
-    ]
-
-    # turns out we only use _std values in the python implementation of NFC
-    # keeping the _used math to avoid confusion between NFC impls
-    # _used = [
-    #     [1.0, 0.0, 0.0, 0.0, 0.0],
-    #     [1.0, 0.0, 0.0, 0.0, 0.0],
-    #     [1.0, 0.0, 0.0, 0.0, 0.0],
-    #     [1.0, 0.0, 0.0, 0.0, 0.0],
-    #     [1.0, 0.0, 0.0, 0.0, 0.0],
-    # ]
-
-    for e in range(5):
-
-        min_prob = 0.0
-        max_prob = 0.0
-        for r in range(1, 5):
-            pirate_odd = opening_odds[e][r]
-            if pirate_odd == 13:
-                _min[e][r] = 0
-                _max[e][r] = 1 / 13
-            elif pirate_odd == 2:
-                _min[e][r] = 1 / 3
-                _max[e][r] = 1
-            else:
-                _min[e][r] = 1 / (1 + pirate_odd)
-                _max[e][r] = 1 / pirate_odd
-            min_prob += _min[e][r]
-            max_prob += _max[e][r]
-
-        for r in range(1, 5):
-            min_original = _min[e][r]
-            max_original = _max[e][r]
-
-            _min[e][r] = max(min_original, 1 + max_original - max_prob)
-            _max[e][r] = min(max_original, 1 + min_original - min_prob)
-            _std[e][r] = (
-                0.05 if opening_odds[e][r] == 13 else (_min[e][r] + _max[e][r]) / 2
-            )
-
-        for rectify_level in range(2, 13):
-            rectify_count = 0
-            std_total = 0.0
-            rectify_value = 0.0
-            max_rectify_value = 1.0
-            for r in range(1, 5):
-                std_total += _std[e][r]
-                if opening_odds[e][r] <= rectify_level:
-                    rectify_count += 1
-                    rectify_value += _std[e][r] - _min[e][r]
-                    max_rectify_value = min(
-                        [
-                            max_rectify_value,
-                            _max[e][r] - _min[e][r],
-                        ]
-                    )
-
-            if std_total == 1:
-                break
-
-            if not (
-                std_total - rectify_value > 1
-                or rectify_count == 0
-                or max_rectify_value * rectify_count < rectify_value + 1 - std_total
-            ):
-                rectify_value += 1 - std_total
-                rectify_value /= rectify_count
-                for r in range(1, 5):
-                    if opening_odds[e][r] <= rectify_level:
-                        _std[e][r] = _min[e][r] + rectify_value
-                break
-
-    #     return_sum = 0.0
-    #     for r in range(1, 5):
-    #         _used[e][r] = _std[e][r]
-    #         return_sum += _used[e][r]
-    #
-    #     for r in range(1, 5):
-    #         _used[e][r] /= return_sum
-    #
-    # return dict(min=_min, max=_max, std=_std, used=_used)
-
-    return _std
-
-
-@njit()
-def ib_doable(ib: int) -> bool:
-    # checks if there are possible winning combinations for ib
-
-    return bool(
-        ib & BIT_MASKS[0]
-        and ib & BIT_MASKS[1]
-        and ib & BIT_MASKS[2]
-        and ib & BIT_MASKS[3]
-        and ib & BIT_MASKS[4]
-    )
-
-
-@njit()
-def ib_prob(ib: int, probabilities: Sequence[Sequence[float]]) -> float:
-    # computes the probability that the winning combination is accepted by ib
-    total_prob = 1.0
-    for _i in range(5):
-        ar_prob = 0.0
-        for _j in range(4):
-            if ib & BIT_MASKS[_i] & PIR_IB[_j]:
-                ar_prob += probabilities[_i][_j + 1]
-        total_prob *= ar_prob
-    return total_prob
-
-
-# expand_ib_object takes an ibObj and returns an ibObj.
-# The returned bet set "res" satisfies the following properties:
-# - for all possible winning combination it has the same value as the old set
-# - two different bets in "res" will have 0 common accepted winning combinations
-# - all winning combinations are accepted by a bet in "res" (giving the value 0 to combinations that busts)
-# It's done so that the probability distribution becomes easy to compute.
-@njit()
-def expand_ib_object(
-    bets: Sequence[Sequence[int]], bet_odds: Sequence[int]
-) -> Dict[int, int]:
-    # BIT_MASKS[i] will accept pirates from arena i and only them. BIT_MASKS[4] == 0b1111, BIT_MASKS[3] == 0b11110000, etc...
-
-    # PIR_IB[i] will accept pirates of index i (from 0 to 3) PIR_IB[0] = 0b10001000100010001000, PIR_IB[1] = 0b01000100010001000100, PIR_IB[2] = 0b00100010001000100010, PIR_IB[3] = 0b00010001000100010001
-
-    # 0xFFFFF = 0b11111111111111111111 (20 '1's), will accept all pirates
-    convert_pir_ib = (0xFFFFF,) + PIR_IB
-
-    # makes a dict of permutations of the pirates + odds
-    # this is why the bet table could be very long
-    bets_to_ib: Dict[int, int] = {}
-    for key, bet_value in enumerate(bets):
-        ib = 0
-        for _x in range(5):
-            # this adds pirates meant by bet[i] to the pirates accepted by ib.
-            ib |= convert_pir_ib[bet_value[_x]] & BIT_MASKS[_x]
-        if ib not in bets_to_ib:
-            bets_to_ib[ib] = 0
-        bets_to_ib[ib] += bet_odds[key]
-
-    # filters down the doable bets from the permutations above
-    res = {0xFFFFF: 0}
-    for ib_bet, winnings in sorted(bets_to_ib.items()):
-        for ib_key in list(res.keys()):
-            com = ib_bet & ib_key
-            if ib_doable(com):
-                val_key = res.pop(ib_key)
-                res[com] = winnings + val_key
-                for _ar in BIT_MASKS:
-                    tst = ib_key ^ (com & _ar)
-                    if ib_doable(tst):
-                        res[tst] = val_key
-                        ib_key = (ib_key & ~_ar) | (com & _ar)
-    return res
-
-
 def get_bet_odds_from_bets(
     bets: Sequence[Sequence[int]],
     bet_odds: Sequence[int],
@@ -530,7 +294,7 @@ def get_bet_odds_from_bets(
 
         return sorted_e
 
-    return compute_win_table(expand_ib_object(bets, bet_odds))
+    return compute_win_table(expand_ib_object_rust(bets, bet_odds))
 
 
 @njit()
