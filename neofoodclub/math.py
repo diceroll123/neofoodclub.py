@@ -2,13 +2,11 @@ from __future__ import annotations
 
 import functools
 import itertools
-import math
 from collections import defaultdict
 from string import ascii_lowercase, ascii_uppercase
 from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
-from numba import njit
 
 from .neofoodclub import (
     binary_to_indices_rust,
@@ -24,7 +22,6 @@ if TYPE_CHECKING:
     from .types import BetOdds
 
 __all__ = (
-    "precompile",
     "pirate_binary",
     "pirates_binary",
     "binary_to_indices",
@@ -59,12 +56,6 @@ PIR_IB: Tuple[int, ...] = (0x88888, 0x44444, 0x22222, 0x11111)
 binary_to_indices = binary_to_indices_rust
 make_probabilities = make_probabilities_rust
 ib_prob = ib_prob_rust
-
-
-def precompile():
-    # run the numba methods to compile, and fill some caches so they're speedier
-    # using garbage data is fine for compiling with.
-    amounts_hash_to_bet_amounts("aaa")
 make_round_dicts = make_round_dicts_rust
 
 
@@ -119,9 +110,16 @@ def bet_amounts_to_amounts_hash(bet_amounts: Dict[int, int]) -> str:
 
     return letters
 
+@functools.lru_cache
+def amounts_hash_to_bet_amounts(amounts_hash: str) -> Tuple[Optional[int], ...]:
+    """Tuple[Optional[:class:`int`], ...]: Returns a tuple of bet amounts from the provided amounts hash.
 
-@njit()
-def amounts_hash_to_bet_amounts_numba(amounts_hash: str) -> List[Optional[int]]:
+    Parameters
+    -----------
+    amounts_hash: :class:`str`
+        The hash of bet amounts.
+    """
+
     nums: List[Optional[int]] = []
     chunked = [amounts_hash[i : i + 3] for i in range(0, len(amounts_hash), 3)]
 
@@ -137,21 +135,7 @@ def amounts_hash_to_bet_amounts_numba(amounts_hash: str) -> List[Optional[int]]:
         else:
             nums.append(value)
 
-    return nums
-
-
-@functools.lru_cache
-def amounts_hash_to_bet_amounts(amounts_hash: str) -> Tuple[Optional[int], ...]:
-    """Tuple[Optional[:class:`int`], ...]: Returns a tuple of bet amounts from the provided amounts hash.
-
-    Parameters
-    -----------
-    amounts_hash: :class:`str`
-        The hash of bet amounts.
-    """
-
-    # this is a convenience method to cache the list as a tuple because i don't think Numba can *do* tuples.
-    return tuple(amounts_hash_to_bet_amounts_numba(amounts_hash))
+    return tuple(nums)
 
 
 @functools.lru_cache(maxsize=256)

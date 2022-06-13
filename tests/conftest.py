@@ -2,7 +2,6 @@ from typing import Any, Dict, Tuple
 
 import pytest
 from neofoodclub import Bets, NeoFoodClub
-from neofoodclub.math import precompile
 
 
 # I picked the smallest round I could quickly find.
@@ -218,6 +217,3 @@ def crazy_bets(nfc: NeoFoodClub, crazy_test_hash: str) -> Bets:
 @pytest.fixture
 def gambit_bets(nfc: NeoFoodClub, gambit_test_binaries: Tuple[int, ...]) -> Bets:
     return nfc.make_bets_from_binaries(*gambit_test_binaries)
-
-
-precompile()

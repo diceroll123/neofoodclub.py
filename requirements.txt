@@ -1,4 +1,4 @@
-numba
+numpy
 python-dateutil
 typing_extensions
 orjson
