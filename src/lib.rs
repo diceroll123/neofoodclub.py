@@ -1,3 +1,4 @@
+use numpy::{ndarray::Array1, PyArray1, ToPyArray};
 use pyo3::prelude::*;
 use std::collections::HashMap;
 
@@ -198,15 +199,22 @@ fn expand_ib_object_rust(bets: Vec<Vec<u8>>, bet_odds: Vec<u32>) -> HashMap<u32,
 }
 
 #[pyfunction]
-fn make_round_dicts_rust(
+fn make_round_dicts_rust<'py>(
+    py: Python<'py>,
     stds: Vec<Vec<f64>>,
     odds: Vec<Vec<u32>>,
-) -> (Vec<u32>, Vec<f64>, Vec<u32>, Vec<f64>, Vec<u32>) {
-    let mut _bins: Vec<u32> = vec![0; 3124];
-    let mut _stds: Vec<f64> = vec![0.0; 3124];
-    let mut _odds: Vec<u32> = vec![0; 3124];
-    let mut _ers: Vec<f64> = vec![0.0; 3124];
-    let mut _maxbets: Vec<u32> = vec![0; 3124];
+) -> (
+    &PyArray1<u32>,
+    &PyArray1<f64>,
+    &PyArray1<u32>,
+    &PyArray1<f64>,
+    &PyArray1<u32>,
+) {
+    let mut _bins: Array1<u32> = Array1::zeros(3124);
+    let mut _stds: Array1<f64> = Array1::zeros(3124);
+    let mut _odds: Array1<u32> = Array1::zeros(3124);
+    let mut _ers: Array1<f64> = Array1::zeros(3124);
+    let mut _maxbets: Array1<u32> = Array1::zeros(3124);
 
     let mut arr_index = 0;
 
@@ -246,7 +254,13 @@ fn make_round_dicts_rust(
         }
     }
 
-    (_bins, _stds, _odds, _ers, _maxbets)
+    (
+        _bins.to_pyarray(py),
+        _stds.to_pyarray(py),
+        _odds.to_pyarray(py),
+        _ers.to_pyarray(py),
+        _maxbets.to_pyarray(py),
+    )
 }
 
 #[pymodule]

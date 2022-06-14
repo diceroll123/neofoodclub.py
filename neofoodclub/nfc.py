@@ -797,11 +797,11 @@ class NeoFoodClub:
             tuple(tuple(row) for row in self._data["customOdds"]),
         )
         # convert the dict items to shapes we'll need:
-        self._data_dict["std"] = np.array(_stds)
-        self._data_dict["ers"] = np.array(_ers)
-        self._data_dict["bins"] = np.array(_bins)
-        self._data_dict["odds"] = np.array(_odds)
-        self._data_dict["maxbets"] = np.array(_maxbets)
+        self._data_dict["std"] = _stds
+        self._data_dict["ers"] = _ers
+        self._data_dict["bins"] = _bins
+        self._data_dict["odds"] = _odds
+        self._data_dict["maxbets"] = _maxbets
 
         self._cache_bet_amount_dicts()
 
