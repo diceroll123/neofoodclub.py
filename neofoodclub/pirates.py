@@ -112,12 +112,7 @@ class Pirate(PirateMixin):
         else:
             self._std = None
             self._er = None
-        self._fa = None
-
-        if foods := nfc._data.get("foods", None):
-            self._fa = sum(
-                -NEGATIVE_FOOD[id][f] + POSITIVE_FOOD[id][f] for f in foods[arena]
-            )
+        self._fa = None  # will be filled as needed in the property
 
     @property
     def id(self) -> int:
@@ -152,6 +147,16 @@ class Pirate(PirateMixin):
     @property
     def fa(self) -> Optional[int]:
         """Optional[:class:`int`]: The pirate's food adjustment. Can be None if no foods are found."""
+        if self._fa is not None:
+            return self._fa
+
+        if foods := self.nfc._data.get("foods", None):
+            # calculated here because it's not a commonly-used property
+            self._fa = sum(
+                -NEGATIVE_FOOD[self.id][f] + POSITIVE_FOOD[self.id][f]
+                for f in foods[self.arena]
+            )
+
         return self._fa
 
     @property
