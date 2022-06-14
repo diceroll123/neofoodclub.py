@@ -16,7 +16,7 @@ const PIR_IB: [u32; 4] = [0x88888, 0x44444, 0x22222, 0x11111];
 const CONVERT_PIR_IB: [u32; 5] = [0xFFFFF, 0x88888, 0x44444, 0x22222, 0x11111];
 
 #[pyfunction]
-fn binary_to_indices_rust(binary: u32) -> PyResult<(u8, u8, u8, u8, u8)> {
+fn binary_to_indices_rust(binary: u32) -> (u8, u8, u8, u8, u8) {
     let mut indices: [u8; 5] = [0; 5];
 
     for (index, mask) in BIT_MASKS.iter().enumerate() {
@@ -29,11 +29,11 @@ fn binary_to_indices_rust(binary: u32) -> PyResult<(u8, u8, u8, u8, u8)> {
     }
 
     // convert indices to tuple
-    Ok((indices[0], indices[1], indices[2], indices[3], indices[4]))
+    (indices[0], indices[1], indices[2], indices[3], indices[4])
 }
 
 #[pyfunction]
-fn make_probabilities_rust(opening_odds: Vec<Vec<u32>>) -> PyResult<Vec<Vec<f64>>> {
+fn make_probabilities_rust(opening_odds: Vec<Vec<u32>>) -> Vec<Vec<f64>> {
     let mut std: [[f64; 5]; 5] = [[1.0, 0.0, 0.0, 0.0, 0.0]; 5];
     let mut min: [[f64; 5]; 5] = [[1.0, 0.0, 0.0, 0.0, 0.0]; 5];
     let mut max: [[f64; 5]; 5] = [[1.0, 0.0, 0.0, 0.0, 0.0]; 5];
@@ -125,7 +125,7 @@ fn make_probabilities_rust(opening_odds: Vec<Vec<u32>>) -> PyResult<Vec<Vec<f64>
     }
 
     // convert std to a vector of vectors before returning
-    Ok(std.iter().map(|&e| e.to_vec()).collect())
+    std.iter().map(|&e| e.to_vec()).collect()
 }
 
 fn ib_doable(binary: u32) -> bool {
@@ -155,7 +155,7 @@ fn ib_prob_rust(binary: u32, probabilities: [[f64; 5]; 5]) -> f64 {
 }
 
 #[pyfunction]
-fn expand_ib_object_rust(bets: Vec<Vec<u8>>, bet_odds: Vec<u32>) -> PyResult<HashMap<u32, u32>> {
+fn expand_ib_object_rust(bets: Vec<Vec<u8>>, bet_odds: Vec<u32>) -> HashMap<u32, u32> {
     // makes a dict of permutations of the pirates + odds
     // this is why the bet table could be very long
 
@@ -194,14 +194,14 @@ fn expand_ib_object_rust(bets: Vec<Vec<u8>>, bet_odds: Vec<u32>) -> PyResult<Has
             }
         }
     }
-    Ok(res)
+    res
 }
 
 #[pyfunction]
 fn make_round_dicts_rust(
     stds: Vec<Vec<f64>>,
     odds: Vec<Vec<u32>>,
-) -> PyResult<(Vec<u32>, Vec<f64>, Vec<u32>, Vec<f64>, Vec<u32>)> {
+) -> (Vec<u32>, Vec<f64>, Vec<u32>, Vec<f64>, Vec<u32>) {
     let mut _bins: Vec<u32> = vec![0; 3124];
     let mut _stds: Vec<f64> = vec![0.0; 3124];
     let mut _odds: Vec<u32> = vec![0; 3124];
@@ -246,7 +246,7 @@ fn make_round_dicts_rust(
         }
     }
 
-    return Ok((_bins, _stds, _odds, _ers, _maxbets));
+    (_bins, _stds, _odds, _ers, _maxbets)
 }
 
 #[pymodule]
