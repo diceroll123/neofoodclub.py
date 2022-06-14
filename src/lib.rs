@@ -17,6 +17,26 @@ const PIR_IB: [u32; 4] = [0x88888, 0x44444, 0x22222, 0x11111];
 const CONVERT_PIR_IB: [u32; 5] = [0xFFFFF, 0x88888, 0x44444, 0x22222, 0x11111];
 
 #[pyfunction]
+fn pirate_binary_rust(index: u8, arena: u8) -> u32 {
+    if index == 0 {
+        return 0;
+    }
+
+    1 << (19 - (index - 1 + arena * 4))
+}
+
+#[pyfunction]
+fn pirates_binary_rust(bets_indices: [u8; 5]) -> u32 {
+    let mut total: u32 = 0;
+
+    for (arena, index) in bets_indices.iter().enumerate() {
+        total += pirate_binary_rust(*index, arena as u8)
+    }
+
+    total
+}
+
+#[pyfunction]
 fn binary_to_indices_rust(binary: u32) -> (u8, u8, u8, u8, u8) {
     let mut indices: [u8; 5] = [0; 5];
 
@@ -265,6 +285,8 @@ fn make_round_dicts_rust<'py>(
 
 #[pymodule]
 fn neofoodclub(_py: Python, m: &PyModule) -> PyResult<()> {
+    m.add_function(wrap_pyfunction!(pirate_binary_rust, m)?)?;
+    m.add_function(wrap_pyfunction!(pirates_binary_rust, m)?)?;
     m.add_function(wrap_pyfunction!(binary_to_indices_rust, m)?)?;
     m.add_function(wrap_pyfunction!(make_probabilities_rust, m)?)?;
     m.add_function(wrap_pyfunction!(ib_prob_rust, m)?)?;

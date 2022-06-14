@@ -1,7 +1,39 @@
 from typing import Dict, List, Sequence, Tuple
 
+def pirate_binary_rust(index: int, arena: int) -> int:
+    """:class:`int`: Returns the bet-binary representation of a pirate in an arena.
 
-def binary_to_indices_rust(bet_binary: int) -> Tuple[int, ...]: ...
+    Parameters
+    -----------
+    index: :class:`int`
+        The index of the pirate in the arena. Can be 0 to 4. If 0, then there is no pirate.
+    arena: :class:`int`
+        The arena's index. Can be 0 to 4.
+    """
+    ...
+
+def pirates_binary_rust(bets_indices: Sequence[int]) -> int:
+    """:class:`int`: Returns the bet-binary representation of bet indices.
+
+    Turns something like (1, 2, 3, 4, 2) for example into 0b10000100001000010100, a bet-binary number.
+
+    This is fundamentally the inverse of binary_to_indices.
+
+    Parameters
+    -----------
+    bets_indices: Sequence[:class:`int`]
+        A sequence of integers from 0 to 4 to represent a bet.
+    """
+    ...
+
+def binary_to_indices_rust(bet_binary: int) -> Tuple[int, ...]:
+    """Tuple[int, ...]: Returns the bet indices of a bet-binary value.
+    Parameters
+    -----------
+    bet_binary: :class:`int`
+        An integer representing a bet.
+    """
+    ...
 
 def make_probabilities_rust(opening_odds: Sequence[Sequence[int]]) -> List[List[float]]: ...
 

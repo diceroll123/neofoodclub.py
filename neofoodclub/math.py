@@ -14,6 +14,8 @@ from .neofoodclub import (
     ib_prob_rust,
     make_probabilities_rust,
     make_round_dicts_rust,
+    pirate_binary_rust,
+    pirates_binary_rust,
 )
 
 from .errors import InvalidData
@@ -53,40 +55,12 @@ BIT_MASKS: Tuple[int, ...] = (0xF0000, 0xF000, 0xF00, 0xF0, 0xF)
 # 0x88888 = (1, 1, 1, 1, 1), which is the first pirate in each arena, and so on.
 PIR_IB: Tuple[int, ...] = (0x88888, 0x44444, 0x22222, 0x11111)
 
+pirate_binary = pirate_binary_rust
+pirates_binary = pirates_binary_rust
 binary_to_indices = binary_to_indices_rust
 make_probabilities = make_probabilities_rust
 ib_prob = ib_prob_rust
 make_round_dicts = make_round_dicts_rust
-
-
-@functools.lru_cache(maxsize=None)
-def pirate_binary(index: int, arena: int) -> int:
-    """:class:`int`: Returns the bet-binary representation of a pirate in an arena.
-
-    Parameters
-    -----------
-    index: :class:`int`
-        The index of the pirate in the arena. Can be 0 to 4. If 0, then there is no pirate.
-    arena: :class:`int`
-        The arena's index. Can be 0 to 4.
-    """
-    return 0 if index == 0 else 1 << (19 - (index - 1 + arena * 4))
-
-
-@functools.lru_cache(maxsize=None)
-def pirates_binary(bets_indices: Sequence[int]) -> int:
-    """:class:`int`: Returns the bet-binary representation of bet indices.
-
-    Turns something like (1, 2, 3, 4, 2) for example into 0b10000100001000010100, a bet-binary number.
-
-    This is fundamentally the inverse of binary_to_indices.
-
-    Parameters
-    -----------
-    bets_indices: Sequence[:class:`int`]
-        A sequence of integers from 0 to 4 to represent a bet.
-    """
-    return sum(pirate_binary(index, arena) for arena, index in enumerate(bets_indices))
 
 
 def bet_amounts_to_amounts_hash(bet_amounts: Dict[int, int]) -> str:
