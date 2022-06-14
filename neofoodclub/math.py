@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import functools
 import itertools
 from collections import defaultdict
 from string import ascii_lowercase, ascii_uppercase
@@ -8,6 +7,7 @@ from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 
+from .errors import InvalidData
 from .neofoodclub import (
     binary_to_indices_rust,
     expand_ib_object_rust,
@@ -17,8 +17,6 @@ from .neofoodclub import (
     pirate_binary_rust,
     pirates_binary_rust,
 )
-
-from .errors import InvalidData
 
 if TYPE_CHECKING:
     from .types import BetOdds
@@ -84,7 +82,6 @@ def bet_amounts_to_amounts_hash(bet_amounts: Dict[int, int]) -> str:
 
     return letters
 
-@functools.lru_cache
 def amounts_hash_to_bet_amounts(amounts_hash: str) -> Tuple[Optional[int], ...]:
     """Tuple[Optional[:class:`int`], ...]: Returns a tuple of bet amounts from the provided amounts hash.
 
@@ -112,7 +109,6 @@ def amounts_hash_to_bet_amounts(amounts_hash: str) -> Tuple[Optional[int], ...]:
     return tuple(nums)
 
 
-@functools.lru_cache(maxsize=256)
 def bets_hash_to_bet_indices(bets_hash: str) -> Tuple[Tuple[int, ...], ...]:
     """Tuple[Tuple[:class:`int`, ...], ...]: Returns a tuple of bet indices from the provided bets hash.
 
