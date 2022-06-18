@@ -9,6 +9,7 @@ import numpy as np
 
 from .errors import InvalidData
 from .neofoodclub import (
+    bets_hash_to_bet_indices_rust,
     binary_to_indices_rust,
     expand_ib_object_rust,
     ib_prob_rust,
@@ -59,6 +60,7 @@ binary_to_indices = binary_to_indices_rust
 make_probabilities = make_probabilities_rust
 ib_prob = ib_prob_rust
 make_round_dicts = make_round_dicts_rust
+bets_hash_to_bet_indices = bets_hash_to_bet_indices_rust
 
 
 def bet_amounts_to_amounts_hash(bet_amounts: Dict[int, int]) -> str:
@@ -81,6 +83,7 @@ def bet_amounts_to_amounts_hash(bet_amounts: Dict[int, int]) -> str:
         letters += e
 
     return letters
+
 
 def amounts_hash_to_bet_amounts(amounts_hash: str) -> Tuple[Optional[int], ...]:
     """Tuple[Optional[:class:`int`], ...]: Returns a tuple of bet amounts from the provided amounts hash.
@@ -107,22 +110,6 @@ def amounts_hash_to_bet_amounts(amounts_hash: str) -> Tuple[Optional[int], ...]:
             nums.append(value)
 
     return tuple(nums)
-
-
-def bets_hash_to_bet_indices(bets_hash: str) -> Tuple[Tuple[int, ...], ...]:
-    """Tuple[Tuple[:class:`int`, ...], ...]: Returns a tuple of bet indices from the provided bets hash.
-
-    Parameters
-    -----------
-    bets_hash: :class:`str`
-        The hash of bet amounts.
-    """
-    indices = [ord(letter) - 97 for letter in bets_hash]
-    s = itertools.chain.from_iterable((e // 5, e % 5) for e in indices)
-    # https://docs.python.org/3/library/itertools.html#itertools-recipes (see "grouper" recipe)
-    return tuple(
-        bet for bet in itertools.zip_longest(*[iter(s)] * 5, fillvalue=0) if any(bet)
-    )
 
 
 def bets_hash_to_bet_binaries(bets_hash: str) -> Tuple[int, ...]:
@@ -162,8 +149,8 @@ def bets_hash_to_bets_count(bets_hash: str) -> int:
     return len(bets_hash_to_bet_indices(bets_hash))
 
 
-def bets_hash_to_bets(bets_hash: str) -> Dict[int, Tuple[int, ...]]:
-    """Dict[:class:`int`, Tuple[:class:`int`, ...]]: Returns a dict of bets where keys are the index and values
+def bets_hash_to_bets(bets_hash: str) -> Dict[int, List[int]]:
+    """Dict[:class:`int`, List[:class:`int`]]: Returns a dict of bets where keys are the index and values
     are bet indicies.
 
     Parameters

@@ -1,5 +1,6 @@
 from typing import Dict, List, Sequence, Tuple
 
+
 def pirate_binary_rust(index: int, arena: int) -> int:
     """:class:`int`: Returns the bet-binary representation of a pirate in an arena.
 
@@ -32,6 +33,16 @@ def binary_to_indices_rust(bet_binary: int) -> Tuple[int, ...]:
     -----------
     bet_binary: :class:`int`
         An integer representing a bet.
+    """
+    ...
+
+def bets_hash_to_bet_indices_rust(bets_hash: str) -> List[List[int]]:
+    """List[List[:class:`int`]]: Returns a list of lists of bet indices from the provided bets hash.
+
+    Parameters
+    -----------
+    bets_hash: :class:`str`
+        The hash of bet amounts.
     """
     ...
 

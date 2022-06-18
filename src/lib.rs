@@ -54,6 +54,41 @@ fn binary_to_indices_rust(binary: u32) -> (u8, u8, u8, u8, u8) {
 }
 
 #[pyfunction]
+fn bets_hash_to_bet_indices_rust(bets_hash: &str) -> Vec<Vec<u8>> {
+    let mut indices = Vec::new();
+    for chr in bets_hash.chars() {
+        let ord: u32 = chr.into();
+        indices.push(ord - 97);
+    }
+
+    let mut output: Vec<u8> = Vec::new();
+
+    for e in indices.iter() {
+        output.push((*e as f64 / 5.0).floor() as u8);
+        output.push((e % 5) as u8);
+    }
+
+    // pad with zeros just in case
+    while output.len() % 5 != 0 {
+        output.push(0);
+    }
+
+    // due to the way this algorithm works, there could be resulting chunks that are entirely all 0,
+    // so let's remove them beforehand.
+    // good examples:
+    // "faa" -> [[1, 0, 0, 0, 0,], [0]]
+    // "faafaafaafaafaafaa" -> [[1, 0, 0, 0, 0], [0, 1, 0, 0, 0], [0, 0, 1, 0, 0], [0, 0, 0, 1, 0], [0, 0, 0, 0, 1], [0, 0, 0, 0, 0], [1, 0, 0, 0, 0]]
+    // ^ note the array containing all zeros
+    // the next part takes care of that.
+
+    output
+        .chunks(5)
+        .filter(|x| x.iter().any(|&n| n > 0))
+        .map(|s| s.into())
+        .collect()
+}
+
+#[pyfunction]
 fn make_probabilities_rust(opening_odds: Vec<Vec<u32>>) -> Vec<Vec<f64>> {
     let mut std: [[f64; 5]; 5] = [[1.0, 0.0, 0.0, 0.0, 0.0]; 5];
     let mut min: [[f64; 5]; 5] = [[1.0, 0.0, 0.0, 0.0, 0.0]; 5];
@@ -288,6 +323,7 @@ fn neofoodclub(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(pirate_binary_rust, m)?)?;
     m.add_function(wrap_pyfunction!(pirates_binary_rust, m)?)?;
     m.add_function(wrap_pyfunction!(binary_to_indices_rust, m)?)?;
+    m.add_function(wrap_pyfunction!(bets_hash_to_bet_indices_rust, m)?)?;
     m.add_function(wrap_pyfunction!(make_probabilities_rust, m)?)?;
     m.add_function(wrap_pyfunction!(ib_prob_rust, m)?)?;
     m.add_function(wrap_pyfunction!(expand_ib_object_rust, m)?)?;
