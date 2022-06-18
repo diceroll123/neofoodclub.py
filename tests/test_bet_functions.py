@@ -1,6 +1,7 @@
-from typing import Tuple
+from typing import Sequence, Tuple
 
 import pytest
+from neofoodclub import math
 from neofoodclub.errors import InvalidAmountHash, InvalidBetHash, InvalidData
 from neofoodclub.nfc import Bets, Modifier, NeoFoodClub
 
@@ -243,3 +244,64 @@ def test_invalid_bet_hash(nfc: NeoFoodClub):
 def test_invalid_amounts_hash(nfc: NeoFoodClub):
     with pytest.raises(InvalidAmountHash):
         nfc.make_bets_from_hash("faa", amounts_hash="???")
+
+
+@pytest.mark.parametrize(
+    "bet_hash, bet_indices",
+    [
+        (
+            "faafa",
+            (
+                (1, 0, 0, 0, 0),
+                (0, 1, 0, 0, 0),
+            ),
+        ),
+        (
+            "vyrapsknfvmjbgedicpliqhyb",
+            (
+                (4, 1, 4, 4, 3),
+                (2, 0, 0, 3, 0),
+                (3, 3, 2, 0, 2),
+                (3, 1, 0, 4, 1),
+                (2, 2, 1, 4, 0),
+                (1, 1, 1, 0, 4),
+                (0, 3, 1, 3, 0),
+                (2, 3, 0, 2, 1),
+                (1, 3, 3, 1, 1),
+                (2, 4, 4, 0, 1),
+            ),
+        ),
+        (
+            "ygavkmihfohgphhklexuqmlns",
+            (
+                (4, 4, 1, 1, 0),
+                (0, 4, 1, 2, 0),
+                (2, 2, 1, 3, 1),
+                (2, 1, 0, 2, 4),
+                (1, 2, 1, 1, 3),
+                (0, 1, 2, 1, 2),
+                (2, 0, 2, 1, 0),
+                (4, 4, 3, 4, 0),
+                (3, 1, 2, 2, 2),
+                (1, 2, 3, 3, 3),
+            ),
+        ),
+        (
+            "tpntkpoqjraksvshxfnogctff",
+            (
+                (3, 4, 3, 0, 2),
+                (3, 3, 4, 2, 0),
+                (3, 0, 2, 4, 3),
+                (1, 1, 4, 3, 2),
+                (0, 0, 2, 0, 3),
+                (3, 4, 1, 3, 3),
+                (1, 2, 4, 3, 1),
+                (0, 2, 3, 2, 4),
+                (1, 1, 0, 2, 3),
+                (4, 1, 0, 1, 0),
+            ),
+        ),
+    ],
+)
+def test_indices_to_bet_hash(bet_hash: str, bet_indices: Sequence[Sequence[int]]):
+    assert math.bets_hash_value(bet_indices) == bet_hash
