@@ -9,6 +9,7 @@ import numpy as np
 
 from .errors import InvalidData
 from .neofoodclub import (
+    bet_amounts_to_amounts_hash_rust,
     bets_hash_to_bet_indices_rust,
     binary_to_indices_rust,
     expand_ib_object_rust,
@@ -61,28 +62,7 @@ make_probabilities = make_probabilities_rust
 ib_prob = ib_prob_rust
 make_round_dicts = make_round_dicts_rust
 bets_hash_to_bet_indices = bets_hash_to_bet_indices_rust
-
-
-def bet_amounts_to_amounts_hash(bet_amounts: Dict[int, int]) -> str:
-    """:class:`str`: Returns the hash for the provided bet amounts.
-
-    This is fundamentally the inverse of amounts_hash_to_bet_amounts.
-
-    Parameters
-    -----------
-    bet_amounts: Dict[int, int]
-        A dict of bet amounts where the key is the index and the value is the bet amount.
-    """
-    letters = ""
-    for _, value in bet_amounts.items():
-        e = ""
-        letter = int(value) % BET_AMOUNT_MAX + BET_AMOUNT_MAX
-        for _ in range(3):
-            e = (ascii_lowercase + ascii_uppercase)[letter % 52] + e
-            letter //= 52
-        letters += e
-
-    return letters
+bet_amounts_to_amounts_hash = bet_amounts_to_amounts_hash_rust
 
 
 def amounts_hash_to_bet_amounts(amounts_hash: str) -> Tuple[Optional[int], ...]:

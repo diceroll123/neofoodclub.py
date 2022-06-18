@@ -46,6 +46,18 @@ def bets_hash_to_bet_indices_rust(bets_hash: str) -> List[List[int]]:
     """
     ...
 
+def bet_amounts_to_amounts_hash_rust(bet_amounts: Dict[int, int]) -> str:
+    """:class:`str`: Returns the hash for the provided bet amounts.
+
+    This is fundamentally the inverse of amounts_hash_to_bet_amounts.
+
+    Parameters
+    -----------
+    bet_amounts: Dict[int, int]
+        A dict of bet amounts where the key is the index and the value is the bet amount.
+    """
+    ...
+
 def make_probabilities_rust(opening_odds: Sequence[Sequence[int]]) -> List[List[float]]: ...
 
 def ib_prob_rust(ib: int, probabilities: Sequence[Sequence[float]]) -> float: ...

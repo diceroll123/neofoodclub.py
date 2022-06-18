@@ -2,6 +2,8 @@ use numpy::{ndarray::Array1, PyArray1, ToPyArray};
 use pyo3::prelude::*;
 use std::collections::HashMap;
 
+const BET_AMOUNT_MAX: u32 = 70304;
+
 // WARNING: the literal integers in this file switches between hex and binary willy-nilly, mostly for readability.
 
 // each arena, as if they were full. this is impossible to actually do.
@@ -86,6 +88,32 @@ fn bets_hash_to_bet_indices_rust(bets_hash: &str) -> Vec<Vec<u8>> {
         .filter(|x| x.iter().any(|&n| n > 0))
         .map(|s| s.into())
         .collect()
+}
+
+#[pyfunction]
+fn bet_amounts_to_amounts_hash_rust(bet_amounts: HashMap<u8, u32>) -> String {
+    // make a vector of optional u32s
+    let mut letters = String::new();
+    // loop through the bet_amounts hashmap enumerating the keys and values
+    for value in bet_amounts.values() {
+        let mut these_letters = String::new();
+        let mut this_letter_value = value % BET_AMOUNT_MAX + BET_AMOUNT_MAX;
+        for _ in 0..3 {
+            let letter_index: u8 = (this_letter_value % 52).try_into().unwrap();
+            // a..z = 97..122
+            // A..Z = 65..90
+            let letter: char = if letter_index <= 26 {
+                (letter_index + 97).into()
+            } else {
+                (letter_index + 65 - 26).into()
+            };
+            these_letters.insert(0, letter);
+            this_letter_value = (this_letter_value as f64 / 52.0).floor() as u32;
+        }
+        letters.push_str(&these_letters);
+    }
+
+    letters
 }
 
 #[pyfunction]
@@ -324,6 +352,7 @@ fn neofoodclub(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(pirates_binary_rust, m)?)?;
     m.add_function(wrap_pyfunction!(binary_to_indices_rust, m)?)?;
     m.add_function(wrap_pyfunction!(bets_hash_to_bet_indices_rust, m)?)?;
+    m.add_function(wrap_pyfunction!(bet_amounts_to_amounts_hash_rust, m)?)?;
     m.add_function(wrap_pyfunction!(make_probabilities_rust, m)?)?;
     m.add_function(wrap_pyfunction!(ib_prob_rust, m)?)?;
     m.add_function(wrap_pyfunction!(expand_ib_object_rust, m)?)?;
