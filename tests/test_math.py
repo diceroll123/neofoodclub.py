@@ -14,6 +14,7 @@ from neofoodclub.math import (
 @pytest.mark.parametrize(
     "bet_binary,expected",
     [
+        (0x84210, (1, 2, 3, 4, 0)),
         (0x88888, (1, 1, 1, 1, 1)),
         (0x44444, (2, 2, 2, 2, 2)),
         (0x22222, (3, 3, 3, 3, 3)),
@@ -75,11 +76,7 @@ def test_bets_hash_to_bets_invalid(bets_hash: str):
 
 @pytest.mark.parametrize(
     "bets_hash,expected",
-    [
-        ("faa", 1),
-        ("faafaa", 2),
-        ("faafaafaafaafaafaafaafaafaafaafaafaafaafaafaa", 15),
-    ],
+    [("faa" * x, x) for x in range(1, 16)],
 )
 def test_bets_hash_to_bets_(bets_hash: str, expected: int):
     assert expected == len(bets_hash_to_bets(bets_hash))
