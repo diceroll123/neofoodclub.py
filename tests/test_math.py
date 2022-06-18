@@ -28,8 +28,19 @@ def test_binary_to_indices(bet_binary: int, expected: Sequence[int]):
 @pytest.mark.parametrize(
     "amount_hash,expected",
     [
-        ("CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS", (8000,) * 10),
         ("BAQBAQBAQBAQBAQBAQBAQBAQBAQBAQ", (4098,) * 10),
+        ("AtmAtmAtmAtmAtmAtmAtmAtmAtmAtm", (1000,) * 10),
+        ("AMyAMyAMyAMyAMyAMyAMyAMyAMyAMy", (2000,) * 10),
+        ("BfKBfKBfKBfKBfKBfKBfKBfKBfKBfK", (3000,) * 10),
+        ("ByWByWByWByWByWByWByWByWByWByW", (4000,) * 10),
+        ("BSiBSiBSiBSiBSiBSiBSiBSiBSiBSi", (5000,) * 10),
+        ("CluCluCluCluCluCluCluCluCluClu", (6000,) * 10),
+        ("CEGCEGCEGCEGCEGCEGCEGCEGCEGCEG", (7000,) * 10),
+        ("CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS", (8000,) * 10),
+        ("DreDreDreDreDreDreDreDreDreDre", (9000,) * 10),
+        ("DKqDKqDKqDKqDKqDKqDKqDKqDKqDKq", (10000,) * 10),
+        ("SzCSzCSzCSzCSzCSzCSzCSzCSzCSzC", (50000,) * 10),
+        ("ZUiZUiZUiZUiZUiZUiZUiZUiZUiZUi", (70000,) * 10),
     ],
 )
 def test_amounts_hash_to_bet_amounts(amount_hash: str, expected: Sequence[int]):
