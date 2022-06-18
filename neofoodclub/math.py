@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import itertools
 from collections import defaultdict
 from string import ascii_lowercase, ascii_uppercase
 from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple
@@ -11,6 +10,7 @@ from .errors import InvalidData
 from .neofoodclub import (
     bet_amounts_to_amounts_hash_rust,
     bets_hash_to_bet_indices_rust,
+    bets_hash_value_rust,
     binary_to_indices_rust,
     expand_ib_object_rust,
     ib_prob_rust,
@@ -55,12 +55,14 @@ BIT_MASKS: Tuple[int, ...] = (0xF0000, 0xF000, 0xF00, 0xF0, 0xF)
 # 0x88888 = (1, 1, 1, 1, 1), which is the first pirate in each arena, and so on.
 PIR_IB: Tuple[int, ...] = (0x88888, 0x44444, 0x22222, 0x11111)
 
+# JSYK! The type hints for these live in ./neofoodclub.pyi
 pirate_binary = pirate_binary_rust
 pirates_binary = pirates_binary_rust
 binary_to_indices = binary_to_indices_rust
 make_probabilities = make_probabilities_rust
 ib_prob = ib_prob_rust
 make_round_dicts = make_round_dicts_rust
+bets_hash_value = bets_hash_value_rust
 bets_hash_to_bet_indices = bets_hash_to_bet_indices_rust
 bet_amounts_to_amounts_hash = bet_amounts_to_amounts_hash_rust
 
@@ -146,23 +148,6 @@ def bets_hash_to_bets(bets_hash: str) -> Dict[int, List[int]]:
         raise InvalidData("An invalid amount of bets was provided")
 
     return dict(zip(range(1, bet_length + 1), bets))
-
-
-def bets_hash_value(bets_indices: Sequence[Sequence[int]]) -> str:
-    """:class:`str`: Returns a hash for the bets indices provided.
-
-    Parameters
-    -----------
-    bets_indices: Sequence[Sequence[:class:`int`]]
-        A sequence of a sequence of integers from 0 to 4 to represent a bet.
-    """
-    flat = itertools.chain.from_iterable(bets_indices)
-    return "".join(
-        ascii_lowercase[multiplier * 5 + adder]
-        for multiplier, adder in itertools.zip_longest(
-            iter(flat), iter(flat), fillvalue=0
-        )
-    )
 
 
 def get_bet_odds_from_bets(

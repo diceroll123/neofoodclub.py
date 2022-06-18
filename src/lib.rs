@@ -117,6 +117,35 @@ fn bet_amounts_to_amounts_hash_rust(bet_amounts: HashMap<u8, u32>) -> String {
 }
 
 #[pyfunction]
+fn bets_hash_value_rust(bets_indices: Vec<Vec<u8>>) -> String {
+    // make a vector of optional u32s
+    let mut letters = String::new();
+
+    let mut flattened: Vec<u8> = bets_indices.into_iter().flatten().collect();
+
+    while flattened.len() % 2 != 0 {
+        flattened.push(0);
+    }
+
+    for chunk in flattened.chunks(2) {
+        let multiplier = chunk[0];
+        let adder = chunk[1];
+
+        // char_index is the index of the character in the alphabet
+        // 0 = a, 1 = b, 2 = c, ..., 25 = z
+        let char_index = multiplier * 5 + adder;
+
+        // 97 is where the alphabet starts in ASCII, so char_index of 0 is "a"
+        let letter: char = (char_index + 97).into();
+
+        letters.push(letter);
+    }
+
+    letters
+}
+
+
+#[pyfunction]
 fn make_probabilities_rust(opening_odds: Vec<Vec<u32>>) -> Vec<Vec<f64>> {
     let mut std: [[f64; 5]; 5] = [[1.0, 0.0, 0.0, 0.0, 0.0]; 5];
     let mut min: [[f64; 5]; 5] = [[1.0, 0.0, 0.0, 0.0, 0.0]; 5];
@@ -351,6 +380,7 @@ fn neofoodclub(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(pirate_binary_rust, m)?)?;
     m.add_function(wrap_pyfunction!(pirates_binary_rust, m)?)?;
     m.add_function(wrap_pyfunction!(binary_to_indices_rust, m)?)?;
+    m.add_function(wrap_pyfunction!(bets_hash_value_rust, m)?)?;
     m.add_function(wrap_pyfunction!(bets_hash_to_bet_indices_rust, m)?)?;
     m.add_function(wrap_pyfunction!(bet_amounts_to_amounts_hash_rust, m)?)?;
     m.add_function(wrap_pyfunction!(make_probabilities_rust, m)?)?;

@@ -58,6 +58,16 @@ def bet_amounts_to_amounts_hash_rust(bet_amounts: Dict[int, int]) -> str:
     """
     ...
 
+def bets_hash_value_rust(bets_indices: Sequence[Sequence[int]]) -> str:
+    """:class:`str`: Returns a hash for the bets indices provided.
+
+    Parameters
+    -----------
+    bets_indices: Sequence[Sequence[:class:`int`]]
+        A sequence of a sequence of integers from 0 to 4 to represent a bet.
+    """
+    ...
+
 def make_probabilities_rust(opening_odds: Sequence[Sequence[int]]) -> List[List[float]]: ...
 
 def ib_prob_rust(ib: int, probabilities: Sequence[Sequence[float]]) -> float: ...
