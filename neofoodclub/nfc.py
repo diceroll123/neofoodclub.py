@@ -537,9 +537,7 @@ class Bets:
     def amounts_hash(self) -> str:
         """:class:`str`: Returns a NeoFoodClub-compatible encoded hash of bet amounts."""
         if np.all(self.bet_amounts > -1000):
-            return math.bet_amounts_to_amounts_hash(
-                dict(zip(range(len(self.bet_amounts)), self.bet_amounts))
-            )
+            return math.bet_amounts_to_amounts_hash(self.bet_amounts)  # type: ignore
 
         return ""
 

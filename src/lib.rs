@@ -91,11 +91,11 @@ fn bets_hash_to_bet_indices_rust(bets_hash: &str) -> Vec<Vec<u8>> {
 }
 
 #[pyfunction]
-fn bet_amounts_to_amounts_hash_rust(bet_amounts: HashMap<u8, u32>) -> String {
+fn bet_amounts_to_amounts_hash_rust(bet_amounts: Vec<u32>) -> String {
     // make a vector of optional u32s
     let mut letters = String::new();
     // loop through the bet_amounts hashmap enumerating the keys and values
-    for value in bet_amounts.values() {
+    for value in bet_amounts {
         let mut these_letters = String::new();
         let mut this_letter_value = value % BET_AMOUNT_MAX + BET_AMOUNT_MAX;
         for _ in 0..3 {
