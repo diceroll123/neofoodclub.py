@@ -276,14 +276,14 @@ class Modifier:
         self._cc_perk = val
 
     @property
-    def custom_odds(self) -> Optional[Dict[int, int]]:
-        """Optional[Dict[int, int]]: A dictionary containing a pirate ID (1-20) as the key, and
+    def custom_odds(self) -> Dict[int, int]:
+        """Dict[int, int]: A dictionary containing a pirate ID (1-20) as the key, and
         desired odds (2-13) as the value. The NeoFoodClub object will be recalculated using these odds on
         top of the current odds."""
         return self._custom_odds
 
     @custom_odds.setter
-    def custom_odds(self, val: Optional[Dict[int, int]]):
+    def custom_odds(self, val: Dict[int, int]):
         if not isinstance(val, dict):
             raise TypeError(
                 f"Expected Dict[int, int] but received {val.__class__.__name__}"
