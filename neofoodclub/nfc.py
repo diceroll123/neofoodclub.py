@@ -1044,9 +1044,12 @@ class NeoFoodClub:
 
         mask = np.in1d(bets._indices, winning_bins_indices)
         bets_odds = self._data_dict["odds"][bets._indices]
-        winnings = bets_odds * multiplier
 
-        return np.sum(np.clip(winnings[mask], 0, 1_000_000))
+        winnings = (bets_odds * multiplier)[mask]
+
+        winnings.clip(0, 1_000_000, out=winnings)
+
+        return np.sum(winnings)
 
     def make_url(
         self,
