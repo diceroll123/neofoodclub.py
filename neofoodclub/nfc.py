@@ -225,7 +225,7 @@ class Modifier:
         self._cc_perk = cc_perk
 
         # the _nfc var will only be written to by the NeoFoodClub object.
-        self._nfc = None
+        self._nfc: Optional[NeoFoodClub] = None
 
     def __repr__(self) -> str:
         return f"<Modifier value={self.value} letters={self.letters} time={self.time}>"
@@ -721,7 +721,7 @@ class NeoFoodClub:
         self._net_expected_cache = np.array([])
 
         self._modifier = modifier or Modifier()
-        self._modifier._nfc = self  # type: ignore
+        self._modifier._nfc = self
 
         if cache:
             self.reset()
@@ -736,7 +736,7 @@ class NeoFoodClub:
             for k2, p in enumerate(a):
                 # custom, user-added odds
                 if p in self._modifier.custom_odds:
-                    self._data["customOdds"][k1][k2 + 1] = self._modifier.custom_odds[p]
+                    self._data["customOdds"][k1][k2 + 1] = self._modifier.custom_odds[p]  # type: ignore
 
     def soft_reset(self) -> None:
         """Resets the custom odds used internally."""
@@ -760,7 +760,7 @@ class NeoFoodClub:
                 )
                 for change in self.changes:
                     if change.timestamp < dt:
-                        self._data["customOdds"][change.arena_index][
+                        self._data["customOdds"][change.arena_index][  # type: ignore
                             change.pirate_index
                         ] = change.new
 
@@ -794,7 +794,7 @@ class NeoFoodClub:
         # most of the binary/odds/std data sits here
         (_bins, _stds, _odds, _ers, _maxbets) = math.make_round_dicts(
             self._stds,
-            tuple(tuple(row) for row in self._data["customOdds"]),
+            tuple(tuple(row) for row in self._data["customOdds"]),  # type: ignore
         )
         # convert the dict items to shapes we'll need:
         self._data_dict["std"] = _stds
@@ -844,7 +844,7 @@ class NeoFoodClub:
 
         reset = self._modifier != val
         self._modifier = val
-        self._modifier._nfc = self  # type: ignore
+        self._modifier._nfc = self
 
         if reset:
             self.reset()
@@ -911,7 +911,7 @@ class NeoFoodClub:
 
         These values are mostly just used internally as a second layer of current_odds.
         This may or may not be identical to current_odds."""
-        return self._data["customOdds"]
+        return self._data["customOdds"]  # type: ignore
 
     @property
     def round(self) -> int:
