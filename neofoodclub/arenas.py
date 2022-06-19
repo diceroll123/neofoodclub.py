@@ -24,6 +24,7 @@ class Arena:
 
     __slots__ = (
         "nfc",
+        "_pirate_ids",
         "_pirates",
         "_id",
         "_odds",
@@ -32,6 +33,7 @@ class Arena:
     def __init__(self, *, nfc: NeoFoodClub, arena_id: int, pirate_ids: Sequence[int]):
         self.nfc = nfc
         self._id = arena_id
+        self._pirate_ids = tuple(pirate_ids)
         self._pirates = tuple(  # adding 1 to index because the original list has a length of 4, but everything else has 5
             Pirate(nfc=nfc, id=p_id, arena=arena_id, index=idx + 1)
             for idx, p_id in enumerate(pirate_ids)
@@ -56,7 +58,7 @@ class Arena:
     @property
     def ids(self) -> Tuple[int, ...]:
         """Tuple[:class:`int`]: Returns a list of the IDs of the pirates in this arena."""
-        return tuple(p.id for p in self._pirates)
+        return self._pirate_ids
 
     @property
     def odds(self) -> float:
