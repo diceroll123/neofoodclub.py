@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Generator, List, Sequence, Tuple
+from typing import TYPE_CHECKING, Generator, Iterator, List, Sequence, Tuple
 
 from . import math
 from .pirates import Pirate
@@ -30,7 +30,9 @@ class Arena:
         "_odds",
     )
 
-    def __init__(self, *, nfc: NeoFoodClub, arena_id: int, pirate_ids: Sequence[int]):
+    def __init__(
+        self, *, nfc: NeoFoodClub, arena_id: int, pirate_ids: Sequence[int]
+    ) -> None:
         self.nfc = nfc
         self._id = arena_id
         self._pirate_ids = tuple(pirate_ids)
@@ -94,10 +96,10 @@ class Arena:
     def __getitem__(self, item: int) -> Pirate:
         return self._pirates[item]
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Pirate]:
         return self._pirates.__iter__()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Arena name={self.name} odds={self._odds} pirates={self.pirates}>"
 
 
@@ -108,7 +110,7 @@ class Arenas:
 
     __slots__ = ("_arenas",)
 
-    def __init__(self, nfc: NeoFoodClub):
+    def __init__(self, nfc: NeoFoodClub) -> None:
         self._arenas = tuple(
             Arena(nfc=nfc, arena_id=idx, pirate_ids=a)
             for idx, a in enumerate(nfc._data["pirates"])
@@ -171,5 +173,5 @@ class Arenas:
     def __iter__(self) -> Generator[Arena, None, None]:
         yield from self._arenas
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Arenas {self._arenas!r}>"

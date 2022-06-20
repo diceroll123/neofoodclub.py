@@ -12,6 +12,7 @@ from typing import (
     Callable,
     Dict,
     Generator,
+    Iterator,
     List,
     Optional,
     Sequence,
@@ -90,7 +91,7 @@ class OddsChange:
         "_round_data",
     )
 
-    def __init__(self, *, index: int, data: OddsChangeDict, round_data: Dict[str, Any]):
+    def __init__(self, *, index: int, data: OddsChangeDict, round_data: Dict[str, Any]) -> None:
         self._index = index
         self._data = data  # to check against each other
         self._round_data = round_data
@@ -149,16 +150,16 @@ class OddsChange:
 
         return ARENA_NAMES[self.arena_index]
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<OddsChange arena={self.arena_index} index={self.index} pirate={self.pirate} old={self.old} new={self.new} timestamp={self.timestamp}>"
 
-    def __eq__(self, other: Any):
+    def __eq__(self, other: Any) -> bool:
         return isinstance(other, self.__class__) and self._data == other.data
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Dict[str, Any]]:
         yield from self._data.items()
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(repr(self))
 
 
@@ -218,7 +219,7 @@ class Modifier:
         cc_perk: bool = False,
         custom_odds: Optional[Dict[int, int]] = None,
         custom_time: Optional[datetime.time] = None,
-    ):
+    ) -> None:
         self.value = flags
         self._custom_odds = custom_odds or {}
         self._time = custom_time
@@ -254,7 +255,7 @@ class Modifier:
         return self._time
 
     @time.setter
-    def time(self, val: datetime.time):
+    def time(self, val: datetime.time) -> None:
         if not isinstance(val, datetime.time):
             raise TypeError(
                 f"Expected datetime.time but received {val.__class__.__name__}"
@@ -269,7 +270,7 @@ class Modifier:
         return self._cc_perk
 
     @cc_perk.setter
-    def cc_perk(self, val: bool):
+    def cc_perk(self, val: bool) -> None:
         if not isinstance(val, bool):
             raise TypeError(f"Expected bool but received {val.__class__.__name__}")
 
@@ -283,7 +284,7 @@ class Modifier:
         return self._custom_odds
 
     @custom_odds.setter
-    def custom_odds(self, val: Dict[int, int]):
+    def custom_odds(self, val: Dict[int, int]) -> None:
         if not isinstance(val, dict):
             raise TypeError(
                 f"Expected Dict[int, int] but received {val.__class__.__name__}"
@@ -333,7 +334,7 @@ class Modifier:
             if self._has_flag(1 << bit)
         )
 
-    def __eq__(self, other: Any):
+    def __eq__(self, other: Any) -> bool:
         return (
             isinstance(other, self.__class__)
             and self.value == other.value
@@ -397,7 +398,7 @@ class Odds:
         "partial_rate",
     )
 
-    def __init__(self, bets: Bets):
+    def __init__(self, bets: Bets) -> None:
         self._odds_values = bets.nfc._data_dict["odds"][bets._indices]
         self._odds = [
             Chance(**chance)
@@ -457,7 +458,7 @@ class Bets:
         nfc: NeoFoodClub,
         indices: np.ndarray,
         amounts: Optional[Sequence[Optional[int]]] = None,
-    ):
+    ) -> None:
         self.nfc = nfc
         self._indices = indices
 
@@ -504,7 +505,7 @@ class Bets:
         return np.array([-1000] * self._indices.size)
 
     @bet_amounts.setter
-    def bet_amounts(self, val: Optional[Union[Sequence[Optional[int]], np.ndarray]]):
+    def bet_amounts(self, val: Optional[Union[Sequence[Optional[int]], np.ndarray]]) -> None:
         if val is None:
             self._bet_amounts = np.array([-1000] * self._indices.size)
             return
@@ -709,7 +710,7 @@ class NeoFoodClub:
         bet_amount: Optional[int] = None,
         modifier: Optional[Modifier] = None,
         cache: bool = True,
-    ):
+    ) -> None:
         # so it's not changing old cache data around, have a deep copy (safety precaution for custom odds)
         self._data: RoundData = orjson.loads(orjson.dumps(data))
         self._bet_amount = bet_amount
@@ -822,7 +823,7 @@ class NeoFoodClub:
         return self._bet_amount
 
     @bet_amount.setter
-    def bet_amount(self, val: Optional[int]):
+    def bet_amount(self, val: Optional[int]) -> None:
         if val != self._bet_amount:
             self._bet_amount = val
             if self._data_dict:
@@ -836,7 +837,7 @@ class NeoFoodClub:
         return self._modifier
 
     @modifier.setter
-    def modifier(self, val: Optional[Modifier]):
+    def modifier(self, val: Optional[Modifier]) -> None:
         """Sets this NeoFoodClub object's modifier as a copy of the passed-in modifier."""
         val = val or Modifier()
 

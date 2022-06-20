@@ -1,6 +1,5 @@
 from typing import Dict, List, Sequence, Tuple
 
-
 def pirate_binary_rust(index: int, arena: int) -> int:
     """:class:`int`: Returns the bet-binary representation of a pirate in an arena.
 

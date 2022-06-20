@@ -63,7 +63,7 @@ class PartialPirate(PirateMixin):
         The pirates image.
     """
 
-    def __init__(self, _id: int):
+    def __init__(self, _id: int) -> None:
         self._id = _id
 
     @property
@@ -98,7 +98,7 @@ class Pirate(PirateMixin):
         "_bin",
     )
 
-    def __init__(self, *, nfc: NeoFoodClub, id: int, arena: int, index: int):
+    def __init__(self, *, nfc: NeoFoodClub, id: int, arena: int, index: int) -> None:
         self.nfc = nfc
         self._id = id
         self._arena = arena

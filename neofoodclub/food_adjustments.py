@@ -9,7 +9,7 @@ class FA(DefaultDict[int, int]):
         *,
         one: Optional[Tuple[int, ...]] = None,
         two: Optional[Tuple[int, ...]] = None
-    ):
+    ) -> DefaultDict[int, int]:
         data: Dict[int, int] = {}
 
         for fa_value, values in zip((1, 2), (one, two)):
@@ -25,7 +25,7 @@ class FA(DefaultDict[int, int]):
             *,
             one: Optional[Tuple[int, ...]] = None,
             two: Optional[Tuple[int, ...]] = None
-        ):
+        ) -> None:
             ...
 
 
