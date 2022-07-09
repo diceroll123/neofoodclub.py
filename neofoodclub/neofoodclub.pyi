@@ -1,4 +1,7 @@
-from typing import Dict, List, Sequence, Tuple
+from typing import TYPE_CHECKING, List, Sequence, Tuple
+
+if TYPE_CHECKING:
+    from neofoodclub.nfc import Chance
 
 def pirate_binary_rust(index: int, arena: int) -> int:
     """:class:`int`: Returns the bet-binary representation of a pirate in an arena.
@@ -69,8 +72,11 @@ def bets_hash_value_rust(bets_indices: Sequence[Sequence[int]]) -> str:
 
 def make_probabilities_rust(opening_odds: Sequence[Sequence[int]]) -> List[List[float]]: ...
 
-def ib_prob_rust(ib: int, probabilities: Sequence[Sequence[float]]) -> float: ...
-
-def expand_ib_object_rust(bets: Sequence[Sequence[int]], bet_odds: Sequence[int]) -> Dict[int, int]: ...
-
 def make_round_dicts_rust(stds: Tuple[Tuple[float, ...], ...], odds: Tuple[Tuple[int, ...], ...]): ...
+
+def build_chance_objects_rust(
+    bets: Sequence[Sequence[int]],
+    bet_odds: Sequence[int],
+    probabilities: Sequence[Sequence[float]],
+) -> List[Chance]:
+    ...

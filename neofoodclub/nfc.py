@@ -17,6 +17,7 @@ from typing import (
     Optional,
     Sequence,
     Tuple,
+    TypedDict,
     TypeVar,
     Union,
     overload,
@@ -350,9 +351,9 @@ class Modifier:
         return self._nfc
 
 
-@dataclass
 class Chance:
     """Represents the probabilities of a singular chance of odds.
+    This serves as a type hint for the Chance struct in our Rust code.
     This class is not to be constructed manually.
 
     Attributes
@@ -400,12 +401,9 @@ class Odds:
 
     def __init__(self, bets: Bets) -> None:
         self._odds_values = bets.nfc._data_dict["odds"][bets._indices]
-        self._odds = [
-            Chance(**chance)
-            for chance in math.get_bet_odds_from_bets(
-                bets.indices, self._odds_values, bets.nfc._stds
-            )
-        ]
+        self._odds = math.build_chance_objects(
+            bets.indices, self._odds_values, bets.nfc._stds
+        )
 
         # highest odds
         self.best = self._odds[-1]

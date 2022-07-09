@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from collections import defaultdict
 from string import ascii_lowercase, ascii_uppercase
-from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 
@@ -12,16 +11,12 @@ from .neofoodclub import (
     bets_hash_to_bet_indices_rust,
     bets_hash_value_rust,
     binary_to_indices_rust,
-    expand_ib_object_rust,
-    ib_prob_rust,
     make_probabilities_rust,
     make_round_dicts_rust,
     pirate_binary_rust,
     pirates_binary_rust,
+    build_chance_objects_rust,
 )
-
-if TYPE_CHECKING:
-    from .types import BetOdds
 
 __all__ = (
     "pirate_binary",
@@ -36,7 +31,7 @@ __all__ = (
     "bets_hash_to_bets",
     "bets_hash_value",
     "make_probabilities",
-    "get_bet_odds_from_bets",
+    "build_chance_objects",
     "make_round_dicts",
     "FULL_BETS",
     "BIT_MASKS",
@@ -60,11 +55,11 @@ pirate_binary = pirate_binary_rust
 pirates_binary = pirates_binary_rust
 binary_to_indices = binary_to_indices_rust
 make_probabilities = make_probabilities_rust
-ib_prob = ib_prob_rust
 make_round_dicts = make_round_dicts_rust
 bets_hash_value = bets_hash_value_rust
 bets_hash_to_bet_indices = bets_hash_to_bet_indices_rust
 bet_amounts_to_amounts_hash = bet_amounts_to_amounts_hash_rust
+build_chance_objects = build_chance_objects_rust
 
 
 def amounts_hash_to_bet_amounts(amounts_hash: str) -> Tuple[Optional[int], ...]:
@@ -148,53 +143,6 @@ def bets_hash_to_bets(bets_hash: str) -> Dict[int, List[int]]:
         raise InvalidData("An invalid amount of bets was provided")
 
     return dict(zip(range(1, bet_length + 1), bets))
-
-
-def get_bet_odds_from_bets(
-    bets: Sequence[Sequence[int]],
-    bet_odds: Sequence[int],
-    probabilities: Sequence[Sequence[float]],
-) -> List[BetOdds]:
-    # ib is a binary format to represent bets.
-    # It works on 20 bits (because there are 20 pirates).
-    # Each of the bits of an ib represents whether it accepts some pirate. (whether the bet can win if this pirate wins)
-    # From most significant to least significant bits, the pirates are in the usual arena-by-arena order.
-    # This binary format allows some easy operations:
-    # ib1&ib2 accepts the pirates that both ib1 and ib2 accepts. The winning combinations of ib1&ib2 is the intersection of the winning combinations of ib1 and ib2.
-    # ib1|ib2 accepts the pirates that ib1 or ib2 accepts. The winning combinations of ib1&ib2 is BIGGER or equal to the union of the winning combinations of ib1 and ib2.
-
-    # Takes a bet set in ibObj satisfying the following condition:
-    # - two different bets in the bet set will have 0 common accepted winning combinations
-    # and computes its win table.
-    def compute_win_table(ib_exp_obj: Dict[int, int]) -> List[BetOdds]:
-        win_table: Dict[int, float] = defaultdict(float)
-        for k, v in ib_exp_obj.items():
-            win_table[v] += ib_prob(k, probabilities)
-
-        sorted_e: List[BetOdds] = sorted(
-            [
-                {
-                    "value": value,
-                    "probability": probability,
-                    "cumulative": 0.0,
-                    "tail": 1.0,
-                }
-                for value, probability in win_table.items()
-            ],
-            key=lambda ee: ee["value"],
-        )
-
-        cumulative = 0.0
-        tail = 1.0
-        for item in sorted_e:
-            cumulative += item["probability"]
-            item["cumulative"] = cumulative
-            item["tail"] = tail
-            tail -= item["probability"]
-
-        return sorted_e
-
-    return compute_win_table(expand_ib_object_rust(bets, bet_odds))
 
 
 # fmt: off

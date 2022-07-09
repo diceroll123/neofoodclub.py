@@ -1,6 +1,6 @@
 use numpy::{ndarray::Array1, PyArray1, ToPyArray};
 use pyo3::prelude::*;
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
 const BET_AMOUNT_MAX: u32 = 70304;
 
@@ -17,6 +17,18 @@ const PIR_IB: [u32; 4] = [0x88888, 0x44444, 0x22222, 0x11111];
 
 // 0xFFFFF = 0b11111111111111111111 (20 '1's), will accept all pirates
 const CONVERT_PIR_IB: [u32; 5] = [0xFFFFF, 0x88888, 0x44444, 0x22222, 0x11111];
+
+#[pyclass]
+struct Chance {
+    #[pyo3(get)]
+    value: u32,
+    #[pyo3(get)]
+    probability: f64,
+    #[pyo3(get)]
+    cumulative: f64,
+    #[pyo3(get)]
+    tail: f64,
+}
 
 #[pyfunction]
 fn pirate_binary_rust(index: u8, arena: u8) -> u32 {
@@ -144,7 +156,6 @@ fn bets_hash_value_rust(bets_indices: Vec<Vec<u8>>) -> String {
     letters
 }
 
-
 #[pyfunction]
 fn make_probabilities_rust(opening_odds: Vec<Vec<u32>>) -> Vec<Vec<f64>> {
     let mut std: [[f64; 5]; 5] = [[1.0, 0.0, 0.0, 0.0, 0.0]; 5];
@@ -251,8 +262,7 @@ fn ib_doable(binary: u32) -> bool {
     true
 }
 
-#[pyfunction]
-fn ib_prob_rust(binary: u32, probabilities: [[f64; 5]; 5]) -> f64 {
+fn ib_prob(binary: u32, probabilities: [[f64; 5]; 5]) -> f64 {
     // computes the probability that the winning combination is accepted by ib
     let mut total_prob: f64 = 1.0;
     for x in 0..5 {
@@ -267,8 +277,7 @@ fn ib_prob_rust(binary: u32, probabilities: [[f64; 5]; 5]) -> f64 {
     total_prob
 }
 
-#[pyfunction]
-fn expand_ib_object_rust(bets: Vec<Vec<u8>>, bet_odds: Vec<u32>) -> HashMap<u32, u32> {
+fn expand_ib_object(bets: Vec<Vec<u8>>, bet_odds: Vec<u32>) -> HashMap<u32, u32> {
     // makes a dict of permutations of the pirates + odds
     // this is why the bet table could be very long
 
@@ -375,6 +384,37 @@ fn make_round_dicts_rust<'py>(
     )
 }
 
+#[pyfunction]
+fn build_chance_objects_rust(
+    bets: Vec<Vec<u8>>,
+    bet_odds: Vec<u32>,
+    probabilities: [[f64; 5]; 5],
+) -> Vec<Chance> {
+    let expanded = expand_ib_object(bets, bet_odds);
+
+    let mut win_table: BTreeMap<u32, f64> = BTreeMap::new();
+    for (key, value) in expanded.iter() {
+        *win_table.entry(*value).or_insert(0.0) += ib_prob(*key, probabilities);
+    }
+
+    let mut cumulative: f64 = 0.0;
+    let mut tail: f64 = 1.0;
+    let mut chances: Vec<Chance> = Vec::new();
+    for (key, value) in win_table.into_iter() {
+        cumulative += value;
+
+        chances.push(Chance {
+            value: key,
+            probability: value,
+            cumulative,
+            tail,
+        });
+
+        tail -= value;
+    }
+    chances
+}
+
 #[pymodule]
 fn neofoodclub(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(pirate_binary_rust, m)?)?;
@@ -384,8 +424,7 @@ fn neofoodclub(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(bets_hash_to_bet_indices_rust, m)?)?;
     m.add_function(wrap_pyfunction!(bet_amounts_to_amounts_hash_rust, m)?)?;
     m.add_function(wrap_pyfunction!(make_probabilities_rust, m)?)?;
-    m.add_function(wrap_pyfunction!(ib_prob_rust, m)?)?;
-    m.add_function(wrap_pyfunction!(expand_ib_object_rust, m)?)?;
     m.add_function(wrap_pyfunction!(make_round_dicts_rust, m)?)?;
+    m.add_function(wrap_pyfunction!(build_chance_objects_rust, m)?)?;
     Ok(())
 }
