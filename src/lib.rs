@@ -221,10 +221,9 @@ fn make_probabilities_rust(opening_odds: Vec<Vec<u32>>) -> Vec<Vec<f64>> {
                 break;
             }
 
-            if (std_total - rectify_value > 1.0
+            if !(std_total - rectify_value > 1.0
                 || rectify_count == 0.0
                 || max_rectify_value * rectify_count < rectify_value + 1.0 - std_total)
-                == false
             {
                 rectify_value += 1.0 - std_total;
                 rectify_value /= rectify_count;
@@ -265,10 +264,10 @@ fn ib_doable(binary: u32) -> bool {
 fn ib_prob(binary: u32, probabilities: [[f64; 5]; 5]) -> f64 {
     // computes the probability that the winning combination is accepted by ib
     let mut total_prob: f64 = 1.0;
-    for x in 0..5 {
+    for (x, bit_mask) in BIT_MASKS.iter().enumerate() {
         let mut ar_prob: f64 = 0.0;
-        for y in 0..4 {
-            if binary & BIT_MASKS[x] & PIR_IB[y] > 0 {
+        for (y, pir_ib) in PIR_IB.iter().enumerate() {
+            if binary & bit_mask & pir_ib > 0 {
                 ar_prob += probabilities[x][y + 1];
             }
         }
