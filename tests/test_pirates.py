@@ -12,6 +12,12 @@ def test_partialpirate():
 def test_pirate_fa(nfc: NeoFoodClub):
     assert nfc.arenas[0].pirates[0].fa == 3
 
+def test_pirate_fa_cached(nfc: NeoFoodClub):
+    # because it caches it the first time!
+    first_pirate = nfc.arenas[0].pirates[0]
+    assert first_pirate.fa == 3
+    assert first_pirate.fa == 3
+
 
 def test_pirate_arena_id(nfc: NeoFoodClub):
     assert nfc.arenas[0].pirates[0].arena == 0
