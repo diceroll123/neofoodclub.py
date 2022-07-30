@@ -246,6 +246,16 @@ def test_invalid_amounts_hash(nfc: NeoFoodClub):
         nfc.make_bets_from_hash("faa", amounts_hash="???")
 
 
+def test_bet_get_win_units(nfc: NeoFoodClub):
+    assert nfc.make_bets_from_hash("faa").get_win_units() == 2
+
+
+def test_bet_get_win_np(nfc: NeoFoodClub):
+    bets = nfc.make_bets_from_hash("faa")
+    bets.bet_amounts = [8000]
+    assert bets.get_win_np() == 16000
+
+
 @pytest.mark.parametrize(
     "bet_hash, bet_indices",
     [

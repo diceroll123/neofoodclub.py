@@ -95,3 +95,7 @@ def test_make_probabilities():
         )
     )
     assert len(probs) == 5
+
+
+def test_amount_hash_to_bet_amounts_below_50():
+    assert amounts_hash_to_bet_amounts("AaX") == (None,)

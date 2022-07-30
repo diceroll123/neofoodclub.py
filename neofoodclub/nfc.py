@@ -658,6 +658,19 @@ class Bets:
 
         return self.nfc.make_url(self, all_data=all_data, include_domain=include_domain)
 
+    def get_win_units(self) -> int:
+        """Returns the amount of units that won, given the provided bets."""
+
+        return self.nfc.get_win_units(self)
+
+    def get_win_np(self) -> int:
+        """Returns the amount of neopoints that won, given the provided bets.
+        If the bets object has no bet amounts, you can opt to use the NeoFoodClub object's bet amount.
+        Will return 0 otherwise.
+        """
+
+        return self.nfc.get_win_np(self)
+
     def _iterator(self) -> Generator[int, None, None]:
         int_bins = self.nfc._data_dict["bins"]
         yield from int_bins[self._indices]
