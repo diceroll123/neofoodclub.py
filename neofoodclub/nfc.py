@@ -1434,12 +1434,14 @@ class NeoFoodClub:
         if not positives:
             # nothing to do here!
             raise NoPositiveArenas
+        
+        positive_count = len(positives)
 
-        if len(positives) == 1:
+        if positive_count == 1:
             # If only one arena is positive, we place 1 bet on each of the pirates of that arena. Total bets = 4.
             best_arena = arenas.best[0]
             bets = Bets.from_binary(*(p.binary for p in best_arena.pirates), nfc=self)
-        elif len(positives) == 2:
+        elif positive_count == 2:
             # If two arenas are positive, we place 1 bet on each of the three worst pirates of the best arena and
             # 1 bet on each of the pirates of the second arena + the best pirate of the best arena. Total bets = 7
             best_arena, second_arena = arenas.best[:2]
