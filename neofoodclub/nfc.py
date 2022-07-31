@@ -657,14 +657,13 @@ class Bets:
         return self.nfc.make_url(self, all_data=all_data, include_domain=include_domain)
 
     def get_win_units(self) -> int:
-        """Returns the amount of units that won, given the provided bets."""
+        """Returns the amount of units that won from this bet set."""
 
         return self.nfc.get_win_units(self)
 
     def get_win_np(self) -> int:
-        """Returns the amount of neopoints that won, given the provided bets.
-        If the bets object has no bet amounts, you can opt to use the NeoFoodClub object's bet amount.
-        Will return 0 otherwise.
+        """Returns the amount of neopoints won from this bet set.
+        If this Bets object has no bet amounts, will return 0.
         """
 
         return self.nfc.get_win_np(self)
@@ -974,8 +973,8 @@ class NeoFoodClub:
     @property
     def winners(self) -> Tuple[int, ...]:
         """Tuple[:class:`int`]: Returns the winning pirates, if applicable.
-        A list of 5 zeroes if not applicable."""
-        return tuple(self._data.get("winners") or [0, 0, 0, 0, 0])
+        A tuple of 5 zeroes if not applicable."""
+        return tuple(self._data.get("winners") or (0, 0, 0, 0, 0))
 
     @property
     def winners_binary(self) -> int:
@@ -986,7 +985,7 @@ class NeoFoodClub:
     @property
     def winners_pirates(self) -> Tuple[Pirate, ...]:
         """Tuple[:class:`Pirate`]: Returns a list of the winning pirates, as Pirate objects, if applicable.
-        Empty list if not applicable."""
+        Empty tuple if not applicable."""
         return self.arenas.get_pirates_from_binary(self.winners_binary)
 
     @property
@@ -1030,8 +1029,7 @@ class NeoFoodClub:
     @_require_cache
     def get_win_np(self, bets: Bets, /) -> int:
         """Returns the amount of neopoints that won, given the provided bets.
-        If the bets object has no bet amounts, you can opt to use the NeoFoodClub object's bet amount.
-        Will return 0 otherwise.
+        If the bets object has no bet amounts, will return 0.
 
         Parameters
         -----------
