@@ -769,7 +769,7 @@ class NeoFoodClub:
                 )
                 for change in self.changes:
                     if change.timestamp < dt:
-                        self._data["customOdds"][change.arena_index][  # type: ignore
+                        self._data["customOdds"][change.arena_index][
                             change.pirate_index
                         ] = change.new
 
