@@ -155,7 +155,7 @@ class OddsChange:
     def __eq__(self, other: Any) -> bool:
         return isinstance(other, self.__class__) and self._data == other.data
 
-    def __iter__(self) -> Iterator[Dict[str, Any]]:
+    def __iter__(self) -> Iterator[Tuple[str, Any]]:
         yield from self._data.items()
 
     def __hash__(self) -> int:

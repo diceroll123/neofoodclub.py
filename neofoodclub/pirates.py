@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Optional, Tuple
+from typing import TYPE_CHECKING, Any, List, Optional, Tuple
 
 from . import math
 from .food_adjustments import NEGATIVE_FOOD, POSITIVE_FOOD
@@ -112,7 +112,7 @@ class Pirate(PirateMixin):
         else:
             self._std = None
             self._er = None
-        self._fa = None  # will be filled as needed in the property
+        self._fa: Optional[int] = None  # will be filled as needed in the property
 
     @property
     def id(self) -> int:
@@ -199,7 +199,7 @@ class Pirate(PirateMixin):
         return isinstance(other, self.__class__) and int(self) == int(other)
 
     def __repr__(self) -> str:
-        attrs = [
+        attrs: List[Tuple[str, Any]] = [
             ("name", self.name),
             ("arena", self.arena),
             ("index", self.index),
