@@ -9,15 +9,10 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Callable,
-    Dict,
     Generator,
     Iterator,
-    List,
-    Optional,
     Sequence,
-    Tuple,
     TypeVar,
-    Union,
     overload,
 )
 
@@ -90,7 +85,7 @@ class OddsChange:
         "_round_data",
     )
 
-    def __init__(self, *, index: int, data: OddsChangeDict, round_data: Dict[str, Any]) -> None:
+    def __init__(self, *, index: int, data: OddsChangeDict, round_data: dict[str, Any]) -> None:
         self._index = index
         self._data = data  # to check against each other
         self._round_data = round_data
@@ -155,7 +150,7 @@ class OddsChange:
     def __eq__(self, other: Any) -> bool:
         return isinstance(other, self.__class__) and self._data == other.data
 
-    def __iter__(self) -> Iterator[Tuple[str, Any]]:
+    def __iter__(self) -> Iterator[tuple[str, Any]]:
         yield from self._data.items()
 
     def __hash__(self) -> int:
@@ -216,8 +211,8 @@ class Modifier:
         flags: int = 0,
         *,
         cc_perk: bool = False,
-        custom_odds: Optional[Dict[int, int]] = None,
-        custom_time: Optional[datetime.time] = None,
+        custom_odds: dict[int, int] | None = None,
+        custom_time: datetime.time | None = None,
     ) -> None:
         self.value = flags
         self._custom_odds = custom_odds or {}
@@ -225,7 +220,7 @@ class Modifier:
         self._cc_perk = cc_perk
 
         # the _nfc var will only be written to by the NeoFoodClub object.
-        self._nfc: Optional[NeoFoodClub] = None
+        self._nfc: NeoFoodClub | None = None
 
     def __repr__(self) -> str:
         return f"<Modifier value={self.value} letters={self.letters} time={self.time}>"
@@ -249,7 +244,7 @@ class Modifier:
         return self._has_flag(self.REVERSE)
 
     @property
-    def time(self) -> Optional[datetime.time]:
+    def time(self) -> datetime.time | None:
         """Optional[:class:`datetime.time`]: Returns the custom time provided, can be None."""
         return self._time
 
@@ -276,14 +271,14 @@ class Modifier:
         self._cc_perk = val
 
     @property
-    def custom_odds(self) -> Dict[int, int]:
+    def custom_odds(self) -> dict[int, int]:
         """Dict[int, int]: A dictionary containing a pirate ID (1-20) as the key, and
         desired odds (2-13) as the value. The NeoFoodClub object will be recalculated using these odds on
         top of the current odds."""
         return self._custom_odds
 
     @custom_odds.setter
-    def custom_odds(self, val: Dict[int, int]) -> None:
+    def custom_odds(self, val: dict[int, int]) -> None:
         if not isinstance(val, dict):
             raise TypeError(
                 f"Expected Dict[int, int] but received {val.__class__.__name__}"
@@ -344,7 +339,7 @@ class Modifier:
         )
 
     @property
-    def nfc(self) -> Optional[NeoFoodClub]:
+    def nfc(self) -> NeoFoodClub | None:
         """Optional[:class:`NeoFoodClub`:] The NeoFoodClub round that this modifier is connected to. Can be None if not set yet."""
         return self._nfc
 
@@ -453,7 +448,7 @@ class Bets:
         *,
         nfc: NeoFoodClub,
         indices: np.ndarray,
-        amounts: Optional[Sequence[Optional[int]]] = None,
+        amounts: Sequence[int | None] | None = None,
     ) -> None:
         self.nfc = nfc
         self._indices = indices
@@ -501,7 +496,7 @@ class Bets:
         return np.array([-1000] * self._indices.size)
 
     @bet_amounts.setter
-    def bet_amounts(self, val: Optional[Union[Sequence[Optional[int]], np.ndarray]]) -> None:
+    def bet_amounts(self, val: Sequence[int | None] | np.ndarray | None) -> None:
         if val is None:
             self._bet_amounts = np.array([-1000] * self._indices.size)
             return
@@ -517,7 +512,7 @@ class Bets:
         self._bet_amounts = utils.fix_bet_amounts(amts)
 
     @property
-    def indices(self) -> Tuple[Tuple[int, ...], ...]:
+    def indices(self) -> tuple[tuple[int, ...], ...]:
         """Tuple[Tuple[:class:`int`, ...], ...]: Returns a nested array of the indices of the pirates in their arenas
         making up these bets."""
         return tuple(
@@ -719,24 +714,24 @@ class NeoFoodClub:
 
     def __init__(
         self,
-        data: Dict[str, Any],
+        data: dict[str, Any],
         /,
         *,
-        bet_amount: Optional[int] = None,
-        modifier: Optional[Modifier] = None,
+        bet_amount: int | None = None,
+        modifier: Modifier | None = None,
         cache: bool = True,
     ) -> None:
         # so it's not changing old cache data around, have a deep copy (safety precaution for custom odds)
         self._data: RoundData = orjson.loads(orjson.dumps(data))
         self._bet_amount = bet_amount
         self._data_dict = {}
-        self._stds: Tuple[Tuple[float, ...], ...] = tuple()
+        self._stds: tuple[tuple[float, ...], ...] = tuple()
         self._maxbet_odds_cache = np.array([])
         self._net_expected_cache = np.array([])
 
         self._modifier = modifier or Modifier()
         self._modifier._nfc = self
-        self._arenas: Optional[Arenas] = None
+        self._arenas: Arenas | None = None
 
         if cache:
             self.reset()
@@ -835,12 +830,12 @@ class NeoFoodClub:
         return self._arenas
 
     @property
-    def bet_amount(self) -> Optional[int]:
+    def bet_amount(self) -> int | None:
         """Optional[:class:`int`]: An integer representing a bet amount to be used for generating bets."""
         return self._bet_amount
 
     @bet_amount.setter
-    def bet_amount(self, val: Optional[int]) -> None:
+    def bet_amount(self, val: int | None) -> None:
         if val != self._bet_amount:
             self._bet_amount = val
             if self._data_dict:
@@ -854,7 +849,7 @@ class NeoFoodClub:
         return self._modifier
 
     @modifier.setter
-    def modifier(self, val: Optional[Modifier]) -> None:
+    def modifier(self, val: Modifier | None) -> None:
         """Sets this NeoFoodClub object's modifier as a copy of the passed-in modifier."""
         val = val or Modifier()
 
@@ -881,7 +876,7 @@ class NeoFoodClub:
 
         return False
 
-    def with_modifier(self, modifier: Optional[Modifier] = None, /) -> Self:
+    def with_modifier(self, modifier: Modifier | None = None, /) -> Self:
         """Applies the supplied modifier to the NeoFoodClub object.
 
         Parameters
@@ -892,7 +887,7 @@ class NeoFoodClub:
         self.modifier = modifier
         return self
 
-    def to_dict(self, *, keep_custom: bool = False) -> Dict[str, Any]:
+    def to_dict(self, *, keep_custom: bool = False) -> dict[str, Any]:
         """:class:`Dict[str, Any]`: Returns the data used to make this NeoFoodClub object.
 
         Parameters
@@ -907,22 +902,22 @@ class NeoFoodClub:
         return data
 
     @property
-    def pirates(self) -> List[List[int]]:
+    def pirates(self) -> list[list[int]]:
         """List[List[:class:`int`]]: Returns a nested list of the pirate IDs per-arena."""
         return self._data["pirates"]
 
     @property
-    def opening_odds(self) -> List[List[int]]:
+    def opening_odds(self) -> list[list[int]]:
         """List[List[:class:`int`]]: Returns a nested list of the opening odds per-arena."""
         return self._data["openingOdds"]
 
     @property
-    def current_odds(self) -> List[List[int]]:
+    def current_odds(self) -> list[list[int]]:
         """List[List[:class:`int`]]: Returns a nested list of the current odds per-arena."""
         return self._data["currentOdds"]
 
     @property
-    def custom_odds(self) -> List[List[int]]:
+    def custom_odds(self) -> list[list[int]]:
         """List[List[:class:`int`]]: Returns a nested list of the custom odds per-arena.
 
         These values are mostly just used internally as a second layer of current_odds.
@@ -935,20 +930,20 @@ class NeoFoodClub:
         return int(self._data["round"])
 
     @property
-    def start(self) -> Optional[datetime.datetime]:
+    def start(self) -> datetime.datetime | None:
         """Optional[datetime.datetime]: When the round started in UTC, if applicable."""
         if start := self._data.get("start"):
             return dateutil.parser.parse(start).astimezone(UTC)
         return None
 
     @property
-    def timestamp(self) -> Optional[datetime.datetime]:
+    def timestamp(self) -> datetime.datetime | None:
         """Optional[datetime.datetime]: When the round data was last updated in UTC, if applicable."""
         if timestamp := self._data.get("timestamp"):
             return dateutil.parser.parse(timestamp).astimezone(UTC)
         return None
 
-    def _get_round_time(self, t: datetime.time) -> Optional[datetime.datetime]:
+    def _get_round_time(self, t: datetime.time) -> datetime.datetime | None:
         if self.start is None or self.timestamp is None:
             return None
 
@@ -980,7 +975,7 @@ class NeoFoodClub:
         return bool(self.winners[0])
 
     @property
-    def winners(self) -> Tuple[int, ...]:
+    def winners(self) -> tuple[int, ...]:
         """Tuple[:class:`int`]: Returns the winning pirates, if applicable.
         A tuple of 5 zeroes if not applicable."""
         return tuple(self._data.get("winners") or (0, 0, 0, 0, 0))
@@ -992,19 +987,19 @@ class NeoFoodClub:
         return math.pirates_binary(tuple(self.winners))
 
     @property
-    def winners_pirates(self) -> Tuple[Pirate, ...]:
+    def winners_pirates(self) -> tuple[Pirate, ...]:
         """Tuple[:class:`Pirate`]: Returns a list of the winning pirates, as Pirate objects, if applicable.
         Empty tuple if not applicable."""
         return self.arenas.get_pirates_from_binary(self.winners_binary)
 
     @property
-    def foods(self) -> Optional[List[List[int]]]:
+    def foods(self) -> list[list[int]] | None:
         """Optional[List[List[:class:`int`]]]: Returns a nested list of each arena's foods for this round.
         Can be None."""
         return self._data.get("foods")
 
     @property
-    def changes(self) -> List[OddsChange]:
+    def changes(self) -> list[OddsChange]:
         """List[:class:`OddsChange`]: Returns a list of changes for this round."""
         copied_data = self.to_dict()
         changed = [
@@ -1068,7 +1063,7 @@ class NeoFoodClub:
 
     def make_url(
         self,
-        bets: Optional[Bets] = None,
+        bets: Bets | None = None,
         /,
         *,
         all_data: bool = False,
@@ -1105,7 +1100,7 @@ class NeoFoodClub:
         url += f"/#round={self.round}"
 
         if all_data:
-            params: List[Tuple[str, str]] = [
+            params: list[tuple[str, str]] = [
                 ("pirates", encode(self.pirates)),
                 ("openingOdds", encode(self.opening_odds)),
                 ("currentOdds", encode(self.current_odds)),
@@ -1138,8 +1133,8 @@ class NeoFoodClub:
         url: str,
         /,
         *,
-        bet_amount: Optional[int] = None,
-        modifier: Optional[Modifier] = None,
+        bet_amount: int | None = None,
+        modifier: Modifier | None = None,
         cache: bool = True,
     ) -> NeoFoodClub:
         """:class:`NeoFoodClub`: Create a NeoFoodClub object using just a URL.
@@ -1324,7 +1319,7 @@ class NeoFoodClub:
 
     @_require_cache
     def _gambit_indices(
-        self, *, five_bet: Optional[int] = None, random: bool = False
+        self, *, five_bet: int | None = None, random: bool = False
     ) -> np.ndarray:
         if five_bet is not None:
             bins = self._data_dict["bins"]
@@ -1353,7 +1348,7 @@ class NeoFoodClub:
         return self._gambit_indices(five_bet=pirate_bin)
 
     @overload
-    def make_gambit_bets(self, *, five_bet: Optional[int] = None) -> Bets:
+    def make_gambit_bets(self, *, five_bet: int | None = None) -> Bets:
         ...
 
     @overload
@@ -1362,7 +1357,7 @@ class NeoFoodClub:
 
     @_require_cache
     def make_gambit_bets(
-        self, *, five_bet: Optional[int] = None, random: bool = False
+        self, *, five_bet: int | None = None, random: bool = False
     ) -> Bets:
         """:class:`Bets`: Creates a Bets object that consists of the top-unit permutations
         of a single full-arena bet."""
@@ -1497,7 +1492,7 @@ class NeoFoodClub:
 
     @overload
     def make_bets_from_indices(
-        self, indices: Sequence[Sequence[int]], /, *, amounts_hash: Optional[str]
+        self, indices: Sequence[Sequence[int]], /, *, amounts_hash: str | None
     ) -> Bets:
         ...
 
@@ -1519,9 +1514,9 @@ class NeoFoodClub:
         indices: Sequence[Sequence[int]],
         /,
         *,
-        amounts_hash: Optional[str] = None,
-        amounts: Optional[Sequence[int]] = None,
-        amount: Optional[int] = None,
+        amounts_hash: str | None = None,
+        amounts: Sequence[int] | None = None,
+        amount: int | None = None,
     ) -> Bets:
         """:class:`Bets`: Creates a Bets object made up of arena indices.
 
@@ -1548,7 +1543,7 @@ class NeoFoodClub:
 
     @overload
     def make_bets_from_hash(
-        self, bets_hash: str, /, *, amounts_hash: Optional[str]
+        self, bets_hash: str, /, *, amounts_hash: str | None
     ) -> Bets:
         ...
 
@@ -1566,9 +1561,9 @@ class NeoFoodClub:
         bets_hash: str,
         /,
         *,
-        amounts_hash: Optional[str] = None,
-        amounts: Optional[Sequence[int]] = None,
-        amount: Optional[int] = None,
+        amounts_hash: str | None = None,
+        amounts: Sequence[int] | None = None,
+        amount: int | None = None,
     ) -> Bets:
         """:class:`Bets`: Creates a Bets object by decoding from bets_hash (and optionally an amounts_hash).
 
@@ -1600,7 +1595,7 @@ class NeoFoodClub:
 
     @overload
     def make_bets_from_binaries(
-        self, *binaries: int, amounts_hash: Optional[str]
+        self, *binaries: int, amounts_hash: str | None
     ) -> Bets:
         ...
 
@@ -1616,9 +1611,9 @@ class NeoFoodClub:
     def make_bets_from_binaries(
         self,
         *binaries: int,
-        amounts_hash: Optional[str] = None,
-        amounts: Optional[Sequence[int]] = None,
-        amount: Optional[int] = None,
+        amounts_hash: str | None = None,
+        amounts: Sequence[int] | None = None,
+        amount: int | None = None,
     ) -> Bets:
         """:class:`Bets`: Creates a Bets object made up of bet-compatible binary numbers.
 

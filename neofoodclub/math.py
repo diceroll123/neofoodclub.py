@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from string import ascii_lowercase, ascii_uppercase
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Sequence
 
 import numpy as np
 
@@ -44,11 +44,11 @@ BET_AMOUNT_MAX = 70304
 # given the current bet (and bet amount) encoding specification
 
 # each arena, as if they were full. this is impossible to actually do.
-BIT_MASKS: Tuple[int, ...] = (0xF0000, 0xF000, 0xF00, 0xF0, 0xF)
+BIT_MASKS: tuple[int, ...] = (0xF0000, 0xF000, 0xF00, 0xF0, 0xF)
 
 # represents each arena with the same pirate index filled.
 # 0x88888 = (1, 1, 1, 1, 1), which is the first pirate in each arena, and so on.
-PIR_IB: Tuple[int, ...] = (0x88888, 0x44444, 0x22222, 0x11111)
+PIR_IB: tuple[int, ...] = (0x88888, 0x44444, 0x22222, 0x11111)
 
 # JSYK! The type hints for these live in ./neofoodclub.pyi
 pirate_binary = pirate_binary_rust
@@ -62,7 +62,7 @@ bet_amounts_to_amounts_hash = bet_amounts_to_amounts_hash_rust
 build_chance_objects = build_chance_objects_rust
 
 
-def amounts_hash_to_bet_amounts(amounts_hash: str) -> Tuple[Optional[int], ...]:
+def amounts_hash_to_bet_amounts(amounts_hash: str) -> tuple[int | None, ...]:
     """Tuple[Optional[:class:`int`], ...]: Returns a tuple of bet amounts from the provided amounts hash.
 
     Parameters
@@ -71,7 +71,7 @@ def amounts_hash_to_bet_amounts(amounts_hash: str) -> Tuple[Optional[int], ...]:
         The hash of bet amounts.
     """
 
-    nums: List[Optional[int]] = []
+    nums: list[int | None] = []
     chunked = [amounts_hash[i : i + 3] for i in range(0, len(amounts_hash), 3)]
 
     for p in chunked:
@@ -89,7 +89,7 @@ def amounts_hash_to_bet_amounts(amounts_hash: str) -> Tuple[Optional[int], ...]:
     return tuple(nums)
 
 
-def bets_hash_to_bet_binaries(bets_hash: str) -> Tuple[int, ...]:
+def bets_hash_to_bet_binaries(bets_hash: str) -> tuple[int, ...]:
     """Tuple[:class:`int`, ...]: Returns the bet-binary representations of the bets hash provided.
 
     Parameters
@@ -104,7 +104,7 @@ def bets_hash_to_bet_binaries(bets_hash: str) -> Tuple[int, ...]:
 
 def bets_indices_to_bet_binaries(
     bets_indices: Sequence[Sequence[int]],
-) -> Tuple[int, ...]:
+) -> tuple[int, ...]:
     """Tuple[:class:`int`, ...]: Returns the bet-binary representations of the bets indices provided.
 
     Parameters
@@ -126,7 +126,7 @@ def bets_hash_to_bets_count(bets_hash: str) -> int:
     return len(bets_hash_to_bet_indices(bets_hash))
 
 
-def bets_hash_to_bets(bets_hash: str) -> Dict[int, List[int]]:
+def bets_hash_to_bets(bets_hash: str) -> dict[int, list[int]]:
     """Dict[:class:`int`, List[:class:`int`]]: Returns a dict of bets where keys are the index and values
     are bet indicies.
 

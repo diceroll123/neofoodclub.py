@@ -1,4 +1,6 @@
-from typing import TYPE_CHECKING, List, Sequence, Tuple
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Sequence
 
 if TYPE_CHECKING:
     from neofoodclub.nfc import Chance
@@ -29,7 +31,7 @@ def pirates_binary_rust(bets_indices: Sequence[int]) -> int:
     """
     ...
 
-def binary_to_indices_rust(bet_binary: int) -> Tuple[int, ...]:
+def binary_to_indices_rust(bet_binary: int) -> tuple[int, ...]:
     """Tuple[int, ...]: Returns the bet indices of a bet-binary value.
     Parameters
     -----------
@@ -38,7 +40,7 @@ def binary_to_indices_rust(bet_binary: int) -> Tuple[int, ...]:
     """
     ...
 
-def bets_hash_to_bet_indices_rust(bets_hash: str) -> List[List[int]]:
+def bets_hash_to_bet_indices_rust(bets_hash: str) -> list[list[int]]:
     """List[List[:class:`int`]]: Returns a list of lists of bet indices from the provided bets hash.
 
     Parameters
@@ -70,13 +72,12 @@ def bets_hash_value_rust(bets_indices: Sequence[Sequence[int]]) -> str:
     """
     ...
 
-def make_probabilities_rust(opening_odds: Sequence[Sequence[int]]) -> List[List[float]]: ...
+def make_probabilities_rust(opening_odds: Sequence[Sequence[int]]) -> list[list[float]]: ...
 
-def make_round_dicts_rust(stds: Tuple[Tuple[float, ...], ...], odds: Tuple[Tuple[int, ...], ...]): ...
+def make_round_dicts_rust(stds: Sequence[Sequence[float]], odds: tuple[tuple[int, ...], ...]): ...
 
 def build_chance_objects_rust(
     bets: Sequence[Sequence[int]],
     bet_odds: Sequence[int],
     probabilities: Sequence[Sequence[float]],
-) -> List[Chance]:
-    ...
+) -> list[Chance]: ...

@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from collections import defaultdict
-from typing import TYPE_CHECKING, DefaultDict, Dict, Optional, Tuple
+from typing import TYPE_CHECKING, DefaultDict
 
 
 # this is just a convoluted way of pre-allocating food adjustment values
@@ -7,10 +9,10 @@ class FA(DefaultDict[int, int]):
     def __new__(
         cls,
         *,
-        one: Optional[Tuple[int, ...]] = None,
-        two: Optional[Tuple[int, ...]] = None
+        one: tuple[int, ...] | None = None,
+        two: tuple[int, ...] | None = None,
     ) -> DefaultDict[int, int]:
-        data: Dict[int, int] = {}
+        data: dict[int, int] = {}
 
         for fa_value, values in zip((1, 2), (one, two)):
             for food_id in values or ():
@@ -23,14 +25,14 @@ class FA(DefaultDict[int, int]):
         def __init__(
             self,
             *,
-            one: Optional[Tuple[int, ...]] = None,
-            two: Optional[Tuple[int, ...]] = None
+            one: tuple[int, ...] | None = None,
+            two: tuple[int, ...] | None = None,
         ) -> None:
             ...
 
 
 # the keys are the pirate IDs
-POSITIVE_FOOD: Dict[int, Dict[int, int]] = {
+POSITIVE_FOOD: dict[int, dict[int, int]] = {
     1: FA(one=(4, 6, 7, 8, 10, 25), two=(1, 12, 33)),
     2: FA(one=(1, 4, 5, 6, 7, 8, 10, 12, 13, 33, 35, 36)),
     3: FA(one=(14, 15, 16, 17, 18, 19, 20, 21, 22, 28, 32, 34, 37, 40)),
@@ -53,7 +55,7 @@ POSITIVE_FOOD: Dict[int, Dict[int, int]] = {
     20: FA(one=(2, 18, 26, 27, 30, 34)),
 }
 
-NEGATIVE_FOOD: Dict[int, Dict[int, int]] = {
+NEGATIVE_FOOD: dict[int, dict[int, int]] = {
     1: FA(one=(14, 15, 16, 28, 32)),
     2: FA(one=(3, 11, 17, 25, 28, 39, 40)),
     3: FA(one=(11, 19, 23, 24, 29)),

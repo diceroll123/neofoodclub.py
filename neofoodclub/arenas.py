@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Generator, Iterator, List, Sequence, Tuple
+from typing import TYPE_CHECKING, Generator, Iterator, Sequence
 
 from . import math
 from .pirates import Pirate
@@ -53,12 +53,12 @@ class Arena:
         return ARENA_NAMES[self._id]
 
     @property
-    def best(self) -> List[Pirate]:
+    def best(self) -> list[Pirate]:
         """List[:class:`Pirate`]: Returns a list of the pirates in this arena sorted from least to greatest odds."""
         return sorted(self._pirates, key=lambda a: a._odds)
 
     @property
-    def ids(self) -> Tuple[int, ...]:
+    def ids(self) -> tuple[int, ...]:
         """Tuple[:class:`int`]: Returns a list of the IDs of the pirates in this arena."""
         return self._pirate_ids
 
@@ -74,7 +74,7 @@ class Arena:
         return 1 / self._odds - 1
 
     @property
-    def pirates(self) -> Tuple[Pirate, ...]:
+    def pirates(self) -> tuple[Pirate, ...]:
         """Tuple[:class:`Pirate`]: Returns a tuple of the pirates in this arena."""
         return self._pirates
 
@@ -89,7 +89,7 @@ class Arena:
         return not self.positive
 
     @property
-    def foods(self) -> Tuple[int, ...]:
+    def foods(self) -> tuple[int, ...]:
         """Tuple[:class:`int`]: Returns a list of the IDs of the foods in this arena, where applicable."""
         return tuple(foods[self._id]) if (foods := self.nfc.foods) else tuple()
 
@@ -122,19 +122,19 @@ class Arenas:
             if p.id == pirate_id:
                 return p
 
-    def get_pirates_by_id(self, *pirate_ids: int) -> Tuple[Pirate, ...]:
+    def get_pirates_by_id(self, *pirate_ids: int) -> tuple[Pirate, ...]:
         """Tuple[:class:`Pirate`]: Returns a list of pirates where their IDs match IDs in pirate_ids."""
         return tuple(p for p in self.all_pirates if p.id in pirate_ids)
 
     @property
-    def all_pirates(self) -> Tuple[Pirate, ...]:
+    def all_pirates(self) -> tuple[Pirate, ...]:
         """Tuple[:class:`Pirate`]: Returns a flat list of all pirates in arena-order."""
-        pirates: Tuple[Pirate, ...] = tuple()
+        pirates: tuple[Pirate, ...] = tuple()
         for a in self._arenas:
             pirates += a.pirates
         return pirates
 
-    def get_pirates_from_binary(self, binary: int) -> Tuple[Pirate, ...]:
+    def get_pirates_from_binary(self, binary: int) -> tuple[Pirate, ...]:
         """Tuple[:class:`Pirate`]: Return a list of pirates based on their bet-binary representation.
 
         Note: This will only provide the left-most filled pirate per-arena."""
@@ -145,22 +145,22 @@ class Arenas:
         )
 
     @property
-    def pirates(self) -> Tuple[Tuple[Pirate, ...], ...]:
+    def pirates(self) -> tuple[tuple[Pirate, ...], ...]:
         """Tuple[Tuple[:class:`Pirate`]]: Returns a nested tuple of all pirates in arena-order."""
         return tuple(arena.pirates for arena in self._arenas)
 
     @property
-    def best(self) -> List[Arena]:
+    def best(self) -> list[Arena]:
         """List[:class:`Arena`]: Returns a list of the arenas sorted from least to greatest odds."""
         return sorted(self._arenas, key=lambda a: a._odds)
 
     @property
-    def pirate_ids(self) -> Tuple[Tuple[int, ...], ...]:
+    def pirate_ids(self) -> tuple[tuple[int, ...], ...]:
         """Tuple[Tuple[:class:`int`]]: Returns a nested tuple of all pirate IDs in arena-order."""
         return tuple(arena.ids for arena in self._arenas)
 
     @property
-    def positives(self) -> List[Arena]:
+    def positives(self) -> list[Arena]:
         """List[:class:`Arena`]: Returns a list of positive arenas sorted from least to greatest odds."""
         return sorted((a for a in self._arenas if a.positive), key=lambda _a: _a._odds)
 

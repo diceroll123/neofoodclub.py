@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, List, Optional, Tuple
+from typing import TYPE_CHECKING, Any
 
 from . import math
 from .food_adjustments import NEGATIVE_FOOD, POSITIVE_FOOD
@@ -112,7 +112,7 @@ class Pirate(PirateMixin):
         else:
             self._std = None
             self._er = None
-        self._fa: Optional[int] = None  # will be filled as needed in the property
+        self._fa: int | None = None  # will be filled as needed in the property
 
     @property
     def id(self) -> int:
@@ -130,7 +130,7 @@ class Pirate(PirateMixin):
         return self._index
 
     @property
-    def std(self) -> Optional[float]:
+    def std(self) -> float | None:
         """Optional[:class:`float`]: The pirate's std probability. If this is None, the NeoFoodClub object has not been cached yet."""
         return self._std
 
@@ -140,12 +140,12 @@ class Pirate(PirateMixin):
         return self._odds
 
     @property
-    def er(self) -> Optional[float]:
+    def er(self) -> float | None:
         """Optional[:class:`float`]: The pirate's expected ratio. This is equal to std * odds. If this is None, the NeoFoodClub object has not been cached yet."""
         return self._er
 
     @property
-    def fa(self) -> Optional[int]:
+    def fa(self) -> int | None:
         """Optional[:class:`int`]: The pirate's food adjustment. Can be None if no foods are found."""
         if self._fa is not None:
             return self._fa
@@ -170,7 +170,7 @@ class Pirate(PirateMixin):
         return self._bin
 
     @property
-    def positive_foods(self) -> Tuple[int, ...]:
+    def positive_foods(self) -> tuple[int, ...]:
         """Tuple[:class:`int`]: Returns a tuple of the positive Food IDs for this pirate's arena that affect this pirate, where applicable."""
         if foods := self.nfc.foods:
             return tuple(
@@ -179,7 +179,7 @@ class Pirate(PirateMixin):
         return tuple()
 
     @property
-    def negative_foods(self) -> Tuple[int, ...]:
+    def negative_foods(self) -> tuple[int, ...]:
         """Tuple[:class:`int`]: Returns a tuple of the negative Food IDs for this pirate's arena that affect this pirate, where applicable."""
         if foods := self.nfc.foods:
             return tuple(
@@ -199,7 +199,7 @@ class Pirate(PirateMixin):
         return isinstance(other, self.__class__) and int(self) == int(other)
 
     def __repr__(self) -> str:
-        attrs: List[Tuple[str, Any]] = [
+        attrs: list[tuple[str, Any]] = [
             ("name", self.name),
             ("arena", self.arena),
             ("index", self.index),
