@@ -7,6 +7,10 @@ __version__ = "0.0.1"
 from . import math as math
 from . import utils as utils
 from .arenas import *
+from .bets import *
 from .errors import *
+from .modifier import *
 from .nfc import *
+from .odds import *
+from .odds_change import *
 from .pirates import *

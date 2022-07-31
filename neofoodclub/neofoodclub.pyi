@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Sequence
 
 if TYPE_CHECKING:
-    from neofoodclub.nfc import Chance
+    from neofoodclub.chance import Chance
 
 def pirate_binary_rust(index: int, arena: int) -> int:
     """:class:`int`: Returns the bet-binary representation of a pirate in an arena.
@@ -72,10 +72,12 @@ def bets_hash_value_rust(bets_indices: Sequence[Sequence[int]]) -> str:
     """
     ...
 
-def make_probabilities_rust(opening_odds: Sequence[Sequence[int]]) -> list[list[float]]: ...
-
-def make_round_dicts_rust(stds: Sequence[Sequence[float]], odds: tuple[tuple[int, ...], ...]): ...
-
+def make_probabilities_rust(
+    opening_odds: Sequence[Sequence[int]],
+) -> list[list[float]]: ...
+def make_round_dicts_rust(
+    stds: Sequence[Sequence[float]], odds: tuple[tuple[int, ...], ...]
+): ...
 def build_chance_objects_rust(
     bets: Sequence[Sequence[int]],
     bet_odds: Sequence[int],

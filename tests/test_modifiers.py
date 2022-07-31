@@ -1,7 +1,8 @@
 import datetime
 
 import pytest
-from neofoodclub.nfc import Modifier, NeoFoodClub
+from neofoodclub.modifier import Modifier
+from neofoodclub.nfc import NeoFoodClub
 
 
 def test_empty_modifier():

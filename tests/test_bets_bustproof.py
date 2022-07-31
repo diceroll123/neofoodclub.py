@@ -1,8 +1,10 @@
 import copy
 
 import pytest
+from neofoodclub.bets import Bets
 from neofoodclub.errors import NoPositiveArenas
-from neofoodclub.nfc import Bets, Modifier, NeoFoodClub
+from neofoodclub.modifier import Modifier
+from neofoodclub.nfc import NeoFoodClub
 
 
 def test_bustproof_generator(nfc: NeoFoodClub):

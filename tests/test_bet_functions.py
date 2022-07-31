@@ -2,8 +2,10 @@ from typing import Sequence, Tuple
 
 import pytest
 from neofoodclub import math
+from neofoodclub.bets import Bets
 from neofoodclub.errors import InvalidAmountHash, InvalidBetHash, InvalidData
-from neofoodclub.nfc import Bets, Modifier, NeoFoodClub
+from neofoodclub.modifier import Modifier
+from neofoodclub.nfc import NeoFoodClub
 
 
 def test_odds_iter(nfc_with_bet_amount: NeoFoodClub):
