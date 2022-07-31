@@ -5,7 +5,6 @@ import datetime
 import functools
 import re
 import urllib.parse
-from dataclasses import dataclass
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -17,7 +16,6 @@ from typing import (
     Optional,
     Sequence,
     Tuple,
-    TypedDict,
     TypeVar,
     Union,
     overload,
