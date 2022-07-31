@@ -558,6 +558,12 @@ class Bets:
 
     @classmethod
     def from_binary(cls, *bins: int, nfc: NeoFoodClub) -> Bets:
+        """:class:`Bets`: Returns a Bets object from a binary representation of bets.
+
+        Raises
+        -------
+        ~neofoodclub.InvalidData
+            Invalid binaries were passed."""
         np_bins = np.array(bins)
         # duplicate bins are removed here
         _, idx = np.unique(np_bins, return_index=True)
@@ -1146,6 +1152,11 @@ class NeoFoodClub:
             An integer representing a bet amounts to be used for generating bets.
         modifier: Optional[:class:`Modifier`]
             The desired modifier for generating bets.
+
+        Raises
+        -------
+        ~neofoodclub.InvalidData
+            The URL provided is invalid.
         """
         neo_fc = NEO_FC_REGEX.search(url)
         if neo_fc is None:
@@ -1379,7 +1390,12 @@ class NeoFoodClub:
         """:class:`Bets`: Creates a Bets object that consists of the highest Expected Ratio -- or Net Expected -- bets
         that include between 1 and 3 selected pirates.
 
-        There is a hard limit on 3 because any more is impossible."""
+        There is a hard limit on 3 because any more is impossible.
+
+        Raises
+        -------
+        ~neofoodclub.InvalidData
+            The amount of selected pirates is not between 1 and 3."""
         amount_of_pirates = sum(1 for mask in math.BIT_MASKS if pirate_binary & mask)
 
         if amount_of_pirates == 0:
@@ -1507,7 +1523,12 @@ class NeoFoodClub:
         amounts: Optional[Sequence[int]] = None,
         amount: Optional[int] = None,
     ) -> Bets:
-        """:class:`Bets`: Creates a Bets object made up of arena indices."""
+        """:class:`Bets`: Creates a Bets object made up of arena indices.
+
+        Raises
+        -------
+        ~neofoodclub.InvalidAmountHash
+            The amount hash contains invalid characters."""
 
         bets = Bets.from_binary(*math.bets_indices_to_bet_binaries(indices), nfc=self)
         if amounts_hash is not None and amounts_hash != "":
@@ -1549,7 +1570,14 @@ class NeoFoodClub:
         amounts: Optional[Sequence[int]] = None,
         amount: Optional[int] = None,
     ) -> Bets:
-        """:class:`Bets`: Creates a Bets object by decoding from bets_hash (and optionally an amounts_hash)."""
+        """:class:`Bets`: Creates a Bets object by decoding from bets_hash (and optionally an amounts_hash).
+
+        Raises
+        -------
+        ~neofoodclub.InvalidBetHash
+            The bet hash contains invalid characters.
+        ~neofoodclub.InvalidAmountHash
+            The amount hash contains invalid characters."""
 
         if not BET_HASH_REGEX.fullmatch(bets_hash):
             raise InvalidBetHash
@@ -1592,7 +1620,12 @@ class NeoFoodClub:
         amounts: Optional[Sequence[int]] = None,
         amount: Optional[int] = None,
     ) -> Bets:
-        """:class:`Bets`: Creates a Bets object made up of bet-compatible binary numbers."""
+        """:class:`Bets`: Creates a Bets object made up of bet-compatible binary numbers.
+
+        Raises
+        -------
+        ~neofoodclub.InvalidAmountHash
+            The amount hash contains invalid characters."""
 
         bets = Bets.from_binary(*binaries, nfc=self)
         if amounts_hash is not None and amounts_hash != "":

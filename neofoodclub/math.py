@@ -134,6 +134,11 @@ def bets_hash_to_bets(bets_hash: str) -> Dict[int, List[int]]:
     -----------
     bets_hash: :class:`str`
         The hash of bet amounts.
+
+    Raises
+    -------
+    ~neofoodclub.InvalidData
+        The amount of bets provided is invalid.
     """
     bets = bets_hash_to_bet_indices(bets_hash)
 
