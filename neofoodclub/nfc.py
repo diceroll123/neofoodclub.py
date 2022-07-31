@@ -708,6 +708,7 @@ class NeoFoodClub:
         "_data_dict",
         "_maxbet_odds_cache",
         "_net_expected_cache",
+        "_arenas",
     )
 
     def __init__(
@@ -729,6 +730,7 @@ class NeoFoodClub:
 
         self._modifier = modifier or Modifier()
         self._modifier._nfc = self
+        self._arenas: Optional[Arenas] = None
 
         if cache:
             self.reset()
@@ -814,16 +816,17 @@ class NeoFoodClub:
 
     def get_arena(self, arena_id: int, /) -> Arena:
         """:class:Arena: Returns the desired Arena object."""
-
-        return Arena(
-            nfc=self, arena_id=arena_id, pirate_ids=self._data["pirates"][arena_id]
-        )
+        return self.arenas[arena_id]
 
     @property
     def arenas(self) -> Arenas:
         """:class:`Arenas`: Returns the Arenas object for this round."""
 
-        return Arenas(self)
+        if self._arenas:
+            return self._arenas
+
+        self._arenas = Arenas(self)
+        return self._arenas
 
     @property
     def bet_amount(self) -> Optional[int]:
