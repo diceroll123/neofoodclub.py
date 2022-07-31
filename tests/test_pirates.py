@@ -12,6 +12,7 @@ def test_partialpirate():
 def test_pirate_fa(nfc: NeoFoodClub):
     assert nfc.arenas[0].pirates[0].fa == 3
 
+
 def test_pirate_fa_cached(nfc: NeoFoodClub):
     # because it caches it the first time!
     first_pirate = nfc.arenas[0].pirates[0]
@@ -68,3 +69,11 @@ def test_pirate_won(nfc: NeoFoodClub):
     assert puffo.won == False
     assert fairfax.won == False
     assert crossblades.won == False
+
+
+def test_pirate_equality(nfc: NeoFoodClub):
+    shipwreck = nfc.arenas[0]
+    sproggie = shipwreck.pirates[0]
+    puffo = shipwreck.pirates[1]
+
+    assert sproggie != puffo
