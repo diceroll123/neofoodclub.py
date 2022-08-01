@@ -113,7 +113,7 @@ fn bet_amounts_to_amounts_hash_rust(bet_amounts: Vec<u32>) -> String {
             let letter_index: u8 = (this_letter_value % 52).try_into().unwrap();
             // a..z = 97..122
             // A..Z = 65..90
-            let letter: char = if letter_index <= 26 {
+            let letter: char = if letter_index < 26 {
                 (letter_index + 97).into()
             } else {
                 (letter_index + 65 - 26).into()
