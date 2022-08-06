@@ -3,8 +3,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Generator, Sequence
 
 import numpy as np
-from neofoodclub import math, utils
 
+from neofoodclub import math, utils
+from neofoodclub.arenas import ARENA_NAMES
 from neofoodclub.errors import InvalidData
 from neofoodclub.odds import Odds
 
@@ -252,6 +253,94 @@ class Bets:
         """
 
         return self.nfc.get_win_np(self)
+
+    @property
+    def table(self) -> str:
+        """:class:`str`: Returns a formatted table of this bet set."""
+        headers: list[str] = ["#"] + ARENA_NAMES
+        rows: list[list[str]] = []
+
+        for bet_index, bet_row in enumerate(self.indices):
+            current_row: list[str] = [str(bet_index + 1)]  # add bet index!
+            for key, pirate_index in enumerate(bet_row):
+                name: str = ""
+                if pirate_index != 0:
+                    name: str = self.nfc.get_arena(key).pirates[pirate_index - 1].name
+                current_row.append(name)
+            rows.append(current_row)
+        return utils.Table.render(rows, headers=headers)
+
+    @property
+    def stats_table(self) -> str:
+        """:class:`str`: Returns a formatted table of this bet set + stats."""
+        headers: list[str] = [
+            "#",
+            "Bet Amt.",
+            "Odds",
+            "Payoff",
+            "ER",
+            "NE",
+            "MaxBet",
+        ] + ARENA_NAMES
+        rows: list[list[str]] = []
+
+        ers: list[float] = []
+        nes: list[float] = []
+        bet_amounts: list[int] = []
+
+        for bet_index, bet_row in enumerate(self.indices):
+            current_row: list[str] = [str(bet_index + 1)]  # add bet index!
+
+            bet_amount: int = self.bet_amounts[bet_index] or -1000
+            bet_amounts.append(bet_amount)
+
+            ne = 0.0
+            if bet_amount > 50:
+                ne: float = (
+                    bet_amount * self.nfc._data_dict["ers"][self._indices][bet_index]
+                    - bet_amount
+                )
+            nes.append(ne)
+
+            er: float = self.nfc._data_dict["ers"][self._indices][bet_index]
+            ers.append(er)
+
+            current_row.append(f"{(bet_amount):,}")
+            bet_odds: int = self.nfc._data_dict["odds"][self._indices][bet_index]
+            current_row.extend(
+                (
+                    f"{bet_odds:,}",
+                    f"{min(bet_odds * bet_amount, 1_000_000):,}",
+                    f"{er:.3f}:1",
+                    f"{ne:.2f}",
+                    f"{self.nfc._data_dict['maxbets'][self._indices][bet_index]:,}",
+                )
+            )
+
+            for key, pirate_index in enumerate(bet_row):
+                name: str = ""
+                if pirate_index != 0:
+                    name: str = self.nfc.get_arena(key).pirates[pirate_index - 1].name
+                current_row.append(name)
+            rows.append(current_row)
+
+        # totals row
+        footers = [
+            "Total:",
+            f"{sum(bet_amounts):,}",  # Bet Amt.
+            "",  # Odds
+            "",  # Payoff
+            f"{sum(ers):.3f}",  # ER
+            f"{sum(nes):.2f}",  # NE
+            "",  # MaxBet
+            "",  # Shipwreck
+            "",  # Lagoon
+            "",  # Treasure
+            "",  # Hidden
+            "",  # Harpoon
+        ]
+
+        return utils.Table.render(rows, headers=headers, footers=footers)
 
     def _iterator(self) -> Generator[int, None, None]:
         int_bins = self.nfc._data_dict["bins"]
