@@ -70,6 +70,7 @@ def test_amounts_hash_to_bet_amounts(amount_hash: str, expected: Sequence[int]):
 def test_bet_amounts_to_amounts_hash(expected: str, bet_amounts: Sequence[int]):
     assert bet_amounts_to_amounts_hash(bet_amounts) == expected
 
+
 @pytest.mark.parametrize(
     "bets_hash,expected",
     [
