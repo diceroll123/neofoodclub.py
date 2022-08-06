@@ -498,9 +498,9 @@ class NeoFoodClub:
             url += "".join([f"&{k}={v}" for k, v in params])
 
         if bets:
-            url += "&b=" + bets.bets_hash
+            url += f"&b={bets.bets_hash}"
             if np.all(bets.bet_amounts > -1000):
-                url += "&a=" + bets.amounts_hash
+                url += f"&a={bets.amounts_hash}"
 
         return url
 
