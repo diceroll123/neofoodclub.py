@@ -273,77 +273,78 @@ class Bets:
     @property
     def stats_table(self) -> str:
         """:class:`str`: Returns a formatted table of this bet set + stats."""
-        headers: list[str] = [
-            "#",
-            "Bet Amt.",
-            "Odds",
-            "Payoff",
-            "ER",
-            "NE",
-            "MaxBet",
-            "Hex",
-        ] + ARENA_NAMES
-        rows: list[list[str]] = []
 
-        ers: list[float] = []
-        nes: list[float] = []
-        bet_amounts: list[int] = []
+        row_nums = np.arange(len(self)) + 1
+        bet_amounts = self.bet_amounts
+        odds = self.nfc._data_dict["odds"][self._indices]
+        payoffs = odds * bet_amounts
+        payoffs[payoffs > 1_000_000] = 1_000_000
+        ers = self.nfc._data_dict["ers"][self._indices]
+        nes = bet_amounts * ers - bet_amounts
+        maxbets = self.nfc._data_dict["maxbets"][self._indices]
+        bins = self.nfc._data_dict["bins"][self._indices]
 
-        for bet_index, bet_row in enumerate(self.indices):
-            current_row: list[str] = [str(bet_index + 1)]  # add bet index!
-
-            bet_amount: int = self.bet_amounts[bet_index] or -1000
-            bet_amounts.append(bet_amount)
-
-            ne = 0.0
-            if bet_amount > 50:
-                ne: float = (
-                    bet_amount * self.nfc._data_dict["ers"][self._indices][bet_index]
-                    - bet_amount
-                )
-            nes.append(ne)
-
-            er: float = self.nfc._data_dict["ers"][self._indices][bet_index]
-            ers.append(er)
-
-            current_row.append(f"{(bet_amount):,}")
-            bet_odds: int = self.nfc._data_dict["odds"][self._indices][bet_index]
-            current_row.extend(
-                (
-                    f"{bet_odds:,}",
-                    f"{min(bet_odds * bet_amount, 1_000_000):,}",
-                    f"{er:.3f}:1",
-                    f"{ne:.2f}",
-                    f"{self.nfc._data_dict['maxbets'][self._indices][bet_index]:,}",
-                    f"0x{self.nfc._data_dict['bins'][self._indices][bet_index]:05X}",
-                )
-            )
+        arena_pirates: list[list[str]] = []
+        for bet_row in self.indices:
+            current_row: list[str] = []
 
             for key, pirate_index in enumerate(bet_row):
                 name: str = ""
                 if pirate_index != 0:
                     name: str = self.nfc.get_arena(key).pirates[pirate_index - 1].name
                 current_row.append(name)
-            rows.append(current_row)
+            arena_pirates.append(current_row)
 
-        # totals row
-        footers = [
-            "Total:",
-            f"{sum(bet_amounts):,}",  # Bet Amt.
-            "",  # Odds
-            "",  # Payoff
-            f"{sum(ers):.3f}",  # ER
-            f"{sum(nes):.2f}",  # NE
-            "",  # MaxBet
-            "",  # Hex
-            "",  # Shipwreck
-            "",  # Lagoon
-            "",  # Treasure
-            "",  # Hidden
-            "",  # Harpoon
-        ]
+        rows: list[Any] = []
 
-        return utils.Table.render(rows, headers=headers, footers=footers)
+        headers: list[str] = []
+        footers: list[str] = []
+
+        headers.append("#")
+        rows.append(row_nums)
+        footers.append("Total:")
+
+        has_bet_amounts = np.all(bet_amounts > -1000)
+
+        if has_bet_amounts:
+            headers.append("Bet Amt.")
+            rows.append(bet_amounts)
+            footers.append(f"{np.sum(bet_amounts):,}")
+
+        headers.append("Odds")
+        rows.append(odds)
+        footers.append("")
+
+        if has_bet_amounts:
+            headers.append("Payoff")
+            rows.append(payoffs)
+            footers.append("")
+
+        headers.append("ER")
+        er_vector = np.vectorize(lambda er: f"{er:.3f}:1")
+        rows.append(er_vector(ers))
+        footers.append(f"{np.sum(ers):.3f}")
+
+        if has_bet_amounts:
+            headers.append("NE")
+            ne_vector = np.vectorize(lambda ne: f"{ne:.2f}")
+            rows.append(ne_vector(nes))
+            footers.append(f"{np.sum(nes):.2f}")
+
+        headers.append("MaxBet")
+        rows.append(maxbets.astype(int))
+        footers.append("")
+
+        hexer = np.vectorize(hex)
+        headers.append("Hex")
+        rows.append(hexer(bins.astype(int)))
+        footers.append("")
+
+        headers.extend(ARENA_NAMES)
+        rows.extend(np.array(arena_pirates).T)
+        footers.extend(["", "", "", "", ""])
+
+        return utils.Table.render(np.array(rows).T, headers=headers, footers=footers)  # type: ignore
 
     def _iterator(self) -> Generator[int, None, None]:
         int_bins = self.nfc._data_dict["bins"]
