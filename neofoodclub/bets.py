@@ -39,7 +39,7 @@ class Bets:
         self._indices = indices
 
         self.bet_amounts = amounts
-        self._odds = None
+        self._odds: Odds | None = None
 
     @property
     def net_expected(self) -> float:
@@ -119,7 +119,7 @@ class Bets:
         return ""
 
     def __repr__(self) -> str:
-        attrs = [
+        attrs: list[tuple[str, Any]] = [
             ("ne", self.net_expected),
             ("er", self.expected_ratio),
             ("bets_hash", self.bets_hash),
