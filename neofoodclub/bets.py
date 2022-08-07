@@ -281,6 +281,7 @@ class Bets:
             "ER",
             "NE",
             "MaxBet",
+            "Hex",
         ] + ARENA_NAMES
         rows: list[list[str]] = []
 
@@ -314,6 +315,7 @@ class Bets:
                     f"{er:.3f}:1",
                     f"{ne:.2f}",
                     f"{self.nfc._data_dict['maxbets'][self._indices][bet_index]:,}",
+                    f"0x{self.nfc._data_dict['bins'][self._indices][bet_index]:05X}",
                 )
             )
 
@@ -333,6 +335,7 @@ class Bets:
             f"{sum(ers):.3f}",  # ER
             f"{sum(nes):.2f}",  # NE
             "",  # MaxBet
+            "",  # Hex
             "",  # Shipwreck
             "",  # Lagoon
             "",  # Treasure
