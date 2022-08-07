@@ -727,18 +727,25 @@ class NeoFoodClub:
     @_require_cache
     def make_all_bets(self, in_order: bool = False, max_ter: bool = False) -> Bets:
         """:class:`Bets`: Creates a Bets object that consists of all bets.
-        
+
         This is mostly for debugging purposes.
         """
         if in_order and max_ter:
             raise ValueError("Cannot use both in_order and max_ter")
 
+        bet_amounts = [-1000] * 3124
+
+        if self.bet_amount and self.bet_amount > 50:
+            bet_amounts = [self.bet_amount] * 3124
+
         if max_ter:
             return Bets(
-                indices=np.argsort(self._max_ter_indices())[::-1], nfc=self
+                indices=np.argsort(self._max_ter_indices())[::-1],
+                nfc=self,
+                amounts=bet_amounts,
             )
 
-        return Bets(indices=np.arange(3124), nfc=self)
+        return Bets(indices=np.arange(3124), nfc=self, amounts=bet_amounts)
 
     @overload
     def make_gambit_bets(self, *, five_bet: int | None = None) -> Bets:

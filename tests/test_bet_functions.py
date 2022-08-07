@@ -214,7 +214,9 @@ def test_random_bets(nfc: NeoFoodClub):
 
 
 def test_make_all_bets(nfc: NeoFoodClub):
-    bets = nfc.make_all_bets(in_order=True)
+    new_nfc = nfc.copy()
+    new_nfc.bet_amount = 8000
+    bets = new_nfc.make_all_bets(in_order=True)
     assert len(bets) == 3124
 
 
