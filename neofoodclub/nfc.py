@@ -724,6 +724,22 @@ class NeoFoodClub:
         pirate_bin = self._data_dict["bins"][math.FULL_BETS[highest_er]]
         return self._gambit_indices(five_bet=pirate_bin)
 
+    @_require_cache
+    def make_all_bets(self, in_order: bool = False, max_ter: bool = False) -> Bets:
+        """:class:`Bets`: Creates a Bets object that consists of all bets.
+        
+        This is mostly for debugging purposes.
+        """
+        if in_order and max_ter:
+            raise ValueError("Cannot use both in_order and max_ter")
+
+        if max_ter:
+            return Bets(
+                indices=np.argsort(self._max_ter_indices())[::-1], nfc=self
+            )
+
+        return Bets(indices=np.arange(3124), nfc=self)
+
     @overload
     def make_gambit_bets(self, *, five_bet: int | None = None) -> Bets:
         ...

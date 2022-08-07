@@ -213,6 +213,21 @@ def test_random_bets(nfc: NeoFoodClub):
     assert len(bets) == 10
 
 
+def test_make_all_bets(nfc: NeoFoodClub):
+    bets = nfc.make_all_bets(in_order=True)
+    assert len(bets) == 3124
+
+
+def test_make_all_bets_max_ter(nfc: NeoFoodClub):
+    bets = nfc.make_all_bets(max_ter=True)
+    assert len(bets) == 3124
+
+
+def test_make_all_bets_valueerror(nfc: NeoFoodClub):
+    with pytest.raises(ValueError):
+        nfc.make_all_bets(max_ter=True, in_order=True)
+
+
 def test_too_many_bet_amounts_from_binaries(nfc: NeoFoodClub):
     with pytest.raises(InvalidData):
         nfc.make_bets_from_binaries(0x1, amounts=[50, 50])
