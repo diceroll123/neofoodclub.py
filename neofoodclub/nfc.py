@@ -733,10 +733,10 @@ class NeoFoodClub:
         if in_order and max_ter:
             raise ValueError("Cannot use both in_order and max_ter")
 
-        bet_amounts = [-1000] * 3124
+        bet_amounts = None
 
-        if self.bet_amount and self.bet_amount > 50:
-            bet_amounts = [self.bet_amount] * 3124
+        if self._maxbet_odds_cache.size > 0:
+            bet_amounts = list(self._maxbet_odds_cache)
 
         if max_ter:
             return Bets(
