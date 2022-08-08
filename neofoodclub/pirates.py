@@ -41,6 +41,10 @@ PIRATE_NAMES = {
 class PirateMixin:
     _id: int
 
+    __slots__ = (
+        "_id",
+    )
+
     @property
     def name(self) -> str:
         return PIRATE_NAMES[self._id]
@@ -87,7 +91,6 @@ class Pirate(PirateMixin):
 
     __slots__ = (
         "nfc",
-        "_id",
         "_arena",
         "_index",
         "_odds",
