@@ -77,7 +77,7 @@ class Modifier:
         self._nfc: NeoFoodClub | None = None
 
     def __repr__(self) -> str:
-        return f"<Modifier value={self.value} letters={self.letters} time={self.time}>"
+        return f"<Modifier value={self.value!r} letters={self.letters!r} time={self.time!r}>"
 
     def _has_flag(self, o: int) -> bool:
         return (self.value & o) == o

@@ -100,7 +100,7 @@ class Arena:
         return self._pirates.__iter__()
 
     def __repr__(self) -> str:
-        return f"<Arena name={self.name} odds={self._odds} pirates={self.pirates}>"
+        return f"<Arena name={self.name!r} odds={self._odds!r} pirates={self.pirates!r}>"
 
 
 class Arenas:

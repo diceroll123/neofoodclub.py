@@ -75,7 +75,7 @@ class PartialPirate(PirateMixin):
         return self._id
 
     def __repr__(self) -> str:
-        return f"<NaivePirate name={self.name}>"
+        return f"<NaivePirate name={self.name!r}>"
 
 
 class Pirate(PirateMixin):
