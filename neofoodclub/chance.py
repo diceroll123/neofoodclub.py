@@ -1,3 +1,7 @@
+from dataclasses import dataclass
+
+
+@dataclass
 class Chance:
     """Represents the probabilities of a singular chance of odds.
     This serves as a type hint for the Chance struct in our Rust code.
