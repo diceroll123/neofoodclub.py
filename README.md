@@ -1,11 +1,11 @@
 # neofoodclub.py
-A Python implementation of functionality used in https://neofood.club
+A mostly-Python implementation of functionality used in https://neofood.club
 
 Notes:
 - *For the time being*, there are no front-facing docs for this beyond docstrings in the code itself 
 
 ## Installing
-**Python 3.8 through 3.10 is suggested**
+**Python 3.8 or higher is suggested**
 
 This project will likely never be put on PyPI, so you'll have to install the development version, from this repo.
 
