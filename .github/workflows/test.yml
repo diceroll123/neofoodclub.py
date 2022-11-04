@@ -28,13 +28,13 @@ jobs:
         run: |
           python -m venv venv
           source ./venv/bin/activate
-          pip install --upgrade pip setuptools wheel pytest
+          pip install --upgrade pip setuptools wheel pytest setuptools-rust
           pip install -U -r requirements_dev.txt
       - name: Installing distribution (dev mode)
         # this adds the .so to the inner lib files so we can test
         run: |
           source ./venv/bin/activate
-          maturin develop --release
+          python ./setup.py develop
       - name: Run tests
         shell: bash
         run: |

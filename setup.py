@@ -2,6 +2,7 @@ import contextlib
 import re
 
 from setuptools import setup
+from setuptools_rust import Binding, RustExtension
 
 requirements = []
 with open("requirements.txt") as f:
@@ -52,8 +53,10 @@ setup(
     description="A Python implementation of functionality used in https://neofood.club",
     license="MIT",
     license_file="LICENSE",
+    url="https://github.com/diceroll123/neofoodclub.py",
     version=version,
     packages=packages,
+    rust_extensions=[RustExtension("neofoodclub.neofoodclub", binding=Binding.PyO3)],
     python_requires=">=3.8.0",
     classifiers=[
         "Programming Language :: Rust",
@@ -63,4 +66,5 @@ setup(
         "Programming Language :: Python :: 3.11",
         "Typing :: Typed",
     ],
+    zip_safe=False,
 )

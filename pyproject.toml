@@ -1,10 +1,5 @@
 [build-system]
-requires = ["maturin>=0.12,<0.13"]
-build-backend = "maturin"
-
-[tool.maturin]
-sdist-include = ["Cargo.lock"]
-strip = true
+requires = ["setuptools", "wheel", "setuptools-rust"]
 
 [tool.coverage.run]
 omit = [
