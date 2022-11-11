@@ -6,6 +6,7 @@ import neofoodclub.math as math
 
 if TYPE_CHECKING:
     from neofoodclub.bets import Bets
+    from neofoodclub.chance import Chance
 
 __all__ = (
     "Odds",
@@ -44,12 +45,12 @@ class Odds:
         )
 
         # highest odds
-        self.best = self._odds[-1]
+        self.best: Chance = self._odds[-1]
 
         # bust chance, can be None
-        self.bust = self._odds[0] if self._odds[0].value == 0 else None
+        self.bust: Chance | None = self._odds[0] if self._odds[0].value == 0 else None
 
-        self.most_likely_winner = max(
+        self.most_likely_winner: Chance = max(
             self._odds[1 if self.bust else 0 :], key=lambda o: o.probability
         )
 

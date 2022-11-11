@@ -3,6 +3,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Sequence
 
 if TYPE_CHECKING:
+    import numpy as np
+    import numpy.typing as npt
+
     from neofoodclub.chance import Chance
 
 def pirate_binary_rust(index: int, arena: int) -> int:
@@ -77,7 +80,13 @@ def make_probabilities_rust(
 ) -> list[list[float]]: ...
 def make_round_dicts_rust(
     stds: Sequence[Sequence[float]], odds: tuple[tuple[int, ...], ...]
-): ...
+) -> tuple[
+    npt.NDArray[np.int_],
+    npt.NDArray[np.float64],
+    npt.NDArray[np.int_],
+    npt.NDArray[np.float64],
+    npt.NDArray[np.int_],
+]: ...
 def build_chance_objects_rust(
     bets: Sequence[Sequence[int]],
     bet_odds: Sequence[int],

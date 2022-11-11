@@ -68,7 +68,7 @@ class Modifier:
         custom_odds: dict[int, int] | None = None,
         custom_time: datetime.time | None = None,
     ) -> None:
-        self.value = flags
+        self.value: int = flags
         self._custom_odds = custom_odds or {}
         self._time = custom_time
         self._cc_perk = cc_perk

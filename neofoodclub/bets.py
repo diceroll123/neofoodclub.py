@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Generator, Sequence
 
 import numpy as np
+import numpy.typing as npt
 
 from neofoodclub import math, utils
 from neofoodclub.arenas import ARENA_NAMES
@@ -32,10 +33,10 @@ class Bets:
         self,
         *,
         nfc: NeoFoodClub,
-        indices: np.ndarray,
+        indices: npt.NDArray[np.int_],
         amounts: Sequence[int | None] | None = None,
     ) -> None:
-        self.nfc = nfc
+        self.nfc: NeoFoodClub = nfc
         self._indices = indices
 
         self.bet_amounts = amounts
@@ -65,7 +66,7 @@ class Bets:
     er = expected_ratio
 
     @property
-    def bet_amounts(self) -> np.ndarray:
+    def bet_amounts(self) -> npt.NDArray[np.int_]:
         """:class:`np.ndarray`: Returns a numpy array of bet amounts corresponding by index to these bets.
 
         These can be user-defined, and generated.
@@ -81,7 +82,9 @@ class Bets:
         return np.array([-1000] * self._indices.size)
 
     @bet_amounts.setter
-    def bet_amounts(self, val: Sequence[int | None] | np.ndarray | None) -> None:
+    def bet_amounts(
+        self, val: Sequence[int | None] | npt.NDArray[np.int_] | None
+    ) -> None:
         if val is None:
             self._bet_amounts = np.array([-1000] * self._indices.size)
             return

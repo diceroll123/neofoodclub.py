@@ -33,7 +33,7 @@ class Arena:
     def __init__(
         self, *, nfc: NeoFoodClub, arena_id: int, pirate_ids: Sequence[int]
     ) -> None:
-        self.nfc = nfc
+        self.nfc: NeoFoodClub = nfc
         self._id = arena_id
         self._pirate_ids = tuple(pirate_ids)
         self._pirates = tuple(  # adding 1 to index because the original list has a length of 4, but everything else has 5
@@ -100,7 +100,9 @@ class Arena:
         return self._pirates.__iter__()
 
     def __repr__(self) -> str:
-        return f"<Arena name={self.name!r} odds={self._odds!r} pirates={self.pirates!r}>"
+        return (
+            f"<Arena name={self.name!r} odds={self._odds!r} pirates={self.pirates!r}>"
+        )
 
 
 class Arenas:

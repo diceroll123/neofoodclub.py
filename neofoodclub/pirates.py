@@ -102,7 +102,7 @@ class Pirate(PirateMixin):
     )
 
     def __init__(self, *, nfc: NeoFoodClub, id: int, arena: int, index: int) -> None:
-        self.nfc = nfc
+        self.nfc: NeoFoodClub = nfc
         self._id = id
         self._arena = arena
         self._index = index
