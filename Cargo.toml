@@ -8,5 +8,10 @@ name = "neofoodclub"
 crate-type = ["cdylib"]
 
 [dependencies]
-pyo3 = { version = "0.16.5", features = ["extension-module"] }
-numpy = "0.16"
+pyo3 = { version = "0.17.3", features = ["extension-module"] }
+numpy = "0.17.2"
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+opt-level = 3

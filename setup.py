@@ -24,6 +24,10 @@ packages = [
     "neofoodclub.types",
 ]
 
+package_data = {
+    "neofoodclub": ["py.typed", "neofoodclub.pyi"],
+}
+
 if version.endswith(("a", "b", "rc")):
     # append version identifier based on commit count
     with contextlib.suppress(Exception):
@@ -56,6 +60,7 @@ setup(
     url="https://github.com/diceroll123/neofoodclub.py",
     version=version,
     packages=packages,
+    package_data=package_data,
     rust_extensions=[RustExtension("neofoodclub.neofoodclub", binding=Binding.PyO3)],
     python_requires=">=3.8.0",
     classifiers=[
@@ -67,4 +72,5 @@ setup(
         "Typing :: Typed",
     ],
     zip_safe=False,
+    include_package_data=True,
 )
