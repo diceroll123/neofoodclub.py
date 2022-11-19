@@ -9,7 +9,6 @@ omit = [
 [tool.coverage.report]
 exclude_lines = [
     "pragma: no cover",
-    "@njit",
     "@overload",
     '^ *\.\.\.$',
     "if (False|TYPE_CHECKING):",
