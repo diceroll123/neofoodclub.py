@@ -136,7 +136,7 @@ class Arenas:
             pirates += a.pirates
         return pirates
 
-    def get_pirates_from_binary(self, binary: int) -> tuple[Pirate, ...]:
+    def get_pirates_from_binary(self, binary: int, /) -> tuple[Pirate, ...]:
         """Tuple[:class:`Pirate`]: Return a list of pirates based on their bet-binary representation.
 
         Note: This will only provide the left-most filled pirate per-arena."""

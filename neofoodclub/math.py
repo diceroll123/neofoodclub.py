@@ -11,11 +11,11 @@ from .neofoodclub import (
     bets_hash_to_bet_indices_rust,
     bets_hash_value_rust,
     binary_to_indices_rust,
+    build_chance_objects_rust,
     make_probabilities_rust,
     make_round_dicts_rust,
     pirate_binary_rust,
     pirates_binary_rust,
-    build_chance_objects_rust,
 )
 
 __all__ = (
@@ -62,7 +62,7 @@ bet_amounts_to_amounts_hash = bet_amounts_to_amounts_hash_rust
 build_chance_objects = build_chance_objects_rust
 
 
-def amounts_hash_to_bet_amounts(amounts_hash: str) -> tuple[int | None, ...]:
+def amounts_hash_to_bet_amounts(amounts_hash: str, /) -> tuple[int | None, ...]:
     """Tuple[Optional[:class:`int`], ...]: Returns a tuple of bet amounts from the provided amounts hash.
 
     Parameters
@@ -89,7 +89,7 @@ def amounts_hash_to_bet_amounts(amounts_hash: str) -> tuple[int | None, ...]:
     return tuple(nums)
 
 
-def bets_hash_to_bet_binaries(bets_hash: str) -> tuple[int, ...]:
+def bets_hash_to_bet_binaries(bets_hash: str, /) -> tuple[int, ...]:
     """Tuple[:class:`int`, ...]: Returns the bet-binary representations of the bets hash provided.
 
     Parameters
@@ -103,7 +103,7 @@ def bets_hash_to_bet_binaries(bets_hash: str) -> tuple[int, ...]:
 
 
 def bets_indices_to_bet_binaries(
-    bets_indices: Sequence[Sequence[int]],
+    bets_indices: Sequence[Sequence[int]], /
 ) -> tuple[int, ...]:
     """Tuple[:class:`int`, ...]: Returns the bet-binary representations of the bets indices provided.
 
@@ -115,7 +115,7 @@ def bets_indices_to_bet_binaries(
     return tuple(pirates_binary(tuple(indices)) for indices in bets_indices)
 
 
-def bets_hash_to_bets_count(bets_hash: str) -> int:
+def bets_hash_to_bets_count(bets_hash: str, /) -> int:
     """:class:`int`: Returns the amount of bets for a given bets hash.
 
     Parameters
@@ -126,7 +126,7 @@ def bets_hash_to_bets_count(bets_hash: str) -> int:
     return len(bets_hash_to_bet_indices(bets_hash))
 
 
-def bets_hash_to_bets(bets_hash: str) -> dict[int, list[int]]:
+def bets_hash_to_bets(bets_hash: str, /) -> dict[int, list[int]]:
     """Dict[:class:`int`, List[:class:`int`]]: Returns a dict of bets where keys are the index and values
     are bet indicies.
 

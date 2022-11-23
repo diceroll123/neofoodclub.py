@@ -33,7 +33,7 @@ class Bets:
         self,
         *,
         nfc: NeoFoodClub,
-        indices: npt.NDArray[np.int_],
+        indices: npt.NDArray[np.int16],
         amounts: Sequence[int | None] | None = None,
     ) -> None:
         self.nfc: NeoFoodClub = nfc
@@ -66,7 +66,7 @@ class Bets:
     er = expected_ratio
 
     @property
-    def bet_amounts(self) -> npt.NDArray[np.int_]:
+    def bet_amounts(self) -> npt.NDArray[np.int32]:
         """:class:`np.ndarray`: Returns a numpy array of bet amounts corresponding by index to these bets.
 
         These can be user-defined, and generated.
@@ -83,10 +83,10 @@ class Bets:
 
     @bet_amounts.setter
     def bet_amounts(
-        self, val: Sequence[int | None] | npt.NDArray[np.int_] | None
+        self, val: Sequence[int | None] | npt.NDArray[np.int32] | None
     ) -> None:
         if val is None:
-            self._bet_amounts = np.array([-1000] * self._indices.size)
+            self._bet_amounts: npt.NDArray[np.int32] = np.array([-1000] * self._indices.size)
             return
 
         # strictly enforcing amount of values provided
@@ -95,7 +95,7 @@ class Bets:
                 f"Invalid bet amounts provided. Expected length: {self._indices.size}, but received {len(val)}."
             )
 
-        amts = np.array([v or math.BET_AMOUNT_MIN for v in val])
+        amts: npt.NDArray[np.int32] = np.array([v or math.BET_AMOUNT_MIN for v in val])
 
         self._bet_amounts = utils.fix_bet_amounts(amts)
 
@@ -132,7 +132,7 @@ class Bets:
         return f"<Bets {joined}>"
 
     @classmethod
-    def _from_generator(cls, *, indices: np.ndarray, nfc: NeoFoodClub) -> Bets:
+    def _from_generator(cls, *, indices: npt.NDArray[np.int16], nfc: NeoFoodClub) -> Bets:
         # here is where we will take indices and sort as needed
         # to avoid confusion with "manually" making bets
 

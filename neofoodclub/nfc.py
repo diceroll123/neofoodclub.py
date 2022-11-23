@@ -10,6 +10,7 @@ from typing import Any, Callable, Sequence, TypeVar, overload
 import dateutil
 import dateutil.parser
 import numpy as np
+import numpy.typing as npt
 import orjson
 from dateutil.tz import UTC, tzutc
 from typing_extensions import ParamSpec, Self
@@ -386,13 +387,13 @@ class NeoFoodClub:
         return list(sorted(changed, key=lambda oc: oc.timestamp))
 
     @_require_cache
-    def _get_winning_bet_indices(self, bets: Bets) -> np.ndarray:
+    def _get_winning_bet_indices(self, bets: Bets, /) -> npt.NDArray[np.int16]:
         bet_bins = self._data_dict["bins"][bets._indices]
         winning_bet_indices = np.where(bet_bins & self.winners_binary == bet_bins)[0]
         return bets._indices[winning_bet_indices]
 
     @_require_cache
-    def _get_winning_odds(self, bets: Bets) -> np.ndarray:
+    def _get_winning_odds(self, bets: Bets) -> npt.NDArray[np.int32]:
         winning_bet_bins = self._get_winning_bet_indices(bets)
         return self._data_dict["odds"][winning_bet_bins]
 
@@ -405,7 +406,7 @@ class NeoFoodClub:
         bets: :class:`Bets`
             The bets you'd like to find the amount of winning units for.
         """
-        return np.sum(self._get_winning_odds(bets))
+        return self._get_winning_odds(bets).sum()
 
     @_require_cache
     def get_win_np(self, bets: Bets, /) -> int:
@@ -430,13 +431,13 @@ class NeoFoodClub:
             return 0
 
         mask = np.in1d(bets._indices, winning_bins_indices)
-        bets_odds = self._data_dict["odds"][bets._indices]
+        bets_odds: npt.NDArray[np.int32] = self._data_dict["odds"][bets._indices]
 
-        winnings = (bets_odds * multiplier)[mask]
+        winnings: npt.NDArray[np.int32] = (bets_odds * multiplier)[mask]
 
         winnings.clip(0, 1_000_000, out=winnings)
 
-        return np.sum(winnings)
+        return winnings.sum()
 
     def make_url(
         self,
