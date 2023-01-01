@@ -1,3 +1,4 @@
+use itertools::iproduct;
 use numpy::{ndarray::Array1, PyArray1, ToPyArray};
 use pyo3::prelude::*;
 use std::collections::{BTreeMap, HashMap};
@@ -336,40 +337,29 @@ fn make_round_dicts_rust<'py>(
 
     let mut arr_index = 0;
 
-    for a in 0..5 {
-        for b in 0..5 {
-            for c in 0..5 {
-                for d in 0..5 {
-                    for e in 0..5 {
-                        let mut total_bin: u32 = 0;
-                        let mut total_stds: f64 = 1.0;
-                        let mut total_odds: u32 = 1;
+    // the first iteration is an empty bet, so we skip it with skip(1)
+    for (a, b, c, d, e) in iproduct!(0..5, 0..5, 0..5, 0..5, 0..5).skip(1) {
+        let mut total_bin: u32 = 0;
+        let mut total_stds: f64 = 1.0;
+        let mut total_odds: u32 = 1;
 
-                        let nums = vec![a, b, c, d, e];
-                        for (arena, index) in nums.iter().enumerate() {
-                            if *index == 0 {
-                                continue;
-                            }
-                            total_bin += 1 << (19 - (index - 1 + arena * 4));
-                            total_stds *= stds[arena][*index];
-                            total_odds *= odds[arena][*index];
-                        }
-
-                        if total_bin == 0 {
-                            continue;
-                        }
-
-                        _bins[arr_index] = total_bin;
-                        _stds[arr_index] = total_stds;
-                        _odds[arr_index] = total_odds;
-                        _ers[arr_index] = total_stds * total_odds as f64;
-                        _maxbets[arr_index] = (1_000_000.0 / total_odds as f64).ceil() as u32;
-
-                        arr_index += 1;
-                    }
-                }
+        let nums = vec![a, b, c, d, e];
+        for (arena, index) in nums.iter().enumerate() {
+            if *index == 0 {
+                continue;
             }
+            total_bin += 1 << (19 - (index - 1 + arena * 4));
+            total_stds *= stds[arena][*index];
+            total_odds *= odds[arena][*index];
         }
+
+        _bins[arr_index] = total_bin;
+        _stds[arr_index] = total_stds;
+        _odds[arr_index] = total_odds;
+        _ers[arr_index] = total_stds * total_odds as f64;
+        _maxbets[arr_index] = (1_000_000.0 / total_odds as f64).ceil() as u32;
+
+        arr_index += 1;
     }
 
     (
