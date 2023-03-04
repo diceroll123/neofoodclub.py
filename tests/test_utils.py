@@ -1,28 +1,29 @@
 import numpy as np
+
 from neofoodclub.math import BET_AMOUNT_MAX, BET_AMOUNT_MIN
 from neofoodclub.nfc import NeoFoodClub
 from neofoodclub.utils import fix_bet_amounts
 
 
-def test_fix_bet_amounts_min():
+def test_fix_bet_amounts_min() -> None:
     # make sure it makes 50 the minimum
     amounts = fix_bet_amounts(np.array([-1000] * 10))
     assert np.sum(amounts) == BET_AMOUNT_MIN * 10
 
 
-def test_fix_bet_amounts_max():
+def test_fix_bet_amounts_max() -> None:
     # make sure it makes 70304 the maximum
     amounts = fix_bet_amounts(np.array([100000] * 10))
     assert np.sum(amounts) == BET_AMOUNT_MAX * 10
 
 
-def test_fix_bet_amounts_same():
+def test_fix_bet_amounts_same() -> None:
     # should be the same numbers in and out
     amounts = fix_bet_amounts(np.array([69420] * 10))
     assert np.sum(amounts) == 694200
 
 
-def test_bets_table(nfc: NeoFoodClub):
+def test_bets_table(nfc: NeoFoodClub) -> None:
     bets = nfc.make_bustproof_bets()
     table = bets.table
     table_str = """
@@ -38,7 +39,7 @@ def test_bets_table(nfc: NeoFoodClub):
     assert table == table_str
 
 
-def test_bets_stats_table(nfc: NeoFoodClub):
+def test_bets_stats_table(nfc: NeoFoodClub) -> None:
     bets = nfc.make_bustproof_bets()
     table = bets.stats_table
     table_str = """
@@ -56,7 +57,7 @@ def test_bets_stats_table(nfc: NeoFoodClub):
     assert table == table_str
 
 
-def test_bets_stats_table_with_net_expected(nfc: NeoFoodClub):
+def test_bets_stats_table_with_net_expected(nfc: NeoFoodClub) -> None:
     # we are testing for NE > 0, so we need a bet amount
     new_nfc = nfc.copy()
     new_nfc.bet_amount = 8000

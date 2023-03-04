@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Generator, Sequence
 
 import numpy as np
-import numpy.typing as npt
 
 from neofoodclub import math, utils
 from neofoodclub.arenas import ARENA_NAMES
@@ -11,11 +10,12 @@ from neofoodclub.errors import InvalidData
 from neofoodclub.odds import Odds
 
 if TYPE_CHECKING:
+    import numpy.typing as npt
+
     from neofoodclub.nfc import NeoFoodClub
 
-__all__ = (
-    "Bets",
-)
+__all__ = ("Bets",)
+
 
 class Bets:
     """A container class containing a set of bets.
@@ -48,7 +48,8 @@ class Bets:
 
         This is equal to (bet_amount * expected_ratio - bet_amount) for each bet and its associated bet amount.
 
-        Returns 0.0 if there is no bet amount set for the NeoFoodClub object, or the bets."""
+        Returns 0.0 if there is no bet amount set for the NeoFoodClub object, or the bets.
+        """
         if np.all(self.bet_amounts > -1000):
             return np.sum(
                 self.bet_amounts * self.nfc._data_dict["ers"][self._indices]
@@ -72,7 +73,8 @@ class Bets:
         These can be user-defined, and generated.
 
         If the NeoFoodClub object has a bet_amount set, and this bet object has no bet amounts, we will
-        fall back to using the NeoFoodClub object's amount, capped at the max bet amount per bet."""
+        fall back to using the NeoFoodClub object's amount, capped at the max bet amount per bet.
+        """
         if np.all(self._bet_amounts > -1000):
             return self._bet_amounts
 
@@ -86,7 +88,9 @@ class Bets:
         self, val: Sequence[int | None] | npt.NDArray[np.int32] | None
     ) -> None:
         if val is None:
-            self._bet_amounts: npt.NDArray[np.int32] = np.array([-1000] * self._indices.size)
+            self._bet_amounts: npt.NDArray[np.int32] = np.array(
+                [-1000] * self._indices.size
+            )
             return
 
         # strictly enforcing amount of values provided
@@ -132,7 +136,9 @@ class Bets:
         return f"<Bets {joined}>"
 
     @classmethod
-    def _from_generator(cls, *, indices: npt.NDArray[np.int16], nfc: NeoFoodClub) -> Bets:
+    def _from_generator(
+        cls, *, indices: npt.NDArray[np.int16], nfc: NeoFoodClub
+    ) -> Bets:
         # here is where we will take indices and sort as needed
         # to avoid confusion with "manually" making bets
 

@@ -1,6 +1,7 @@
 from typing import Any, Dict, Tuple
 
 import pytest
+
 from neofoodclub import Bets, NeoFoodClub
 
 

@@ -1,9 +1,11 @@
 from __future__ import annotations
 
-from typing import Sequence
+from typing import TYPE_CHECKING, Sequence
 
 import numpy as np
-import numpy.typing as npt
+
+if TYPE_CHECKING:
+    import numpy.typing as npt
 
 from . import math
 
@@ -82,7 +84,8 @@ class Table:
 
 def fix_bet_amounts(amts: npt.NDArray[np.int32]) -> npt.NDArray[np.int32]:
     """:class:`np.ndarray`: Returns a "clamped" array of the bet amounts passed in where the minimum value is 50 and
-    the maximum value is 70304, which is the highest value that the current hashing algorithm can understand."""
+    the maximum value is 70304, which is the highest value that the current hashing algorithm can understand.
+    """
     # fix any values below 50 to be 50, to maintain working bets
     # floor any values above max bet amount
     return np.clip(amts, math.BET_AMOUNT_MIN, math.BET_AMOUNT_MAX)

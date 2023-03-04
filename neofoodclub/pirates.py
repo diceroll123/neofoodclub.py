@@ -179,7 +179,7 @@ class Pirate(PirateMixin):
             return tuple(
                 f for f in foods[self._arena] if POSITIVE_FOOD[self._id][f] != 0
             )
-        return tuple()
+        return ()
 
     @property
     def negative_foods(self) -> tuple[int, ...]:
@@ -188,7 +188,7 @@ class Pirate(PirateMixin):
             return tuple(
                 f for f in foods[self._arena] if NEGATIVE_FOOD[self._id][f] != 0
             )
-        return tuple()
+        return ()
 
     @property
     def won(self) -> bool:

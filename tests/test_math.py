@@ -1,6 +1,7 @@
 from typing import Sequence
 
 import pytest
+
 from neofoodclub.errors import InvalidData
 from neofoodclub.math import (
     amounts_hash_to_bet_amounts,
@@ -23,7 +24,7 @@ from neofoodclub.math import (
         (0x00000, (0, 0, 0, 0, 0)),
     ],
 )
-def test_binary_to_indices(bet_binary: int, expected: Sequence[int]):
+def test_binary_to_indices(bet_binary: int, expected: Sequence[int]) -> None:
     assert expected == binary_to_indices(bet_binary)
 
 
@@ -45,7 +46,7 @@ def test_binary_to_indices(bet_binary: int, expected: Sequence[int]):
         ("ZUiZUiZUiZUiZUiZUiZUiZUiZUiZUi", (70000,) * 10),
     ],
 )
-def test_amounts_hash_to_bet_amounts(amount_hash: str, expected: Sequence[int]):
+def test_amounts_hash_to_bet_amounts(amount_hash: str, expected: Sequence[int]) -> None:
     assert expected == amounts_hash_to_bet_amounts(amount_hash)
 
 
@@ -67,7 +68,7 @@ def test_amounts_hash_to_bet_amounts(amount_hash: str, expected: Sequence[int]):
         ("ZUiZUiZUiZUiZUiZUiZUiZUiZUiZUi", (70000,) * 10),
     ],
 )
-def test_bet_amounts_to_amounts_hash(expected: str, bet_amounts: Sequence[int]):
+def test_bet_amounts_to_amounts_hash(expected: str, bet_amounts: Sequence[int]) -> None:
     assert bet_amounts_to_amounts_hash(bet_amounts) == expected
 
 
@@ -81,7 +82,7 @@ def test_bet_amounts_to_amounts_hash(expected: str, bet_amounts: Sequence[int]):
         ("ltqvqwgimhqtvrnywrwvijwnnxgslqmrylolnk", 15),
     ],
 )
-def test_bets_hash_to_bets_count(bets_hash: str, expected: int):
+def test_bets_hash_to_bets_count(bets_hash: str, expected: int) -> None:
     assert expected == bets_hash_to_bets_count(bets_hash)
 
 
@@ -92,7 +93,7 @@ def test_bets_hash_to_bets_count(bets_hash: str, expected: int):
         "faafaafaafaafaafaafaafaafaafaafaafaafaafaafaafaa",  # 16 bets
     ],
 )
-def test_bets_hash_to_bets_invalid(bets_hash: str):
+def test_bets_hash_to_bets_invalid(bets_hash: str) -> None:
     with pytest.raises(InvalidData):
         bets_hash_to_bets(bets_hash)
 
@@ -101,11 +102,11 @@ def test_bets_hash_to_bets_invalid(bets_hash: str):
     "bets_hash,expected",
     [("faa" * x, x) for x in range(1, 16)],
 )
-def test_bets_hash_to_bets_(bets_hash: str, expected: int):
+def test_bets_hash_to_bets_(bets_hash: str, expected: int) -> None:
     assert expected == len(bets_hash_to_bets(bets_hash))
 
 
-def test_make_probabilities():
+def test_make_probabilities() -> None:
     # this is more for code coverage purposes, to hit the `if std_total == 1: break`
     # line in the make_probabilities method
     probs = make_probabilities(
@@ -120,5 +121,5 @@ def test_make_probabilities():
     assert len(probs) == 5
 
 
-def test_amount_hash_to_bet_amounts_below_50():
+def test_amount_hash_to_bet_amounts_below_50() -> None:
     assert amounts_hash_to_bet_amounts("AaX") == (None,)

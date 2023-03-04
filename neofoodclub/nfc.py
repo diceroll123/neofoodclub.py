@@ -5,12 +5,11 @@ import datetime
 import functools
 import re
 import urllib.parse
-from typing import Any, Callable, Sequence, TypeVar, overload
+from typing import TYPE_CHECKING, Any, Callable, Sequence, TypeVar, overload
 
 import dateutil
 import dateutil.parser
 import numpy as np
-import numpy.typing as npt
 import orjson
 from dateutil.tz import UTC, tzutc
 from typing_extensions import ParamSpec, Self
@@ -18,12 +17,18 @@ from typing_extensions import ParamSpec, Self
 from neofoodclub.bets import Bets
 from neofoodclub.modifier import Modifier
 from neofoodclub.odds_change import OddsChange
-from neofoodclub.types import RoundData
 
 from . import math, utils
 from .arenas import Arena, Arenas
 from .errors import InvalidAmountHash, InvalidBetHash, InvalidData, NoPositiveArenas
-from .pirates import Pirate
+
+if TYPE_CHECKING:
+    import numpy.typing as npt
+
+    from neofoodclub.types import RoundData
+
+    from .pirates import Pirate
+
 
 NEO_FC_REGEX = re.compile(
     r"(/(?P<perk>15/)?)#(?P<query>[a-zA-Z0-9=&\[\],%-:+]+)",
@@ -103,7 +108,7 @@ class NeoFoodClub:
         self._data: RoundData = orjson.loads(orjson.dumps(data))
         self._bet_amount = bet_amount
         self._data_dict = {}
-        self._stds: tuple[tuple[float, ...], ...] = tuple()
+        self._stds: tuple[tuple[float, ...], ...] = ()
         self._maxbet_odds_cache = np.array([])
         self._net_expected_cache = np.array([])
 
@@ -140,17 +145,16 @@ class NeoFoodClub:
         # based on.
         self._data["customOdds"] = orjson.loads(orjson.dumps(self._data[key]))
 
-        if self._modifier.time:
-            if dt := self._get_round_time(self._modifier.time):
-                # start custom odds from opening odds and add from there
-                self._data["customOdds"] = orjson.loads(
-                    orjson.dumps(self._data["openingOdds"])
-                )
-                for change in self.changes:
-                    if change.timestamp < dt:
-                        self._data["customOdds"][change.arena_index][
-                            change.pirate_index
-                        ] = change.new
+        if self._modifier.time and (dt := self._get_round_time(self._modifier.time)):
+            # start custom odds from opening odds and add from there
+            self._data["customOdds"] = orjson.loads(
+                orjson.dumps(self._data["openingOdds"])
+            )
+            for change in self.changes:
+                if change.timestamp < dt:
+                    self._data["customOdds"][change.arena_index][
+                        change.pirate_index
+                    ] = change.new
 
         self._add_custom_odds()
 
@@ -384,7 +388,7 @@ class NeoFoodClub:
             OddsChange(index=idx, round_data=copied_data, data=c)
             for idx, c in enumerate(copied_data.get("changes") or [])
         ]
-        return list(sorted(changed, key=lambda oc: oc.timestamp))
+        return sorted(changed, key=lambda oc: oc.timestamp)
 
     @_require_cache
     def _get_winning_bet_indices(self, bets: Bets, /) -> npt.NDArray[np.int16]:
@@ -648,7 +652,8 @@ class NeoFoodClub:
     @property
     def max_amount_of_bets(self) -> int:
         """:class:`int`: Returns the maximum amount of bets that can be generated. Will be 10, unless
-        this class' Modifier has the Charity Corner perk attribute set to True, in which case it returns 15."""
+        this class' Modifier has the Charity Corner perk attribute set to True, in which case it returns 15.
+        """
         return 15 if self._modifier._cc_perk else 10
 
     @_require_cache

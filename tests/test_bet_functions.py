@@ -1,6 +1,7 @@
 from typing import Sequence, Tuple
 
 import pytest
+
 from neofoodclub import math
 from neofoodclub.bets import Bets
 from neofoodclub.errors import InvalidAmountHash, InvalidBetHash, InvalidData
@@ -8,25 +9,25 @@ from neofoodclub.modifier import Modifier
 from neofoodclub.nfc import NeoFoodClub
 
 
-def test_odds_iter(nfc_with_bet_amount: NeoFoodClub):
+def test_odds_iter(nfc_with_bet_amount: NeoFoodClub) -> None:
     # bet amounts are NEEDED to make bustproof + guaranteed wins
     bets = nfc_with_bet_amount.make_bustproof_bets()
     assert len(list(bets.odds)) == 4
 
 
-def test_guaranteed_win_true(nfc_with_bet_amount: NeoFoodClub):
+def test_guaranteed_win_true(nfc_with_bet_amount: NeoFoodClub) -> None:
     # bet amounts are NEEDED to make bustproof + guaranteed wins
     bets = nfc_with_bet_amount.make_bustproof_bets()
     assert bets.is_guaranteed_win is True
 
 
-def test_guaranteed_win_false(nfc: NeoFoodClub):
+def test_guaranteed_win_false(nfc: NeoFoodClub) -> None:
     bets = nfc.make_max_ter_bets()  # max ter bets are not guaranteed, ever probably
     # don't we wish max ter was guaranteed
     assert bets.is_guaranteed_win is False
 
 
-def test_make_url_no_bet_amount(nfc: NeoFoodClub):
+def test_make_url_no_bet_amount(nfc: NeoFoodClub) -> None:
     bets = nfc.make_max_ter_bets()
     assert (
         bets.make_url(include_domain=False)
@@ -34,7 +35,7 @@ def test_make_url_no_bet_amount(nfc: NeoFoodClub):
     )
 
 
-def test_make_url(nfc_with_bet_amount: NeoFoodClub):
+def test_make_url(nfc_with_bet_amount: NeoFoodClub) -> None:
     bets = nfc_with_bet_amount.make_max_ter_bets()
     assert (
         bets.make_url(include_domain=False)
@@ -42,25 +43,25 @@ def test_make_url(nfc_with_bet_amount: NeoFoodClub):
     )
 
 
-def test_make_url_all_data(nfc: NeoFoodClub, test_max_ter_15_bets: str):
+def test_make_url_all_data(nfc: NeoFoodClub, test_max_ter_15_bets: str) -> None:
     new_nfc = NeoFoodClub(nfc.to_dict())
     new_nfc.modifier = Modifier(cc_perk=True)
     bets = new_nfc.make_max_ter_bets()
     assert bets.make_url(all_data=True) == f"https://neofood.club{test_max_ter_15_bets}"
 
 
-def test_short_hash(nfc: NeoFoodClub):
+def test_short_hash(nfc: NeoFoodClub) -> None:
     bets = nfc.make_bets_from_hash("f")
     assert bets.bets_hash == "faa"
 
 
-def test_bets_without_bet_amount(nfc: NeoFoodClub):
+def test_bets_without_bet_amount(nfc: NeoFoodClub) -> None:
     # when bets have no amounts set, they default to -1000 for each bet.
     bets = nfc.make_max_ter_bets()
     assert bets.bet_amounts.sum() == -10000
 
 
-def test_bets_set_bet_amount_below_50(nfc: NeoFoodClub):
+def test_bets_set_bet_amount_below_50(nfc: NeoFoodClub) -> None:
     # set bets externally to -1000 for each amount
     # setting numerical values below 50 should min-max the amount to 50
     bets = nfc.make_max_ter_bets()
@@ -68,7 +69,7 @@ def test_bets_set_bet_amount_below_50(nfc: NeoFoodClub):
     assert bets.bet_amounts.sum() == 500
 
 
-def test_bets_set_bet_amount_none(nfc: NeoFoodClub):
+def test_bets_set_bet_amount_none(nfc: NeoFoodClub) -> None:
     bets = nfc.make_max_ter_bets()
     bets.bet_amounts = None
     assert bets.amounts_hash == ""
@@ -79,7 +80,7 @@ def test_bet_equivalence(
     crazy_test_hash: str,
     crazy_test_indices: Tuple[Tuple[int, ...], ...],
     crazy_test_binaries: Tuple[int, ...],
-):
+) -> None:
     crazy_from_hash = nfc.make_bets_from_hash(crazy_test_hash)
     crazy_from_indices = nfc.make_bets_from_indices(crazy_test_indices)
     crazy_from_binaries = nfc.make_bets_from_binaries(*crazy_test_binaries)
@@ -90,7 +91,7 @@ def test_bet_equivalence(
 
 def test_bet_equivalence_with_amount(
     nfc: NeoFoodClub,
-):
+) -> None:
     mer_from_hash = nfc.make_bets_from_hash(
         "eukucjuoycaulucepkyrtukyw", amounts_hash="CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS"
     )
@@ -137,26 +138,28 @@ def test_bet_equivalence_with_amount(
     assert mer_control == mer_control_two
 
 
-def test_bet_hash_encoding(nfc: NeoFoodClub, crazy_test_hash: str):
+def test_bet_hash_encoding(nfc: NeoFoodClub, crazy_test_hash: str) -> None:
     assert nfc.make_bets_from_hash(crazy_test_hash).bets_hash == crazy_test_hash
 
 
 def test_bet_indices_encoding(
     nfc: NeoFoodClub, crazy_test_indices: Tuple[Tuple[int, ...], ...]
-):
+) -> None:
     assert nfc.make_bets_from_indices(crazy_test_indices).indices == crazy_test_indices
 
 
 def test_bet_indices_with_amount(
     nfc: NeoFoodClub, crazy_test_indices: Tuple[Tuple[int, ...], ...]
-):
+) -> None:
     assert (
         nfc.make_bets_from_indices(crazy_test_indices, amount=8000).indices
         == crazy_test_indices
     )
 
 
-def test_bet_binaries_encoding(nfc: NeoFoodClub, crazy_test_binaries: Tuple[int, ...]):
+def test_bet_binaries_encoding(
+    nfc: NeoFoodClub, crazy_test_binaries: Tuple[int, ...]
+) -> None:
     assert (
         tuple(nfc.make_bets_from_binaries(*crazy_test_binaries)) == crazy_test_binaries
     )
@@ -164,14 +167,14 @@ def test_bet_binaries_encoding(nfc: NeoFoodClub, crazy_test_binaries: Tuple[int,
 
 def test_bet_binaries_with_amount(
     nfc: NeoFoodClub, crazy_test_binaries: Tuple[int, ...]
-):
+) -> None:
     assert (
         tuple(nfc.make_bets_from_binaries(*crazy_test_binaries, amount=8000))
         == crazy_test_binaries
     )
 
 
-def test_expected_ratio_equality(crazy_bets: Bets):
+def test_expected_ratio_equality(crazy_bets: Bets) -> None:
     # There's a discrepancy between what the website says vs what this says.
     # When it comes to expected ratio and net expected, the inconsistent
     # floating point accuracy across different programming languages shows.
@@ -181,7 +184,7 @@ def test_expected_ratio_equality(crazy_bets: Bets):
 
 def test_net_expected_equality_with_amount(
     nfc_with_bet_amount: NeoFoodClub, crazy_test_hash: str
-):
+) -> None:
     # There's a discrepancy between what the website says vs what this says.
     # When it comes to expected ratio and net expected, the inconsistent
     # floating point accuracy across different programming languages shows.
@@ -197,79 +200,81 @@ def test_net_expected_equality_with_amount(
         (0x1, 0x3, 0x4),
     ],
 )
-def test_bets_from_binary_error(nfc: NeoFoodClub, bet_binaries: Tuple[int, ...]):
+def test_bets_from_binary_error(
+    nfc: NeoFoodClub, bet_binaries: Tuple[int, ...]
+) -> None:
     with pytest.raises(InvalidData):
         Bets.from_binary(*bet_binaries, nfc=nfc)
 
 
-def test_repeating_bets_from_binary(nfc: NeoFoodClub):
+def test_repeating_bets_from_binary(nfc: NeoFoodClub) -> None:
     # duplicates are removed in from_binary, we're making sure of this
     repeating = Bets.from_binary(0x1, 0x1, 0x2, nfc=nfc)
     assert len(repeating) == 2
 
 
-def test_random_bets(nfc: NeoFoodClub):
+def test_random_bets(nfc: NeoFoodClub) -> None:
     bets = nfc.make_random_bets()
     assert len(bets) == 10
 
 
-def test_make_all_bets(nfc: NeoFoodClub):
+def test_make_all_bets(nfc: NeoFoodClub) -> None:
     new_nfc = nfc.copy()
     new_nfc.bet_amount = 8000
     bets = new_nfc.make_all_bets(in_order=True)
     assert len(bets) == 3124
 
 
-def test_make_all_bets_max_ter(nfc: NeoFoodClub):
+def test_make_all_bets_max_ter(nfc: NeoFoodClub) -> None:
     bets = nfc.make_all_bets(max_ter=True)
     assert len(bets) == 3124
 
 
-def test_make_all_bets_valueerror(nfc: NeoFoodClub):
+def test_make_all_bets_valueerror(nfc: NeoFoodClub) -> None:
     with pytest.raises(ValueError):
         nfc.make_all_bets(max_ter=True, in_order=True)
 
 
-def test_too_many_bet_amounts_from_binaries(nfc: NeoFoodClub):
+def test_too_many_bet_amounts_from_binaries(nfc: NeoFoodClub) -> None:
     with pytest.raises(InvalidData):
         nfc.make_bets_from_binaries(0x1, amounts=[50, 50])
 
 
-def test_invalid_bet_amounts_from_binaries(nfc: NeoFoodClub):
+def test_invalid_bet_amounts_from_binaries(nfc: NeoFoodClub) -> None:
     with pytest.raises(InvalidAmountHash):
         nfc.make_bets_from_binaries(0x1, amounts_hash="???")
 
 
-def test_too_many_bet_amounts_from_indices(nfc: NeoFoodClub):
+def test_too_many_bet_amounts_from_indices(nfc: NeoFoodClub) -> None:
     with pytest.raises(InvalidData):
         nfc.make_bets_from_indices([(1, 0, 0, 0, 0)], amounts=[50, 50])
 
 
-def test_invalid_bet_amounts_from_indices(nfc: NeoFoodClub):
+def test_invalid_bet_amounts_from_indices(nfc: NeoFoodClub) -> None:
     with pytest.raises(InvalidAmountHash):
         nfc.make_bets_from_indices([(1, 0, 0, 0, 0)], amounts_hash="???")
 
 
-def test_too_many_bet_amounts_from_hash(nfc: NeoFoodClub):
+def test_too_many_bet_amounts_from_hash(nfc: NeoFoodClub) -> None:
     with pytest.raises(InvalidData):
         nfc.make_bets_from_hash("faa", amounts=[50, 50])
 
 
-def test_invalid_bet_hash(nfc: NeoFoodClub):
+def test_invalid_bet_hash(nfc: NeoFoodClub) -> None:
     with pytest.raises(InvalidBetHash):
         nfc.make_bets_from_hash("faz")
 
 
-def test_invalid_amounts_hash(nfc: NeoFoodClub):
+def test_invalid_amounts_hash(nfc: NeoFoodClub) -> None:
     with pytest.raises(InvalidAmountHash):
         nfc.make_bets_from_hash("faa", amounts_hash="???")
 
 
-def test_bet_get_win_units(nfc: NeoFoodClub):
+def test_bet_get_win_units(nfc: NeoFoodClub) -> None:
     assert nfc.make_bets_from_hash("faa").get_win_units() == 2
 
 
-def test_bet_get_win_np(nfc: NeoFoodClub):
+def test_bet_get_win_np(nfc: NeoFoodClub) -> None:
     bets = nfc.make_bets_from_hash("faa")
     bets.bet_amounts = [8000]
     assert bets.get_win_np() == 16000
@@ -332,5 +337,7 @@ def test_bet_get_win_np(nfc: NeoFoodClub):
         ),
     ],
 )
-def test_indices_to_bet_hash(bet_hash: str, bet_indices: Sequence[Sequence[int]]):
+def test_indices_to_bet_hash(
+    bet_hash: str, bet_indices: Sequence[Sequence[int]]
+) -> None:
     assert math.bets_hash_value(bet_indices) == bet_hash

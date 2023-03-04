@@ -6,9 +6,7 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from neofoodclub.nfc import NeoFoodClub
 
-__all__ = (
-    "Modifier",
-)
+__all__ = ("Modifier",)
 
 
 class Modifier:
@@ -166,7 +164,8 @@ class Modifier:
     def from_type(cls, letters: str, /, *, cc_perk: bool = False) -> Modifier:
         """:class:`Modifier`: Creates a Modifier using the letters of the modifiers you'd like. For example, passing in
         "ROG" will result in a modifier with General, Opening, and Reverse modifiers set to True.
-        These are generally used as a prefix for commands in NeoBot, such as `?rogmer` for example."""
+        These are generally used as a prefix for commands in NeoBot, such as `?rogmer` for example.
+        """
         letters = letters.lower()
         value = 0
         for index, letter in enumerate(cls.LETTERS.lower()):

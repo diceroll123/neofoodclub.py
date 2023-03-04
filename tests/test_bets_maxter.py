@@ -1,8 +1,8 @@
-from neofoodclub.nfc import NeoFoodClub
 from neofoodclub.modifier import Modifier
+from neofoodclub.nfc import NeoFoodClub
 
 
-def test_mer_bets_binaries_no_bet_amount(nfc: NeoFoodClub):
+def test_mer_bets_binaries_no_bet_amount(nfc: NeoFoodClub) -> None:
     # make sure it creates the same bets, regardless of order
     bets = nfc.make_max_ter_bets()
 
@@ -20,7 +20,7 @@ def test_mer_bets_binaries_no_bet_amount(nfc: NeoFoodClub):
     }
 
 
-def test_mer_bets_binaries_with_amounts(nfc_with_bet_amount: NeoFoodClub):
+def test_mer_bets_binaries_with_amounts(nfc_with_bet_amount: NeoFoodClub) -> None:
     # make sure it creates the same bets, regardless of order
     bets = nfc_with_bet_amount.make_max_ter_bets()
 
@@ -38,12 +38,12 @@ def test_mer_bets_binaries_with_amounts(nfc_with_bet_amount: NeoFoodClub):
     }
 
 
-def test_mer_bet_amounts(nfc_with_bet_amount: NeoFoodClub):
+def test_mer_bet_amounts(nfc_with_bet_amount: NeoFoodClub) -> None:
     bets = nfc_with_bet_amount.make_max_ter_bets()
     assert bets.bet_amounts.sum() == 80000
 
 
-def test_mer_reverse(nfc_with_bet_amount: NeoFoodClub):
+def test_mer_reverse(nfc_with_bet_amount: NeoFoodClub) -> None:
     new_nfc = nfc_with_bet_amount.copy()
     new_nfc.modifier = Modifier(Modifier.REVERSE)
     bets = new_nfc.make_max_ter_bets()

@@ -1,18 +1,19 @@
 from __future__ import annotations
 
-import datetime
-from typing import Any, Iterator
+from typing import TYPE_CHECKING, Any, Iterator
 
 import dateutil.parser
 from dateutil.tz import UTC
 
 from neofoodclub.arenas import ARENA_NAMES
 from neofoodclub.pirates import PartialPirate
-from neofoodclub.types import OddsChangeDict
 
-__all__ = (
-    "OddsChange",
-)
+if TYPE_CHECKING:
+    import datetime
+
+    from neofoodclub.types import OddsChangeDict
+
+__all__ = ("OddsChange",)
 
 
 class OddsChange:

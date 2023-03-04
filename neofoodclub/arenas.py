@@ -91,7 +91,7 @@ class Arena:
     @property
     def foods(self) -> tuple[int, ...]:
         """Tuple[:class:`int`]: Returns a list of the IDs of the foods in this arena, where applicable."""
-        return tuple(foods[self._id]) if (foods := self.nfc.foods) else tuple()
+        return tuple(foods[self._id]) if (foods := self.nfc.foods) else ()
 
     def __getitem__(self, item: int) -> Pirate:
         return self._pirates[item]
@@ -131,7 +131,7 @@ class Arenas:
     @property
     def all_pirates(self) -> tuple[Pirate, ...]:
         """Tuple[:class:`Pirate`]: Returns a flat list of all pirates in arena-order."""
-        pirates: tuple[Pirate, ...] = tuple()
+        pirates: tuple[Pirate, ...] = ()
         for a in self._arenas:
             pirates += a.pirates
         return pirates
