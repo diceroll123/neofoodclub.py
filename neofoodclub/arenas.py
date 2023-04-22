@@ -118,11 +118,14 @@ class Arenas:
             for idx, a in enumerate(nfc._data["pirates"])
         )
 
-    def get_pirate_by_id(self, pirate_id: int, /) -> Pirate:  # type: ignore
+    def get_pirate_by_id(self, pirate_id: int, /) -> Pirate:
         """:class:`Pirate`: Returns a single pirate where their ID matches pirate_id."""
         for p in self.all_pirates:
             if p.id == pirate_id:
                 return p
+        raise ValueError(
+            f"Could not find pirate with ID {pirate_id}. Only 1 through 20 are valid."
+        )
 
     def get_pirates_by_id(self, *pirate_ids: int) -> tuple[Pirate, ...]:
         """Tuple[:class:`Pirate`]: Returns a list of pirates where their IDs match IDs in pirate_ids."""
