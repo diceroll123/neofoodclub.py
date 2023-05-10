@@ -1,3 +1,5 @@
+import pytest
+
 from neofoodclub.nfc import NeoFoodClub
 
 
@@ -34,3 +36,8 @@ def test_arenas_get_arena(nfc: NeoFoodClub) -> None:
 
 def test_arenas_iter(nfc: NeoFoodClub) -> None:
     assert len(list(nfc.arenas)) == 5
+
+
+def test_arenas_get_pirate_by_id_wrong(nfc: NeoFoodClub) -> None:
+    with pytest.raises(ValueError):
+        nfc.arenas.get_pirate_by_id(21)
