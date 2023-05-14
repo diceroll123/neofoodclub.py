@@ -66,11 +66,10 @@ def amounts_hash_to_bet_amounts(amounts_hash: str, /) -> tuple[int | None, ...]:
     """Tuple[Optional[:class:`int`], ...]: Returns a tuple of bet amounts from the provided amounts hash.
 
     Parameters
-    -----------
+    ----------
     amounts_hash: :class:`str`
         The hash of bet amounts.
     """
-
     nums: list[int | None] = []
     chunked = [amounts_hash[i : i + 3] for i in range(0, len(amounts_hash), 3)]
 
@@ -93,7 +92,7 @@ def bets_hash_to_bet_binaries(bets_hash: str, /) -> tuple[int, ...]:
     """Tuple[:class:`int`, ...]: Returns the bet-binary representations of the bets hash provided.
 
     Parameters
-    -----------
+    ----------
     bets_hash: :class:`str`
         The hash of bet amounts.
     """
@@ -108,7 +107,7 @@ def bets_indices_to_bet_binaries(
     """Tuple[:class:`int`, ...]: Returns the bet-binary representations of the bets indices provided.
 
     Parameters
-    -----------
+    ----------
     bets_indices: Sequence[Sequence[:class:`int`]]
         A sequence of a sequence of integers from 0 to 4 to represent a bet.
     """
@@ -119,7 +118,7 @@ def bets_hash_to_bets_count(bets_hash: str, /) -> int:
     """:class:`int`: Returns the amount of bets for a given bets hash.
 
     Parameters
-    -----------
+    ----------
     bets_hash: :class:`str`
         The hash of bet amounts.
     """
@@ -131,12 +130,12 @@ def bets_hash_to_bets(bets_hash: str, /) -> dict[int, list[int]]:
     are bet indicies.
 
     Parameters
-    -----------
+    ----------
     bets_hash: :class:`str`
         The hash of bet amounts.
 
     Raises
-    -------
+    ------
     ~neofoodclub.InvalidData
         The amount of bets provided is invalid.
     """

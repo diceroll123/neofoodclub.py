@@ -8,7 +8,7 @@ class Chance:
     This class is not to be constructed manually.
 
     Attributes
-    -----------
+    ----------
     value: :class:`int`
         The actual odds of this instance. For example, if value == 0, this is the Chance object of busting.
     probability: :class:`float`

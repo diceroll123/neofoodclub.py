@@ -106,7 +106,8 @@ class Bets:
     @property
     def indices(self) -> tuple[tuple[int, ...], ...]:
         """Tuple[Tuple[:class:`int`, ...], ...]: Returns a nested array of the indices of the pirates in their arenas
-        making up these bets."""
+        making up these bets.
+        """
         return tuple(
             math.binary_to_indices(binary)
             for binary in self.nfc._data_dict["bins"][self._indices]
@@ -132,7 +133,7 @@ class Bets:
             ("bets_hash", self.bets_hash),
             ("amounts_hash", self.amounts_hash),
         ]
-        joined = " ".join("%s=%r" % t for t in attrs)
+        joined = " ".join("{}={!r}".format(*t) for t in attrs)
         return f"<Bets {joined}>"
 
     @classmethod
@@ -150,9 +151,10 @@ class Bets:
         """:class:`Bets`: Returns a Bets object from a binary representation of bets.
 
         Raises
-        -------
+        ------
         ~neofoodclub.InvalidData
-            Invalid binaries were passed."""
+        Invalid binaries were passed.
+        """
         np_bins = np.array(bins)
         # duplicate bins are removed here
         _, idx = np.unique(np_bins, return_index=True)
@@ -204,7 +206,6 @@ class Bets:
           - All bets must be subsets of the largest integer.
           - There must be at least 2 bets.
         """
-
         if len(self) < 2:
             return False
 
@@ -240,7 +241,7 @@ class Bets:
         """:class:`str`: Returns an optionally-fully-loaded NeoFoodClub URL to describe these bets.
 
         Parameters
-        -----------
+        ----------
         all_data: :class:`bool`
             Whether or not you want the URL with all pirates, odds, etc. included. Usually, this is not necessary.
             Default = False.
@@ -248,25 +249,22 @@ class Bets:
             Whether or not you want the output URL to include the preferred neofoodclub website's domain.
             Default = True.
         """
-
         return self.nfc.make_url(self, all_data=all_data, include_domain=include_domain)
 
     def get_win_units(self) -> int:
         """Returns the amount of units that won from this bet set."""
-
         return self.nfc.get_win_units(self)
 
     def get_win_np(self) -> int:
         """Returns the amount of neopoints won from this bet set.
         If this Bets object has no bet amounts, will return 0.
         """
-
         return self.nfc.get_win_np(self)
 
     @property
     def table(self) -> str:
         """:class:`str`: Returns a formatted table of this bet set."""
-        headers: list[str] = ["#"] + ARENA_NAMES
+        headers: list[str] = ["#", *ARENA_NAMES]
         rows: list[list[str]] = []
 
         for bet_index, bet_row in enumerate(self.indices):
@@ -282,7 +280,6 @@ class Bets:
     @property
     def stats_table(self) -> str:
         """:class:`str`: Returns a formatted table of this bet set + stats."""
-
         row_nums = np.arange(len(self)) + 1
         bet_amounts = self.bet_amounts
         odds = self.nfc._data_dict["odds"][self._indices]

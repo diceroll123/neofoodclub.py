@@ -58,7 +58,7 @@ class PartialPirate(PirateMixin):
     """Represents a "partial" pirate that only has an ID.
 
     Attributes
-    -----------
+    ----------
     id: :class:`int`
         The pirate's ID.
     name: :class:`str`
@@ -82,7 +82,7 @@ class Pirate(PirateMixin):
     """Represents a single pirate.
 
     Attributes
-    -----------
+    ----------
     name: :class:`str`
         The pirate's name.
     image: :class:`str`
@@ -237,5 +237,5 @@ class Pirate(PirateMixin):
             ("binary", self.binary),
             ("won", self.won),
         ]
-        joined = " ".join("%s=%r" % t for t in attrs)
+        joined = " ".join("{}={!r}".format(*t) for t in attrs)
         return f"<Pirate {joined}>"

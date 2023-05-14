@@ -45,7 +45,6 @@ class Table:
         | 4 |           |        |          |        |   Stuff    |
         +---+-----------+--------+----------+--------+------------+
         """
-
         _headers: list[str] = list(headers) if headers is not None else []
         _rows: list[list[str]] = [list(row) for row in rows]
         _footers: list[str] = list(footers) if footers is not None else []

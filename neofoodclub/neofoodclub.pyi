@@ -12,7 +12,7 @@ def pirate_binary_rust(index: int, arena: int) -> int:
     """:class:`int`: Returns the bet-binary representation of a pirate in an arena.
 
     Parameters
-    -----------
+    ----------
     index: :class:`int`
         The index of the pirate in the arena. Can be 0 to 4. If 0, then there is no pirate.
     arena: :class:`int`
@@ -28,7 +28,7 @@ def pirates_binary_rust(bets_indices: Sequence[int]) -> int:
     This is fundamentally the inverse of binary_to_indices.
 
     Parameters
-    -----------
+    ----------
     bets_indices: Sequence[:class:`int`]
         A sequence of integers from 0 to 4 to represent a bet.
     """
@@ -36,8 +36,9 @@ def pirates_binary_rust(bets_indices: Sequence[int]) -> int:
 
 def binary_to_indices_rust(bet_binary: int) -> tuple[int, ...]:
     """Tuple[int, ...]: Returns the bet indices of a bet-binary value.
+
     Parameters
-    -----------
+    ----------
     bet_binary: :class:`int`
         An integer representing a bet.
     """
@@ -47,7 +48,7 @@ def bets_hash_to_bet_indices_rust(bets_hash: str) -> list[list[int]]:
     """List[List[:class:`int`]]: Returns a list of lists of bet indices from the provided bets hash.
 
     Parameters
-    -----------
+    ----------
     bets_hash: :class:`str`
         The hash of bet amounts.
     """
@@ -59,7 +60,7 @@ def bet_amounts_to_amounts_hash_rust(bet_amounts: Sequence[int]) -> str:
     This is fundamentally the inverse of amounts_hash_to_bet_amounts.
 
     Parameters
-    -----------
+    ----------
     bet_amounts: Sequence[int]
         A sequence of bet amount integers.
     """
@@ -69,7 +70,7 @@ def bets_hash_value_rust(bets_indices: Sequence[Sequence[int]]) -> str:
     """:class:`str`: Returns a hash for the bets indices provided.
 
     Parameters
-    -----------
+    ----------
     bets_indices: Sequence[Sequence[:class:`int`]]
         A sequence of a sequence of integers from 0 to 4 to represent a bet.
     """

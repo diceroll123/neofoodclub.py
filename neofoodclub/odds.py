@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Generator
 
-import neofoodclub.math as math
+from neofoodclub import math
 
 if TYPE_CHECKING:
     from neofoodclub.bets import Bets
@@ -18,7 +18,7 @@ class Odds:
     This class is not to be constructed manually.
 
     Attributes
-    -----------
+    ----------
     best: :class:`Chance`
         The Chance object with the highest odds value.
     bust: Optional[:class:`Chance`]
@@ -73,5 +73,5 @@ class Odds:
             ("most_likely_winner", self.most_likely_winner),
             ("partial_rate", self.partial_rate),
         ]
-        joined = " ".join("%s=%r" % t for t in attrs)
+        joined = " ".join("{}={!r}".format(*t) for t in attrs)
         return f"<Odds {joined}>"

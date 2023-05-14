@@ -72,7 +72,6 @@ class OddsChange:
     @property
     def pirate(self) -> PartialPirate:
         """:class:`PartialPirate`: Returns a partial pirate object, which is a convenience object storing the pirate's ID."""
-
         return PartialPirate(
             self._round_data["pirates"][self.arena_index][self.pirate_index - 1]
         )
@@ -85,7 +84,6 @@ class OddsChange:
     @property
     def arena(self) -> str:
         """:class:`str`: Returns name of the arena that this change occurred in."""
-
         return ARENA_NAMES[self.arena_index]
 
     def __repr__(self) -> str:

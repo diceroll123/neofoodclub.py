@@ -73,7 +73,7 @@ class NeoFoodClub:
     This class is the basis of this library.
 
     Parameters
-    -----------
+    ----------
     data: :class:`RoundData`
         The all-encompassing Dict that provides the values to create a working object.
     bet_amount: Optional[:class:`int`]
@@ -203,7 +203,6 @@ class NeoFoodClub:
     @property
     def arenas(self) -> Arenas:
         """:class:`Arenas`: Returns the Arenas object for this round."""
-
         if self._arenas:
             return self._arenas
 
@@ -244,8 +243,8 @@ class NeoFoodClub:
     @property
     def modified(self) -> bool:
         """:class:`bool`: Whether or not this NeoFoodClub object has been modified heavily enough that it does not
-        resemble the original data."""
-
+        resemble the original data.
+        """
         if self._modifier.custom_odds:
             return True
 
@@ -261,10 +260,10 @@ class NeoFoodClub:
         """Applies the supplied modifier to the NeoFoodClub object.
 
         Parameters
-        -----------
+        ----------
         modifier: Optional[:class:`Modifier`]
-            The modifier object you'd like to add to this NeoFoodClub object."""
-
+        The modifier object you'd like to add to this NeoFoodClub object.
+        """
         self.modifier = modifier
         return self
 
@@ -272,7 +271,7 @@ class NeoFoodClub:
         """:class:`Dict[str, Any]`: Returns the data used to make this NeoFoodClub object.
 
         Parameters
-        -----------
+        ----------
         keep_custom: :class:`bool`
             Whether or not you'd like to keep the customOdds data key. False by default.
         """
@@ -302,7 +301,8 @@ class NeoFoodClub:
         """List[List[:class:`int`]]: Returns a nested list of the custom odds per-arena.
 
         These values are mostly just used internally as a second layer of current_odds.
-        This may or may not be identical to current_odds."""
+        This may or may not be identical to current_odds.
+        """
         return self._data["customOdds"]  # type: ignore
 
     @property
@@ -358,25 +358,29 @@ class NeoFoodClub:
     @property
     def winners(self) -> tuple[int, ...]:
         """Tuple[:class:`int`]: Returns the winning pirates, if applicable.
-        A tuple of 5 zeroes if not applicable."""
+        A tuple of 5 zeroes if not applicable.
+        """
         return tuple(self._data.get("winners") or (0, 0, 0, 0, 0))
 
     @property
     def winners_binary(self) -> int:
         """:class:`int`: Returns a bet-binary representation of the winning pirates, if applicable.
-        0 if not applicable."""
+        0 if not applicable.
+        """
         return math.pirates_binary(tuple(self.winners))
 
     @property
     def winners_pirates(self) -> tuple[Pirate, ...]:
         """Tuple[:class:`Pirate`]: Returns a list of the winning pirates, as Pirate objects, if applicable.
-        Empty tuple if not applicable."""
+        Empty tuple if not applicable.
+        """
         return self.arenas.get_pirates_from_binary(self.winners_binary)
 
     @property
     def foods(self) -> list[list[int]] | None:
         """Optional[List[List[:class:`int`]]]: Returns a nested list of each arena's foods for this round.
-        Can be None."""
+        Can be None.
+        """
         return self._data.get("foods")
 
     @property
@@ -405,7 +409,7 @@ class NeoFoodClub:
         """Returns the amount of units that won, given the provided bets.
 
         Parameters
-        -----------
+        ----------
         bets: :class:`Bets`
             The bets you'd like to find the amount of winning units for.
         """
@@ -417,11 +421,10 @@ class NeoFoodClub:
         If the bets object has no bet amounts, will return 0.
 
         Parameters
-        -----------
+        ----------
         bets: :class:`Bets`
             The bets you'd like to find the amount of winning neopoints for.
         """
-
         winning_bins_indices = self._get_winning_bet_indices(bets)
 
         if winning_bins_indices.size == 0:
@@ -453,7 +456,7 @@ class NeoFoodClub:
         """:class:`str`: Returns an optionally-fully-loaded NeoFoodClub URL to describe the provided bets.
 
         Parameters
-        -----------
+        ----------
         bets: :class:`Bets`
             The bets you'd like to make the URL for.
         all_data: :class:`bool`
@@ -521,7 +524,7 @@ class NeoFoodClub:
         """:class:`NeoFoodClub`: Create a NeoFoodClub object using just a URL.
 
         Parameters
-        -----------
+        ----------
         url: :class:`str`
             The URL describing this NeoFoodClub round.
         bet_amount: Optional[:class:`int`]
@@ -530,7 +533,7 @@ class NeoFoodClub:
             The desired modifier for generating bets.
 
         Raises
-        -------
+        ------
         ~neofoodclub.InvalidData
             The URL provided is invalid.
         """
@@ -645,7 +648,7 @@ class NeoFoodClub:
             ("timestamp", self.timestamp),
             ("is_over", self.is_over),
         ]
-        joined = " ".join("%s=%r" % t for t in attrs if t[1] is not None)
+        joined = " ".join("{}={!r}".format(*t) for t in attrs if t[1] is not None)
         return f"<NeoFoodClub {joined}>"
 
     @property
@@ -685,7 +688,8 @@ class NeoFoodClub:
     def make_crazy_bets(self) -> Bets:
         """:class:`Bets`: Creates a Bets object that consists of randomly-selected, full-arena bets.
 
-        These bets are not for the faint of heart."""
+        These bets are not for the faint of heart.
+        """
         return Bets._from_generator(indices=self._crazy_bets_indices(), nfc=self)
 
     @_require_cache
@@ -696,7 +700,8 @@ class NeoFoodClub:
     def make_random_bets(self) -> Bets:
         """:class:`Bets`: Creates a Bets object that consists of randomly-selected bets.
 
-        These bets are not for the faint of heart."""
+        These bets are not for the faint of heart.
+        """
         return Bets._from_generator(indices=self._random_indices(), nfc=self)
 
     @_require_cache
@@ -765,7 +770,8 @@ class NeoFoodClub:
         self, *, five_bet: int | None = None, random: bool = False
     ) -> Bets:
         """:class:`Bets`: Creates a Bets object that consists of the top-unit permutations
-        of a single full-arena bet."""
+        of a single full-arena bet.
+        """
         return Bets._from_generator(
             indices=self._gambit_indices(five_bet=five_bet, random=random), nfc=self
         )
@@ -793,9 +799,10 @@ class NeoFoodClub:
         There is a hard limit on 3 because any more is impossible.
 
         Raises
-        -------
+        ------
         ~neofoodclub.InvalidData
-            The amount of selected pirates is not between 1 and 3."""
+        The amount of selected pirates is not between 1 and 3.
+        """
         amount_of_pirates = sum(1 for mask in math.BIT_MASKS if pirate_binary & mask)
 
         if amount_of_pirates == 0:
@@ -819,7 +826,8 @@ class NeoFoodClub:
         """:class:`Bets`: Creates a Bets object that consists of the highest STD probability that are greater than or
         equal to the units value.
 
-        This CAN return an empty Bets object."""
+        This CAN return an empty Bets object.
+        """
         return Bets._from_generator(indices=self._unit_indices(units), nfc=self)
 
     @_require_cache
@@ -830,7 +838,7 @@ class NeoFoodClub:
         This requires at least one positive arena, otherwise will throw :class:`NoPositiveArenas`.
 
         Raises
-        -------
+        ------
         ~neofoodclub.NoPositiveArenas
             There are no positive arenas, so a bustproof set can not be made.
         """
@@ -928,12 +936,12 @@ class NeoFoodClub:
         """:class:`Bets`: Creates a Bets object made up of arena indices.
 
         Raises
-        -------
+        ------
         ~neofoodclub.InvalidAmountHash
-            The amount hash contains invalid characters."""
-
+        The amount hash contains invalid characters.
+        """
         bets = Bets.from_binary(*math.bets_indices_to_bet_binaries(indices), nfc=self)
-        if amounts_hash is not None and amounts_hash != "":
+        if amounts_hash:
             if not AMOUNT_HASH_REGEX.fullmatch(amounts_hash):
                 raise InvalidAmountHash
             bets.bet_amounts = math.amounts_hash_to_bet_amounts(amounts_hash)
@@ -975,17 +983,17 @@ class NeoFoodClub:
         """:class:`Bets`: Creates a Bets object by decoding from bets_hash (and optionally an amounts_hash).
 
         Raises
-        -------
+        ------
         ~neofoodclub.InvalidBetHash
             The bet hash contains invalid characters.
         ~neofoodclub.InvalidAmountHash
-            The amount hash contains invalid characters."""
-
+        The amount hash contains invalid characters.
+        """
         if not BET_HASH_REGEX.fullmatch(bets_hash):
             raise InvalidBetHash
 
         bets = Bets.from_binary(*math.bets_hash_to_bet_binaries(bets_hash), nfc=self)
-        if amounts_hash is not None and amounts_hash != "":
+        if amounts_hash:
             if not AMOUNT_HASH_REGEX.fullmatch(amounts_hash):
                 raise InvalidAmountHash
             bets.bet_amounts = math.amounts_hash_to_bet_amounts(amounts_hash)
@@ -1023,12 +1031,12 @@ class NeoFoodClub:
         """:class:`Bets`: Creates a Bets object made up of bet-compatible binary numbers.
 
         Raises
-        -------
+        ------
         ~neofoodclub.InvalidAmountHash
-            The amount hash contains invalid characters."""
-
+        The amount hash contains invalid characters.
+        """
         bets = Bets.from_binary(*binaries, nfc=self)
-        if amounts_hash is not None and amounts_hash != "":
+        if amounts_hash:
             if not AMOUNT_HASH_REGEX.fullmatch(amounts_hash):
                 raise InvalidAmountHash
             bets.bet_amounts = math.amounts_hash_to_bet_amounts(amounts_hash)

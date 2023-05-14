@@ -44,17 +44,17 @@ class Arena:
 
     @property
     def id(self) -> int:
-        """:class:`int`: Alias for Arena.index"""
+        """:class:`int`: Alias for Arena.index."""
         return self.index
 
     @property
     def index(self) -> int:
-        """:class:`int`: The arena's zero-based index, correlating to its place in the list ["Shipwreck", "Lagoon", "Treasure", "Hidden", "Harpoon"]"""
+        """:class:`int`: The arena's zero-based index, correlating to its place in the list ["Shipwreck", "Lagoon", "Treasure", "Hidden", "Harpoon"]."""
         return self._id
 
     @property
     def name(self) -> str:
-        """:class:`str`: The name of this arena, can be one of ["Shipwreck", "Lagoon", "Treasure", "Hidden", "Harpoon"]"""
+        """:class:`str`: The name of this arena, can be one of ["Shipwreck", "Lagoon", "Treasure", "Hidden", "Harpoon"]."""
         return ARENA_NAMES[self._id]
 
     @property
@@ -75,7 +75,7 @@ class Arena:
 
     @property
     def ratio(self) -> float:
-        """:class:`float`: Returns the ratio of this arena, which is `1 / Arena.odds - 1`"""
+        """:class:`float`: Returns the ratio of this arena, which is `1 / Arena.odds - 1`."""
         return 1 / self._odds - 1
 
     @property
@@ -147,7 +147,8 @@ class Arenas:
     def get_pirates_from_binary(self, binary: int, /) -> tuple[Pirate, ...]:
         """Tuple[:class:`Pirate`]: Return a list of pirates based on their bet-binary representation.
 
-        Note: This will only provide the left-most filled pirate per-arena."""
+        Note: This will only provide the left-most filled pirate per-arena.
+        """
         return tuple(
             self._arenas[arena][index - 1]
             for arena, index in enumerate(math.binary_to_indices(binary))

@@ -12,9 +12,8 @@ __all__ = ("Modifier",)
 class Modifier:
     """An object that tells a NeoFoodClub object to behave differently.
 
-
     Parameters
-    -----------
+    ----------
     flags: :class:`int`
         A bit field of the modifiers you'd like to use.
         For example if you'd like to have a general modifier and an opening modifier, you would
@@ -28,7 +27,7 @@ class Modifier:
         A timestamp that the NeoFoodClub object will seek to and recalculate using the odds from that time.
 
     Attributes
-    -----------
+    ----------
     GENERAL: :class:`int`
         This flag value means that bets will be generated without bet amount in mind.
         When this value is true, Max TER for example will use actual Expected Ratio instead of Net Expected.
@@ -126,7 +125,8 @@ class Modifier:
     def custom_odds(self) -> dict[int, int]:
         """Dict[int, int]: A dictionary containing a pirate ID (1-20) as the key, and
         desired odds (2-13) as the value. The NeoFoodClub object will be recalculated using these odds on
-        top of the current odds."""
+        top of the current odds.
+        """
         return self._custom_odds
 
     @custom_odds.setter
