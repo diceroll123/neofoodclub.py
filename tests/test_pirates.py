@@ -13,6 +13,16 @@ def test_pirate_fa(nfc: NeoFoodClub) -> None:
     assert nfc.arenas[0].pirates[0].fa == 3
 
 
+def test_pirate_pfa(nfc: NeoFoodClub) -> None:
+    assert nfc.arenas[0].pirates[0].pfa == 5
+    assert nfc.arenas[0].pirates[0].pfa == 5
+
+
+def test_pirate_nfa(nfc: NeoFoodClub) -> None:
+    assert nfc.arenas[0].pirates[0].nfa == -2
+    assert nfc.arenas[0].pirates[0].nfa == -2
+
+
 def test_pirate_fa_cached(nfc: NeoFoodClub) -> None:
     # because it caches it the first time!
     first_pirate = nfc.arenas[0].pirates[0]

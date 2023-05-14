@@ -97,7 +97,8 @@ class Pirate(PirateMixin):
         "_opening_odds",
         "_std",
         "_er",
-        "_fa",
+        "_pfa",
+        "_nfa",
         "_bin",
     )
 
@@ -115,7 +116,8 @@ class Pirate(PirateMixin):
         else:
             self._std = None
             self._er = None
-        self._fa: int | None = None  # will be filled as needed in the property
+        self._nfa: int | None = None  # will be filled as needed in the property
+        self._pfa: int | None = None  # will be filled as needed in the property
 
     @property
     def id(self) -> int:
@@ -150,17 +152,40 @@ class Pirate(PirateMixin):
     @property
     def fa(self) -> int | None:
         """Optional[:class:`int`]: The pirate's food adjustment. Can be None if no foods are found."""
-        if self._fa is not None:
-            return self._fa
+        if self._nfa is not None and self._pfa is not None:
+            return self._nfa + self._pfa
 
         if foods := self.nfc._data.get("foods", None):
             # calculated here because it's not a commonly-used property
-            self._fa = sum(
-                -NEGATIVE_FOOD[self.id][f] + POSITIVE_FOOD[self.id][f]
-                for f in foods[self.arena]
-            )
+            for f in foods[self.arena]:
+                self._nfa = (self._nfa or 0) - NEGATIVE_FOOD[self.id][f]
+                self._pfa = (self._pfa or 0) + POSITIVE_FOOD[self.id][f]
 
-        return self._fa
+            # it's UNLIKELY but let's not cause an infinite loop here if both are None still
+            # this would only happen if the foods arena has no foods. shouldn't happen in a normal dataset though.
+            return None if self._nfa is None or self._pfa is None else self.fa
+
+        return None  # pragma: no cover
+
+    @property
+    def nfa(self) -> int | None:
+        """Optional[:class:`int`]: The pirate's negative food adjustment. Can be None if no foods are found."""
+        if self._nfa is not None:
+            return self._nfa
+
+        _ = self.fa  # calculate it if it's not already calculated
+
+        return self._nfa
+
+    @property
+    def pfa(self) -> int | None:
+        """Optional[:class:`int`]: The pirate's positive food adjustment. Can be None if no foods are found."""
+        if self._pfa is not None:
+            return self._pfa
+
+        _ = self.fa  # calculate it if it's not already calculated
+
+        return self._pfa
 
     @property
     def opening_odds(self) -> int:
