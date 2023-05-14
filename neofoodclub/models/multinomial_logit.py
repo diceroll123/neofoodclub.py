@@ -18,6 +18,8 @@ __all__ = [
 
 
 class MultinomialLogitModel(BaseModel):
+    __slots__ = ("probabilities",)
+
     def __init__(self, nfc: NeoFoodClub) -> None:
         probs: list[list[float]] = [
             [1, 0, 0, 0, 0],

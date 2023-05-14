@@ -11,6 +11,8 @@ from neofoodclub import math
 
 
 class OriginalModel(BaseModel):
+    __slots__ = ("probabilities",)
+
     def __init__(self, nfc: NeoFoodClub) -> None:
         self.probabilities = tuple(
             tuple(row)
