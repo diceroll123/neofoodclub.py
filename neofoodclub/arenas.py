@@ -44,7 +44,12 @@ class Arena:
 
     @property
     def id(self) -> int:
-        """:class:`int`: The arena's zero-based ID, correlating to its place in the list ["Shipwreck", "Lagoon", "Treasure", "Hidden", "Harpoon"]"""
+        """:class:`int`: Alias for Arena.index"""
+        return self.index
+
+    @property
+    def index(self) -> int:
+        """:class:`int`: The arena's zero-based index, correlating to its place in the list ["Shipwreck", "Lagoon", "Treasure", "Hidden", "Harpoon"]"""
         return self._id
 
     @property
