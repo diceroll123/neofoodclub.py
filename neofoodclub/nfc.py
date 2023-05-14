@@ -15,6 +15,7 @@ from dateutil.tz import UTC, tzutc
 from typing_extensions import ParamSpec, Self
 
 from neofoodclub.bets import Bets
+from neofoodclub.models import OriginalModel, ProbabilityModel
 from neofoodclub.modifier import Modifier
 from neofoodclub.odds_change import OddsChange
 
@@ -93,6 +94,7 @@ class NeoFoodClub:
         "_maxbet_odds_cache",
         "_net_expected_cache",
         "_arenas",
+        "_probability_model",
     )
 
     def __init__(
@@ -103,6 +105,7 @@ class NeoFoodClub:
         bet_amount: int | None = None,
         modifier: Modifier | None = None,
         cache: bool = True,
+        probability_model: type[ProbabilityModel] = OriginalModel,
     ) -> None:
         # so it's not changing old cache data around, have a deep copy (safety precaution for custom odds)
         self._data: RoundData = orjson.loads(orjson.dumps(data))
@@ -115,6 +118,7 @@ class NeoFoodClub:
         self._modifier = modifier or Modifier()
         self._modifier._nfc = self
         self._arenas: Arenas | None = None
+        self._probability_model = probability_model
 
         if cache:
             self.reset()
@@ -177,12 +181,7 @@ class NeoFoodClub:
             self._net_expected_cache = mb_copy * self._data_dict["ers"] - mb_copy
 
     def _cache_dicts(self) -> None:
-        self._stds = tuple(
-            tuple(row)
-            for row in math.make_probabilities(
-                tuple(tuple(x) for x in self._data["openingOdds"])
-            )
-        )
+        self._stds = self._probability_model(self).probabilities
         # most of the binary/odds/std data sits here
         (_bins, _stds, _odds, _ers, _maxbets) = math.make_round_dicts(
             self._stds,
