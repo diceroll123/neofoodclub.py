@@ -126,12 +126,12 @@ class Pirate(PirateMixin):
 
     @property
     def arena(self) -> int:
-        """:class:`int`: The ID of the arena this pirate is in."""
+        """:class:`int`: The index of the arena this pirate is in."""
         return self._arena
 
     @property
     def index(self) -> int:
-        """:class:`int`: The pirate's index in the arena the pirate is in."""
+        """:class:`int`: The pirate's index in the arena the pirate is in. One-based."""
         return self._index
 
     @property
