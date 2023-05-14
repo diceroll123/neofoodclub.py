@@ -3,6 +3,7 @@ from typing import Any, Dict, Tuple
 import pytest
 
 from neofoodclub import Bets, NeoFoodClub
+from neofoodclub.models.multinomial_logit import MultinomialLogitModel
 
 
 # I picked the smallest round I could quickly find.
@@ -198,6 +199,13 @@ def nfc_no_cache(test_round_data: Dict[str, Any]) -> NeoFoodClub:
 @pytest.fixture
 def nfc_with_bet_amount(test_round_data: Dict[str, Any]) -> NeoFoodClub:
     return NeoFoodClub(test_round_data, bet_amount=8000)
+
+
+@pytest.fixture
+def nfc_with_bet_amount_logit_model(test_round_data: Dict[str, Any]) -> NeoFoodClub:
+    return NeoFoodClub(
+        test_round_data, bet_amount=8000, probability_model=MultinomialLogitModel
+    )
 
 
 @pytest.fixture

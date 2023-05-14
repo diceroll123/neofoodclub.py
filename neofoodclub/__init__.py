@@ -9,6 +9,7 @@ from . import utils as utils
 from .arenas import *
 from .bets import *
 from .errors import *
+from .models import *
 from .modifier import *
 from .nfc import *
 from .odds import *
