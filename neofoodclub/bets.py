@@ -93,6 +93,10 @@ class Bets:
             )
             return
 
+        # remove trailing None's
+        while len(val) and val[-1] is None:
+            val = val[:-1]
+
         # strictly enforcing amount of values provided
         if len(val) != self._indices.size:
             raise InvalidData(

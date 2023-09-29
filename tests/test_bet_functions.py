@@ -341,3 +341,13 @@ def test_indices_to_bet_hash(
     bet_hash: str, bet_indices: Sequence[Sequence[int]]
 ) -> None:
     assert math.bets_hash_value(bet_indices) == bet_hash
+
+
+def test_bet_with_trailing_none_in_amounts(
+    nfc: NeoFoodClub,
+) -> None:
+    nine_bets = nfc.make_bets_from_hash(
+        "abaakaebapkddapudaaqkbaaa", amounts_hash="EmxCoKCoKCglDKUCYqEXkByWBpqzGO"
+    )
+    assert len(nine_bets) == 9
+    assert len(nine_bets.bet_amounts) == 9
