@@ -7,10 +7,8 @@ Notes:
 ## Installing
 **Python 3.8 or higher is suggested**
 
-This project will likely never be put on PyPI, so you'll have to install the development version, from this repo.
-
 ```sh
-python -m pip install -U git+https://github.com/diceroll123/neofoodclub.py
+pip install neofoodclub
 ```
 
 *Alternatively,*
