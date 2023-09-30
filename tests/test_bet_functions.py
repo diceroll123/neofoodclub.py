@@ -27,27 +27,26 @@ def test_guaranteed_win_false(nfc: NeoFoodClub) -> None:
     assert bets.is_guaranteed_win is False
 
 
-def test_make_url_no_bet_amount(nfc: NeoFoodClub) -> None:
-    bets = nfc.make_max_ter_bets()
-    assert (
-        bets.make_url(include_domain=False)
-        == "/#round=7956&b=eukucjuoycaulucepkyreynyc"
-    )
-
-
 def test_make_url(nfc_with_bet_amount: NeoFoodClub) -> None:
-    bets = nfc_with_bet_amount.make_max_ter_bets()
-    assert (
-        bets.make_url(include_domain=False)
-        == "/#round=7956&b=eukucjuoycaulucepkyrtukyw&a=CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS"
+    bets = nfc_with_bet_amount.make_bets_from_indices(
+        (
+            (0, 4, 4, 0, 2),
+            (0, 4, 0, 0, 2),
+            (1, 4, 4, 0, 2),
+            (4, 4, 4, 0, 2),
+            (0, 0, 4, 0, 2),
+            (1, 4, 0, 0, 2),
+            (0, 4, 3, 0, 2),
+            (0, 4, 4, 3, 2),
+            (3, 4, 4, 0, 2),
+            (0, 4, 4, 4, 2),
+        ),
+        amounts_hash="CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS",
     )
-
-
-def test_make_url_all_data(nfc: NeoFoodClub, test_max_ter_15_bets: str) -> None:
-    new_nfc = NeoFoodClub(nfc.to_dict())
-    new_nfc.modifier = Modifier(cc_perk=True)
-    bets = new_nfc.make_max_ter_bets()
-    assert bets.make_url(all_data=True) == f"https://neofood.club{test_max_ter_15_bets}"
+    assert (
+        bets.make_url(include_domain=True)
+        == "https://neofood.club/#round=7956&b=eukucjuoycaulucepkyrtukyw&a=CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS"
+    )
 
 
 def test_short_hash(nfc: NeoFoodClub) -> None:

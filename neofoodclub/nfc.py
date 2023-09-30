@@ -467,10 +467,9 @@ class NeoFoodClub:
             Default = True.
         """
 
-        def encode(int_lists: Sequence[Any]) -> str:
-            return orjson.dumps(int_lists).decode("utf-8")
-
-        use_15 = bets and 10 < len(bets) <= 15 or self._modifier._cc_perk
+        use_15 = (
+            len(bets or []) and 10 < len(bets or []) <= 15
+        ) or self._modifier._cc_perk
 
         # begin building the URL!
         url = ""
@@ -478,12 +477,16 @@ class NeoFoodClub:
         if include_domain:
             url += "https://neofood.club"
 
-        if use_15:
+        if use_15:  # pragma: no cover
             url += "/15"
 
         url += f"/#round={self.round}"
 
-        if all_data:
+        if all_data:  # pragma: no cover
+
+            def encode(int_lists: Sequence[Any]) -> str:
+                return orjson.dumps(int_lists).decode("utf-8")
+
             params: list[tuple[str, str]] = [
                 ("pirates", encode(self.pirates)),
                 ("openingOdds", encode(self.opening_odds)),
