@@ -1,3 +1,4 @@
+import math
 from typing import List, Tuple
 
 from neofoodclub.nfc import NeoFoodClub
@@ -25,11 +26,11 @@ def test_first_arena_pirate_ids(nfc: NeoFoodClub) -> None:
 
 
 def test_first_arena_odds(nfc: NeoFoodClub) -> None:
-    assert nfc.arenas[0].odds == 1.11025641025641
+    assert math.isclose(nfc.arenas[0].odds, 1.1102564102564103)
 
 
 def test_first_arena_ratio(nfc: NeoFoodClub) -> None:
-    assert nfc.arenas[0].ratio == -0.09930715935334855
+    assert math.isclose(nfc.arenas[0].ratio, -0.09930715935334877)
 
 
 def test_first_arena_negative(nfc: NeoFoodClub) -> None:
