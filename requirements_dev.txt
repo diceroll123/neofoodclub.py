@@ -2,4 +2,5 @@ numpy
 orjson
 pytest
 python-dateutil
+time-machine
 typing_extensions

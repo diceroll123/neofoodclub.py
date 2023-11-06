@@ -2,6 +2,8 @@ import datetime
 from typing import Any, Dict, Optional
 
 import pytest
+import time_machine
+from dateutil.tz import tzutc
 
 from neofoodclub import Modifier, NeoFoodClub
 from neofoodclub.errors import InvalidData
@@ -218,6 +220,11 @@ def test_outdated_lock(nfc: NeoFoodClub) -> None:
     # we're not even in the same year anymore
     # so this should be True
     assert nfc.is_outdated_lock is True
+
+
+@time_machine.travel(datetime.datetime(2021, 2, 16, 12, 0, 0, 0, tzinfo=tzutc()))
+def test_outdated_lock_false(nfc: NeoFoodClub) -> None:
+    assert nfc.is_outdated_lock is False
 
 
 def test_outdated_lock_none(nfc: NeoFoodClub) -> None:
