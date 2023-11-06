@@ -103,11 +103,16 @@ def get_dst_offset(today: datetime.datetime) -> datetime.timedelta:
 
     today_offset = today.utcoffset()
 
+    print(today_offset)
+    print(yesterday_offset)
+
     difference = datetime.timedelta(0)
     if yesterday_offset is not None and today_offset is not None:
         if yesterday_offset < today_offset:
             difference = datetime.timedelta(hours=1)
         if yesterday_offset > today_offset:
             difference = datetime.timedelta(hours=-1)
+
+    print(difference)
 
     return difference
