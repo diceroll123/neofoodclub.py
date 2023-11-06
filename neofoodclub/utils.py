@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING, Sequence
 
 import numpy as np
+from dateutil import tz
 
 if TYPE_CHECKING:
     import numpy.typing as npt
@@ -11,6 +13,7 @@ from . import math
 
 __all__ = (
     "fix_bet_amounts",
+    "get_dst_offset",
     "Table",
 )
 
@@ -88,3 +91,23 @@ def fix_bet_amounts(amts: npt.NDArray[np.int32]) -> npt.NDArray[np.int32]:
     # fix any values below 50 to be 50, to maintain working bets
     # floor any values above max bet amount
     return np.clip(amts, math.BET_AMOUNT_MIN, math.BET_AMOUNT_MAX)
+
+
+def get_dst_offset(today: datetime.datetime) -> datetime.timedelta:
+    """Gets the difference in daylight savings time offset between today and yesterday.
+    This is used to determine if the current time is during daylight savings time or not.
+    This allows the "outdated" checks to be more accurate.
+    """
+    today = today.astimezone(tz.gettz("America/Los_Angeles"))
+    yesterday_offset = (today - datetime.timedelta(days=1)).utcoffset()
+
+    today_offset = today.utcoffset()
+
+    difference = datetime.timedelta(0)
+    if yesterday_offset is not None and today_offset is not None:
+        if yesterday_offset < today_offset:
+            difference = datetime.timedelta(hours=1)
+        if yesterday_offset > today_offset:
+            difference = datetime.timedelta(hours=-1)
+
+    return difference

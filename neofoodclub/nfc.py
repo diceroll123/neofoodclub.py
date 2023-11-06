@@ -347,7 +347,11 @@ class NeoFoodClub:
         """:class:`bool`: Returns whether or not this round is to be considered over. 24 hours after the start time."""
         if self.start is None:
             return True
-        return self.start <= datetime.datetime.now(tzutc()) - datetime.timedelta(days=1)
+        today = self.start.astimezone(tzutc()) + datetime.timedelta(days=1)
+
+        difference = utils.get_dst_offset(today)
+
+        return not (self.start <= datetime.datetime.now(tzutc()) <= today + difference)
 
     @property
     def is_over(self) -> bool:
