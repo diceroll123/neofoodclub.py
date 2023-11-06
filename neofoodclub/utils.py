@@ -98,7 +98,9 @@ def get_dst_offset(today: datetime.datetime) -> datetime.timedelta:
     This is used to determine if the current time is during daylight savings time or not.
     This allows the "outdated" checks to be more accurate.
     """
+    print(repr(today))
     today = today.astimezone(tz.gettz("America/Los_Angeles"))
+    print(repr(today))
     yesterday_offset = (today - datetime.timedelta(days=1)).utcoffset()
 
     today_offset = today.utcoffset()
