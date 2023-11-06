@@ -4,93 +4,97 @@ on:
   push:
     tags: [ 'v*' ]
 
-env:
-  CARGO_INCREMENTAL: 0
-  CARGO_NET_RETRY: 10
-  CARGO_TERM_COLOR: always
-  RUSTUP_MAX_RETRIES: 10
-
 jobs:
-
-  macos-x86_64:
-    runs-on: macos-latest
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}  - ${{ matrix.vers }}
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ '3.8', '3.9', '3.10', '3.11', '3.12' ]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-          architecture: x64
-      - name: "Build wheels - x86_64"
-        uses: PyO3/maturin-action@v1
-        with:
-          target: x86_64
-          args: --release --out dist
-      - name: Upload wheels
-        uses: actions/upload-artifact@v3
-        with:
-          name: wheels
-          path: dist
+        include:
+          - vers: i686
+            os: ubuntu-20.04
+          - vers: aarch64
+            os: ubuntu-20.04
+          - vers: auto64
+            os: ubuntu-20.04
+          - vers: arm64
+            os: macos-10.15
+          - vers: auto64
+            os: macos-10.15
 
-  macos-universal:
-    runs-on: macos-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: [ '3.8', '3.9', '3.10', '3.11', '3.12' ]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-          architecture: x64
-      - name: "Build wheels - universal"
-        uses: PyO3/maturin-action@v1
-        with:
-          args: --release --target universal2-apple-darwin --out dist
-      - name: Upload wheels
-        uses: actions/upload-artifact@v3
-        with:
-          name: wheels
-          path: dist
+    env:
+      SCCACHE_VERSION: 0.7.0
+      CIBW_BEFORE_ALL_LINUX: "curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable -y && yum install -y openssl-devel"
+      CIBW_BUILD_VERBOSITY: "1" # Make some more noise so that travis doesn't stall
+      CIBW_ENVIRONMENT: 'PATH="$PATH:$HOME/.cargo/bin"'
+      CIBW_SKIP: "cp27-* cp34-* cp35-* pp* *-win32"
 
-  linux:
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v2
+        name: Install Python
+        with:
+          python-version: "3.8"
+
+      - name: Set up QEMU
+        if: runner.os == 'Linux'
+        uses: docker/setup-qemu-action@v1
+        with:
+          platforms: all
+
+      - name: wheels Linux ${{ matrix.vers }}
+        if: runner.os == 'Linux'
+        uses: joerick/cibuildwheel@v1.10.0
+        env:
+          CIBW_ARCHS_LINUX: ${{ matrix.vers }}
+
+      - name: wheels Macos ${{ matrix.vers }}
+        if: runner.os == 'Macos'
+        uses: joerick/cibuildwheel@v1.10.0
+        env:
+          CIBW_ARCHS_MACOS: ${{ matrix.vers }}
+
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./wheelhouse/*.whl
+
+  build_sdist:
+    name: Build source distribution
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: [ '3.8', '3.9', '3.10', '3.11', '3.12' ]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-      - uses: PyO3/maturin-action@v1.40.2
-        with:
-          manylinux: auto
-          command: build
-          args: --release -o dist
-      - name: Upload wheels
-        uses: actions/upload-artifact@v2
-        with:
-          name: wheels
-          path: dist
+      - uses: actions/checkout@v2
 
+      - name: Install rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+
+      - uses: actions/setup-python@v2
+        name: Install Python
+        with:
+          python-version: "3.8"
+
+      - name: Build sdist
+        run: |
+          python -m pip install setuptools-rust setuptools wheel
+          python setup.py sdist
+
+      - uses: actions/upload-artifact@v2
+        with:
+          path: dist/*.tar.gz
   release:
-    name: Release
+    needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest
-    needs: [ linux, macos-x86_64, macos-universal ]
     steps:
       - uses: actions/download-artifact@v2
         with:
-          name: wheels
-      - name: Publish to PyPI
-        uses: PyO3/maturin-action@v1.40.2
-        env:
-          MATURIN_PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+          name: artifact
+          path: dist
+
+      - uses: pypa/gh-action-pypi-publish@master
         with:
-          command: upload
-          args: --skip-existing *
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
