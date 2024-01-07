@@ -42,3 +42,47 @@ jobs:
         run: |
           source ./venv/bin/activate
           PYTHONPATH="$(pwd)" pytest
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up CPython 3.12
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m venv venv
+          source ./venv/bin/activate
+          pip install --upgrade pip setuptools wheel pytest setuptools-rust
+          pip install -U -r requirements_dev.txt
+      - name: Installing distribution (dev mode)
+        # this adds the .so to the inner lib files so we can test
+        run: |
+          source ./venv/bin/activate
+          python ./setup.py develop
+      - name: Run tests
+        shell: bash
+        run: |
+          source ./venv/bin/activate
+          PYTHONPATH="$(pwd)" coverage run -m pytest
+
+      - name: Coverage comment
+        id: coverage_comment
+        uses: py-cov-action/python-coverage-comment-action@v3
+        with:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Store Pull Request comment to be posted
+        uses: actions/upload-artifact@v4
+        if: steps.coverage_comment.outputs.COMMENT_FILE_WRITTEN == 'true'
+        with:
+          name: python-coverage-comment-action
+          path: python-coverage-comment-action.txt
