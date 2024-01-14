@@ -2,6 +2,7 @@ name: CI
 
 on:
   workflow_dispatch:
+  pull_request:
   push:
     tags: ["v*"]
 
@@ -16,19 +17,13 @@ jobs:
     runs-on: macos-latest
     strategy:
       fail-fast: false
-      matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-          architecture: x64
       - name: "Build wheels - x86_64"
         uses: PyO3/maturin-action@v1
         with:
           target: x86_64
-          args: --release -i python${{ matrix.python-version }} --out dist
+          args: --release --find-interpreter --out dist
       - name: Upload wheels
         uses: actions/upload-artifact@v3
         with:
@@ -39,18 +34,12 @@ jobs:
     runs-on: macos-latest
     strategy:
       fail-fast: false
-      matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-          architecture: x64
       - name: "Build wheels - universal"
         uses: PyO3/maturin-action@v1
         with:
-          args: --release -i python${{ matrix.python-version }} --target universal2-apple-darwin --out dist
+          args: --release --find-interpreter --target universal2-apple-darwin --out dist
       - name: Upload wheels
         uses: actions/upload-artifact@v3
         with:
@@ -62,24 +51,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
         platform:
           - target: x86_64-pc-windows-msvc
-            arch: x64
           - target: i686-pc-windows-msvc
-            arch: x86
           - target: aarch64-pc-windows-msvc
-            arch: x64
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-          architecture: ${{ matrix.platform.arch }}
       - name: "Build wheels - windows"
         uses: PyO3/maturin-action@v1
         with:
-          args: --release -i python${{ matrix.python-version }} --out dist
+          args: --release --find-interpreter --out dist --target ${{ matrix.platform.target }}
       - name: Upload wheels
         uses: actions/upload-artifact@v3
         with:
@@ -91,23 +72,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
         target:
           - x86_64-unknown-linux-gnu
           - i686-unknown-linux-gnu
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-          architecture: x64
       - name: "Build wheels - linux"
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
           manylinux: auto
           command: build
-          args: --release -i python${{ matrix.python-version }} -o dist
+          args: --release --find-interpreter -o dist
       - name: Upload wheels
         uses: actions/upload-artifact@v3
         with:
@@ -119,7 +95,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
         platform:
           - target: aarch64-unknown-linux-gnu
             arch: aarch64
@@ -134,17 +109,13 @@ jobs:
             arch: ppc64
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-          architecture: x64
       - name: "Build wheels - linux-cross"
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
           manylinux: auto
           docker-options: ${{ matrix.platform.maturin_docker_options }}
-          args: --release -i python${{ matrix.python-version }} -o dist
+          args: --release --find-interpreter -o dist
       - name: Upload wheels
         uses: actions/upload-artifact@v3
         with:
@@ -156,22 +127,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
         target:
           - x86_64-unknown-linux-musl
           - i686-unknown-linux-musl
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-          architecture: x64
       - name: "Build wheels - musllinux"
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
           manylinux: musllinux_1_2
-          args: --release -i python${{ matrix.python-version }} -o dist
+          args: --release --find-interpreter -o dist
       - name: Upload wheels
         uses: actions/upload-artifact@v3
         with:
@@ -183,7 +149,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
         platform:
           - target: aarch64-unknown-linux-musl
             arch: aarch64
@@ -192,15 +157,12 @@ jobs:
             arch: armv7
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
       - name: "Build wheels - musllinux-cross"
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
           manylinux: musllinux_1_2
-          args: --release -i python${{ matrix.python-version }} -o dist
+          args: --release --find-interpreter -o dist
           docker-options: ${{ matrix.platform.maturin_docker_options }}
       - name: Upload wheels
         uses: actions/upload-artifact@v3
