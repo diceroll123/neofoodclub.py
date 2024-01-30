@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Generator, Sequence
+from itertools import starmap
+from typing import TYPE_CHECKING, Any, Generator, Iterator, Sequence
 
 import numpy as np
 
@@ -137,7 +138,7 @@ class Bets:
             ("bets_hash", self.bets_hash),
             ("amounts_hash", self.amounts_hash),
         ]
-        joined = " ".join("{}={!r}".format(*t) for t in attrs)
+        joined = " ".join(starmap("{}={!r}".format, attrs))
         return f"<Bets {joined}>"
 
     @classmethod
@@ -360,10 +361,10 @@ class Bets:
         int_bins = self.nfc._data_dict["bins"]
         yield from int_bins[self._indices]
 
-    def __iter__(self) -> Generator[int, None, None]:
+    def __iter__(self) -> Iterator[int]:
         return self._iterator()
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         return (
             isinstance(other, self.__class__)
             and self.bets_hash == other.bets_hash

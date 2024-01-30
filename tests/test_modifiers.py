@@ -76,7 +76,7 @@ def test_modifier_copy_equality() -> None:
 
 
 @pytest.mark.parametrize(
-    "pirate_id,pirate_odds",
+    ("pirate_id", "pirate_odds"),
     [
         (0, 2),  # out of bounds pirate_id
         (21, 2),  # out of bounds pirate_id

@@ -89,7 +89,7 @@ class OddsChange:
     def __repr__(self) -> str:
         return f"<OddsChange arena={self.arena_index!r} index={self.index!r} pirate={self.pirate!r} old={self.old!r} new={self.new!r} timestamp={self.timestamp!r}>"
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         return isinstance(other, self.__class__) and self._data == other.data
 
     def __iter__(self) -> Iterator[tuple[str, Any]]:

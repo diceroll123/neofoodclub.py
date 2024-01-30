@@ -70,15 +70,13 @@ class Table:
         lines: list[str] = [line]
         if _headers:
             # add the headers, and a separator line
-            lines.append(make_line(_headers))
-            lines.append(line)
+            lines.extend((make_line(_headers), line))
 
         for row in _rows:
             lines.append(make_line(row))
 
         if _footers:
-            lines.append(line)
-            lines.append(make_line(_footers))
+            lines.extend((line, make_line(_footers)))
 
         lines.append(line)
         return "\n".join(lines)

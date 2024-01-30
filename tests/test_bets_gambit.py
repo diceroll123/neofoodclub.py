@@ -40,7 +40,7 @@ def test_random_gambit_bets(nfc: NeoFoodClub) -> None:
 
 
 @pytest.mark.parametrize(
-    "five_bet,bets_hash",
+    ("five_bet", "bets_hash"),
     [
         (0x88888, "ggfgggbgbgbbggfaggaggffgf"),
         (0x44444, "mmmmckmmmkkkmmakmccamckmm"),

@@ -14,7 +14,7 @@ from neofoodclub.math import (
 
 
 @pytest.mark.parametrize(
-    "bet_binary,expected",
+    ("bet_binary", "expected"),
     [
         (0x84210, (1, 2, 3, 4, 0)),
         (0x88888, (1, 1, 1, 1, 1)),
@@ -29,7 +29,7 @@ def test_binary_to_indices(bet_binary: int, expected: Sequence[int]) -> None:
 
 
 @pytest.mark.parametrize(
-    "amount_hash,expected",
+    ("amount_hash", "expected"),
     [
         ("BAQBAQBAQBAQBAQBAQBAQBAQBAQBAQ", (4098,) * 10),
         ("AtmAtmAtmAtmAtmAtmAtmAtmAtmAtm", (1000,) * 10),
@@ -51,7 +51,7 @@ def test_amounts_hash_to_bet_amounts(amount_hash: str, expected: Sequence[int]) 
 
 
 @pytest.mark.parametrize(
-    "expected,bet_amounts",
+    ("expected", "bet_amounts"),
     [
         ("BAQBAQBAQBAQBAQBAQBAQBAQBAQBAQ", (4098,) * 10),
         ("AtmAtmAtmAtmAtmAtmAtmAtmAtmAtm", (1000,) * 10),
@@ -73,7 +73,7 @@ def test_bet_amounts_to_amounts_hash(expected: str, bet_amounts: Sequence[int]) 
 
 
 @pytest.mark.parametrize(
-    "bets_hash,expected",
+    ("bets_hash", "expected"),
     [
         ("", 0),
         ("f", 1),
@@ -99,7 +99,7 @@ def test_bets_hash_to_bets_invalid(bets_hash: str) -> None:
 
 
 @pytest.mark.parametrize(
-    "bets_hash,expected",
+    ("bets_hash", "expected"),
     [("faa" * x, x) for x in range(1, 16)],
 )
 def test_bets_hash_to_bets_(bets_hash: str, expected: int) -> None:

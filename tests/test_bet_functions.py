@@ -5,7 +5,6 @@ import pytest
 from neofoodclub import math
 from neofoodclub.bets import Bets
 from neofoodclub.errors import InvalidAmountHash, InvalidBetHash, InvalidData
-from neofoodclub.modifier import Modifier
 from neofoodclub.nfc import NeoFoodClub
 
 
@@ -280,7 +279,7 @@ def test_bet_get_win_np(nfc: NeoFoodClub) -> None:
 
 
 @pytest.mark.parametrize(
-    "bet_hash, bet_indices",
+    ("bet_hash", "bet_indices"),
     [
         (
             "faafa",

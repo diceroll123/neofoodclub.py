@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from neofoodclub.nfc import NeoFoodClub
@@ -181,7 +181,7 @@ class Modifier:
             if self._has_flag(1 << bit)
         )
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         return (
             isinstance(other, self.__class__)
             and self.value == other.value

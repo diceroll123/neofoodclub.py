@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Generator
+from itertools import starmap
+from typing import TYPE_CHECKING, Generator, Iterator
 
 from neofoodclub import math
 
@@ -63,7 +64,7 @@ class Odds:
     def _iterator(self) -> Generator[int, None, None]:
         yield from self._odds_values
 
-    def __iter__(self) -> Generator[int, None, None]:
+    def __iter__(self) -> Iterator[int]:
         return self._iterator()
 
     def __repr__(self) -> str:
@@ -73,5 +74,5 @@ class Odds:
             ("most_likely_winner", self.most_likely_winner),
             ("partial_rate", self.partial_rate),
         ]
-        joined = " ".join("{}={!r}".format(*t) for t in attrs)
+        joined = " ".join(starmap("{}={!r}".format, attrs))
         return f"<Odds {joined}>"

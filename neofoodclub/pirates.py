@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from itertools import starmap
 from typing import TYPE_CHECKING, Any
 
 from . import math
@@ -223,7 +224,7 @@ class Pirate(PirateMixin):
     def __int__(self) -> int:
         return self._bin
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         return isinstance(other, self.__class__) and int(self) == int(other)
 
     def __repr__(self) -> str:
@@ -237,5 +238,5 @@ class Pirate(PirateMixin):
             ("binary", self.binary),
             ("won", self.won),
         ]
-        joined = " ".join("{}={!r}".format(*t) for t in attrs)
+        joined = " ".join(starmap("{}={!r}".format, attrs))
         return f"<Pirate {joined}>"

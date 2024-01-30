@@ -3,6 +3,7 @@ from __future__ import annotations
 import contextlib
 import datetime
 import functools
+import operator
 import re
 import urllib.parse
 from typing import TYPE_CHECKING, Any, Callable, Sequence, TypeVar, overload
@@ -609,7 +610,7 @@ class NeoFoodClub:
             raise InvalidData("NeoFoodClub URL parameter `pirates` is invalid.")
 
         pirate_lists = orjson.loads(pirate_string)
-        has_proper_ids = set(sum(pirate_lists, [])) == set(range(1, 21))
+        has_proper_ids = set(functools.reduce(operator.iadd, pirate_lists, [])) == set(range(1, 21))
         if not has_proper_ids:
             raise InvalidData("NeoFoodClub URL parameter `pirates` is invalid.")
 

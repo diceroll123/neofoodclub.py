@@ -11,7 +11,7 @@ class FA(DefaultDict[int, int]):
         *,
         one: tuple[int, ...] | None = None,
         two: tuple[int, ...] | None = None,
-    ) -> DefaultDict[int, int]:
+    ) -> defaultdict[int, int]:
         data: dict[int, int] = {}
 
         for fa_value, values in zip((1, 2), (one, two)):

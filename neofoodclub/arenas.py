@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Generator, Iterator, Sequence
+from typing import TYPE_CHECKING, Iterator, Sequence
 
 from . import math
 from .pirates import Pirate
@@ -102,7 +102,7 @@ class Arena:
         return self._pirates[item]
 
     def __iter__(self) -> Iterator[Pirate]:
-        return self._pirates.__iter__()
+        return iter(self._pirates)
 
     def __repr__(self) -> str:
         return (
@@ -181,7 +181,7 @@ class Arenas:
     def __getitem__(self, key: int) -> Arena:
         return self._arenas[key]
 
-    def __iter__(self) -> Generator[Arena, None, None]:
+    def __iter__(self) -> Iterator[Arena]:
         yield from self._arenas
 
     def __repr__(self) -> str:

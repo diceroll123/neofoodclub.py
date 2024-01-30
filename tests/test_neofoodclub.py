@@ -115,7 +115,7 @@ def test_cc_perk(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
 
 
 @pytest.mark.parametrize(
-    "bet_hash,winnings",
+    ("bet_hash", "winnings"),
     [
         ("aukacfukycuulacauutcbukdc", 24),
         ("ltqvqwgimhqtvrnywrwvijwnn", 0),
@@ -132,7 +132,7 @@ def test_get_win_units(
 
 
 @pytest.mark.parametrize(
-    "bet_hash,bet_amount,winnings",
+    ("bet_hash", "bet_amount", "winnings"),
     [
         ("aukacfukycuulacauutcbukdc", 8000, 192000),
         ("aukacfukycuulacauutcbukdc", None, 0),
