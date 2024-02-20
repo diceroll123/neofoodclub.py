@@ -6,17 +6,18 @@ from typing import Sequence
 import numpy as np
 
 from .neofoodclub import (
-    bet_amounts_to_amounts_hash_rust,
-    bets_hash_to_bet_indices_rust,
-    bets_hash_value_rust,
-    binary_to_indices_rust,
-    build_chance_objects_rust,
-    make_probabilities_rust,
-    make_round_dicts_rust,
-    pirate_binary_rust,
-    pirates_binary_rust,
+    bet_amounts_to_amounts_hash,
+    bets_hash_to_bet_indices,
+    bets_hash_value,
+    binary_to_indices,
+    build_chance_objects,
+    make_probabilities,
+    make_round_dicts,
+    pirate_binary,
+    pirates_binary,
 )
 
+# JSYK! The type hints for these live in ./neofoodclub.pyi
 __all__ = (
     "pirate_binary",
     "pirates_binary",
@@ -47,17 +48,6 @@ BIT_MASKS: tuple[int, ...] = (0xF0000, 0xF000, 0xF00, 0xF0, 0xF)
 # represents each arena with the same pirate index filled.
 # 0x88888 = (1, 1, 1, 1, 1), which is the first pirate in each arena, and so on.
 PIR_IB: tuple[int, ...] = (0x88888, 0x44444, 0x22222, 0x11111)
-
-# JSYK! The type hints for these live in ./neofoodclub.pyi
-pirate_binary = pirate_binary_rust
-pirates_binary = pirates_binary_rust
-binary_to_indices = binary_to_indices_rust
-make_probabilities = make_probabilities_rust
-make_round_dicts = make_round_dicts_rust
-bets_hash_value = bets_hash_value_rust
-bets_hash_to_bet_indices = bets_hash_to_bet_indices_rust
-bet_amounts_to_amounts_hash = bet_amounts_to_amounts_hash_rust
-build_chance_objects = build_chance_objects_rust
 
 
 def amounts_hash_to_bet_amounts(amounts_hash: str, /) -> tuple[int | None, ...]:
