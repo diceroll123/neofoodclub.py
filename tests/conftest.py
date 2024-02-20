@@ -138,7 +138,7 @@ def crazy_test_hash() -> str:
 
 
 @pytest.fixture()
-def crazy_test_indices() -> Tuple[Tuple[int, ...], ...]:
+def crazy_test_indices() -> Tuple[list[int], ...]:
     return (
         [2, 1, 3, 4, 3],
         [1, 4, 1, 3, 1],
