@@ -19,6 +19,9 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.PAT_TOKEN }}
       - name: "Build wheels - x86_64"
         uses: PyO3/maturin-action@v1
         with:
@@ -36,6 +39,9 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.PAT_TOKEN }}
       - name: "Build wheels - universal"
         uses: PyO3/maturin-action@v1
         with:
@@ -57,6 +63,9 @@ jobs:
           - target: aarch64-pc-windows-msvc
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.PAT_TOKEN }}
       - name: "Build wheels - windows"
         uses: PyO3/maturin-action@v1
         with:
@@ -77,6 +86,9 @@ jobs:
           - i686-unknown-linux-gnu
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.PAT_TOKEN }}
       - name: "Build wheels - linux"
         uses: PyO3/maturin-action@v1
         with:
@@ -109,6 +121,9 @@ jobs:
             arch: ppc64
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.PAT_TOKEN }}
       - name: "Build wheels - linux-cross"
         uses: PyO3/maturin-action@v1
         with:
@@ -132,6 +147,9 @@ jobs:
           - i686-unknown-linux-musl
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.PAT_TOKEN }}
       - name: "Build wheels - musllinux"
         uses: PyO3/maturin-action@v1
         with:
@@ -157,6 +175,9 @@ jobs:
             arch: armv7
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.PAT_TOKEN }}
       - name: "Build wheels - musllinux-cross"
         uses: PyO3/maturin-action@v1
         with:
