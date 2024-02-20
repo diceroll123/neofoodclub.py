@@ -29,19 +29,20 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m venv venv
-          source ./venv/bin/activate
-          pip install --upgrade pip setuptools wheel pytest setuptools-rust
-          pip install -U -r requirements_dev.txt
+          pip install uv
+          uv venv
+          source ./.venv/bin/activate
+          uv pip install --upgrade setuptools wheel pytest setuptools-rust
+          uv pip install -U -r requirements_dev.txt
       - name: Installing distribution (dev mode)
         # this adds the .so to the inner lib files so we can test
         run: |
-          source ./venv/bin/activate
+          source ./.venv/bin/activate
           python ./setup.py develop
       - name: Run tests
         shell: bash
         run: |
-          source ./venv/bin/activate
+          source ./.venv/bin/activate
           PYTHONPATH="$(pwd)" pytest
 
   coverage:
@@ -63,19 +64,20 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m venv venv
-          source ./venv/bin/activate
-          pip install --upgrade pip setuptools wheel pytest setuptools-rust
-          pip install -U -r requirements_dev.txt
+          pip install uv
+          uv venv
+          source ./.venv/bin/activate
+          uv pip install --upgrade setuptools wheel pytest setuptools-rust
+          uv pip install -U -r requirements_dev.txt
       - name: Installing distribution (dev mode)
         # this adds the .so to the inner lib files so we can test
         run: |
-          source ./venv/bin/activate
+          source ./.venv/bin/activate
           python ./setup.py develop
       - name: Run tests
         shell: bash
         run: |
-          source ./venv/bin/activate
+          source ./.venv/bin/activate
           PYTHONPATH="$(pwd)" coverage run -m pytest
 
       - name: Coverage comment
