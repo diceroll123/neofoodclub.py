@@ -1,0 +1,3 @@
+[submodule "neofoodclub_rs"]
+	path = neofoodclub_rs
+	url = git@github.com:diceroll123/neofoodclub.rs.git
