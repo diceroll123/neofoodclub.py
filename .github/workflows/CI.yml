@@ -30,8 +30,8 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels
-          path: dist
+          name: wheels-${{ matrix.platform.target }}
+          path: dist/*
 
   macos-universal:
     runs-on: macos-latest
@@ -49,8 +49,8 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels
-          path: dist
+          name: wheels-${{ matrix.platform.target }}
+          path: dist/*
 
   windows:
     runs-on: windows-latest
@@ -73,8 +73,8 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels
-          path: dist
+          name: wheels-${{ matrix.platform.target }}
+          path: dist/*
 
   linux:
     runs-on: ubuntu-latest
@@ -99,8 +99,8 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels
-          path: dist
+          name: wheels-${{ matrix.platform.target }}
+          path: dist/*
 
   linux-cross:
     runs-on: ubuntu-latest
@@ -134,8 +134,8 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels
-          path: dist
+          name: wheels-${{ matrix.platform.target }}
+          path: dist/*
 
   musllinux:
     runs-on: ubuntu-latest
@@ -159,8 +159,8 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels
-          path: dist
+          name: wheels-${{ matrix.platform.target }}
+          path: dist/*
 
   musllinux-cross:
     runs-on: ubuntu-latest
@@ -188,8 +188,8 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels
-          path: dist
+          name: wheels-${{ matrix.platform.target }}
+          path: dist/*
 
   release:
     name: Release
@@ -206,7 +206,9 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: wheels
+          pattern: wheels-*
+          path: dist
+          merge-multiple: true
       - name: Publish to PyPI
         uses: PyO3/maturin-action@v1
         env:
