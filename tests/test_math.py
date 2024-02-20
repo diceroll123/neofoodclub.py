@@ -2,11 +2,9 @@ from typing import Sequence
 
 import pytest
 
-from neofoodclub.errors import InvalidData
 from neofoodclub.math import (
     amounts_hash_to_bet_amounts,
     bet_amounts_to_amounts_hash,
-    bets_hash_to_bets,
     bets_hash_to_bets_count,
     binary_to_indices,
     make_probabilities,
@@ -84,26 +82,6 @@ def test_bet_amounts_to_amounts_hash(expected: str, bet_amounts: Sequence[int]) 
 )
 def test_bets_hash_to_bets_count(bets_hash: str, expected: int) -> None:
     assert expected == bets_hash_to_bets_count(bets_hash)
-
-
-@pytest.mark.parametrize(
-    "bets_hash",
-    [
-        "",  # zero bets
-        "faafaafaafaafaafaafaafaafaafaafaafaafaafaafaafaa",  # 16 bets
-    ],
-)
-def test_bets_hash_to_bets_invalid(bets_hash: str) -> None:
-    with pytest.raises(InvalidData):
-        bets_hash_to_bets(bets_hash)
-
-
-@pytest.mark.parametrize(
-    ("bets_hash", "expected"),
-    [("faa" * x, x) for x in range(1, 16)],
-)
-def test_bets_hash_to_bets_(bets_hash: str, expected: int) -> None:
-    assert expected == len(bets_hash_to_bets(bets_hash))
 
 
 def test_make_probabilities() -> None:

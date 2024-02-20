@@ -5,7 +5,6 @@ from typing import Sequence
 
 import numpy as np
 
-from .errors import InvalidData
 from .neofoodclub import (
     bet_amounts_to_amounts_hash_rust,
     bets_hash_to_bet_indices_rust,
@@ -28,7 +27,6 @@ __all__ = (
     "bets_hash_to_bets_count",
     "bets_hash_to_bet_binaries",
     "bets_indices_to_bet_binaries",
-    "bets_hash_to_bets",
     "bets_hash_value",
     "make_probabilities",
     "build_chance_objects",
@@ -123,30 +121,6 @@ def bets_hash_to_bets_count(bets_hash: str, /) -> int:
         The hash of bet amounts.
     """
     return len(bets_hash_to_bet_indices(bets_hash))
-
-
-def bets_hash_to_bets(bets_hash: str, /) -> dict[int, list[int]]:
-    """Dict[:class:`int`, List[:class:`int`]]: Returns a dict of bets where keys are the index and values
-    are bet indicies.
-
-    Parameters
-    ----------
-    bets_hash: :class:`str`
-        The hash of bet amounts.
-
-    Raises
-    ------
-    ~neofoodclub.InvalidData
-        The amount of bets provided is invalid.
-    """
-    bets = bets_hash_to_bet_indices(bets_hash)
-
-    bet_length = len(bets)
-    if not 1 <= bet_length <= 15:
-        # currently support 15 bets still for reverse-compatibility i guess
-        raise InvalidData("An invalid amount of bets was provided")
-
-    return dict(zip(range(1, bet_length + 1), bets))
 
 
 # fmt: off
