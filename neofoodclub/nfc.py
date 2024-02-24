@@ -995,7 +995,7 @@ class NeoFoodClub:
         ~neofoodclub.InvalidBetHash
             The bet hash contains invalid characters.
         ~neofoodclub.InvalidAmountHash
-        The amount hash contains invalid characters.
+            The amount hash contains invalid characters.
         """
         if not BET_HASH_REGEX.fullmatch(bets_hash):
             raise InvalidBetHash
