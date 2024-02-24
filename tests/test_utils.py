@@ -84,7 +84,7 @@ def test_bets_stats_table_with_net_expected(nfc: NeoFoodClub) -> None:
 def test_dst_offset_fall_back() -> None:
     # starting at America/New_York because I live there and I hate timezone math
     offset = utils.get_dst_offset(
-        datetime.datetime(2023, 11, 5, 8, 0, 0, 0, tzinfo=tz.gettz("America/New_York"))
+        datetime.datetime(2023, 11, 5, 8, 0, 0, 0, tzinfo=tz.gettz("America/New_York")),
     )
     assert offset == datetime.timedelta(hours=-1)
 
@@ -92,7 +92,7 @@ def test_dst_offset_fall_back() -> None:
 def test_dst_offset_spring_forward() -> None:
     # starting at America/New_York because I live there and I hate timezone math
     offset = utils.get_dst_offset(
-        datetime.datetime(2024, 3, 10, 8, 0, 0, 0, tzinfo=tz.gettz("America/New_York"))
+        datetime.datetime(2024, 3, 10, 8, 0, 0, 0, tzinfo=tz.gettz("America/New_York")),
     )
     assert offset == datetime.timedelta(hours=1)
 
@@ -100,6 +100,6 @@ def test_dst_offset_spring_forward() -> None:
 def test_dst_offset_no_dst() -> None:
     # starting at America/New_York because I live there and I hate timezone math
     offset = utils.get_dst_offset(
-        datetime.datetime(2024, 1, 1, 8, 0, 0, 0, tzinfo=tz.gettz("America/New_York"))
+        datetime.datetime(2024, 1, 1, 8, 0, 0, 0, tzinfo=tz.gettz("America/New_York")),
     )
     assert offset == datetime.timedelta(hours=0)

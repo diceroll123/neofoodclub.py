@@ -122,7 +122,7 @@ def test_cc_perk(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
     ],
 )
 def test_get_win_units(
-    nfc: NeoFoodClub, nfc_from_url: NeoFoodClub, bet_hash: str, winnings: int
+    nfc: NeoFoodClub, nfc_from_url: NeoFoodClub, bet_hash: str, winnings: int,
 ) -> None:
     bets = nfc.make_bets_from_hash(bet_hash)
     assert nfc.get_win_units(bets) == winnings

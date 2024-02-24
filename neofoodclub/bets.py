@@ -55,7 +55,7 @@ class Bets:
         if np.all(self.bet_amounts > -1000):
             return np.sum(
                 self.bet_amounts * self.nfc._data_dict["ers"][self._indices]
-                - self.bet_amounts
+                - self.bet_amounts,
             )
         return 0.0
 
@@ -87,11 +87,11 @@ class Bets:
 
     @bet_amounts.setter
     def bet_amounts(
-        self, val: Sequence[int | None] | npt.NDArray[np.int32] | None
+        self, val: Sequence[int | None] | npt.NDArray[np.int32] | None,
     ) -> None:
         if val is None:
             self._bet_amounts: npt.NDArray[np.int32] = np.array(
-                [-1000] * self._indices.size
+                [-1000] * self._indices.size,
             )
             return
 
@@ -102,7 +102,7 @@ class Bets:
         # strictly enforcing amount of values provided
         if len(val) != self._indices.size:
             raise InvalidData(
-                f"Invalid bet amounts provided. Expected length: {self._indices.size}, but received {len(val)}."
+                f"Invalid bet amounts provided. Expected length: {self._indices.size}, but received {len(val)}.",
             )
 
         amts: npt.NDArray[np.int32] = np.array([v or Math.BET_AMOUNT_MIN for v in val])
@@ -144,7 +144,7 @@ class Bets:
 
     @classmethod
     def _from_generator(
-        cls, *, indices: npt.NDArray[np.int16], nfc: NeoFoodClub
+        cls, *, indices: npt.NDArray[np.int16], nfc: NeoFoodClub,
     ) -> Bets:
         # here is where we will take indices and sort as needed
         # to avoid confusion with "manually" making bets
@@ -160,6 +160,7 @@ class Bets:
         ------
         ~neofoodclub.InvalidData
         Invalid binaries were passed.
+
         """
         np_bins = np.array(bins)
         # duplicate bins are removed here
@@ -171,13 +172,13 @@ class Bets:
 
         if intersection.size == 0:
             raise InvalidData(
-                "Bets class requires at least one valid bet binary integer."
+                "Bets class requires at least one valid bet binary integer.",
             )
 
         if intersection.size != np_bins.size:
             diff = np.setxor1d(np_bins, intersection)
             raise InvalidData(
-                f"Invalid bet binaries entered: {', '.join([hex(b) for b in diff])}"
+                f"Invalid bet binaries entered: {', '.join([hex(b) for b in diff])}",
             )
 
         return cls(nfc=nfc, indices=intersection)
@@ -254,6 +255,7 @@ class Bets:
         include_domain: :class:`bool`
             Whether or not you want the output URL to include the preferred neofoodclub website's domain.
             Default = True.
+
         """
         return self.nfc.make_url(self, all_data=all_data, include_domain=include_domain)
 

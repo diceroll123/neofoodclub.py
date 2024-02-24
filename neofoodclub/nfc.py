@@ -39,7 +39,7 @@ NEO_FC_REGEX = re.compile(
 )
 PIRATES_REGEX = re.compile(r"^\[((\[(\d+,){3}\d+\]),){4}(\[(\d+,){3}\d+\])\]$")
 ODDS_REGEX = re.compile(
-    r"^\[(\[1,(([2-9]|1[0-3]),){3}([2-9]|1[0-3])\],){4}\[1,(([2-9]|1[0-3]),){3}([2-9]|1[0-3])\]\]$"
+    r"^\[(\[1,(([2-9]|1[0-3]),){3}([2-9]|1[0-3])\],){4}\[1,(([2-9]|1[0-3]),){3}([2-9]|1[0-3])\]\]$",
 )
 WINNERS_REGEX = re.compile(r"^\[((([1-4],){4}[1-4])|(0,0,0,0,0))\]$")
 FOODS_REGEX = re.compile(r"^\[((\[(\d+,){9}\d+\]),){4}(\[(\d+,){9}\d+\])\]$")
@@ -85,6 +85,7 @@ class NeoFoodClub:
     cache: :class:`bool`
         Whether or not to instantly calculate and cache the round's data.
         Turning this off is useful for when you're just analyzing data and not generating bets.
+
     """
 
     __slots__ = (
@@ -154,7 +155,7 @@ class NeoFoodClub:
         if self._modifier.time and (dt := self._get_round_time(self._modifier.time)):
             # start custom odds from opening odds and add from there
             self._data["customOdds"] = orjson.loads(
-                orjson.dumps(self._data["openingOdds"])
+                orjson.dumps(self._data["openingOdds"]),
             )
             for change in self.changes:
                 if change.timestamp < dt:
@@ -265,6 +266,7 @@ class NeoFoodClub:
         ----------
         modifier: Optional[:class:`Modifier`]
         The modifier object you'd like to add to this NeoFoodClub object.
+
         """
         self.modifier = modifier
         return self
@@ -276,6 +278,7 @@ class NeoFoodClub:
         ----------
         keep_custom: :class:`bool`
             Whether or not you'd like to keep the customOdds data key. False by default.
+
         """
         # return a deep copy of this round's dict
         data = orjson.loads(orjson.dumps(self._data))
@@ -418,6 +421,7 @@ class NeoFoodClub:
         ----------
         bets: :class:`Bets`
             The bets you'd like to find the amount of winning units for.
+
         """
         return self._get_winning_odds(bets).sum()
 
@@ -430,6 +434,7 @@ class NeoFoodClub:
         ----------
         bets: :class:`Bets`
             The bets you'd like to find the amount of winning neopoints for.
+
         """
         winning_bins_indices = self._get_winning_bet_indices(bets)
 
@@ -471,8 +476,8 @@ class NeoFoodClub:
         include_domain: :class:`bool`
             Whether or not you want the output URL to include the preferred neofoodclub website's domain.
             Default = True.
-        """
 
+        """
         use_15 = (
             len(bets or []) and 10 < len(bets or []) <= 15
         ) or self._modifier._cc_perk
@@ -507,7 +512,7 @@ class NeoFoodClub:
 
             if self.timestamp:
                 timestamp = self.timestamp.replace(
-                    microsecond=0, tzinfo=datetime.timezone.utc
+                    microsecond=0, tzinfo=datetime.timezone.utc,
                 ).isoformat()
                 params.append(("timestamp", timestamp))
 
@@ -545,6 +550,7 @@ class NeoFoodClub:
         ------
         ~neofoodclub.InvalidData
             The URL provided is invalid.
+
         """
         neo_fc = NEO_FC_REGEX.search(url)
         if neo_fc is None:
@@ -612,7 +618,7 @@ class NeoFoodClub:
 
         pirate_lists = orjson.loads(pirate_string)
         has_proper_ids = set(functools.reduce(operator.iadd, pirate_lists, [])) == set(
-            range(1, 21)
+            range(1, 21),
         )
         if not has_proper_ids:
             raise InvalidData("NeoFoodClub URL parameter `pirates` is invalid.")
@@ -686,7 +692,7 @@ class NeoFoodClub:
     def make_max_ter_bets(self) -> Bets:
         """:class:`Bets`: Creates a Bets object that consists of the highest ERs."""
         return Bets._from_generator(
-            indices=np.argsort(self._max_ter_indices()), nfc=self
+            indices=np.argsort(self._max_ter_indices()), nfc=self,
         )
 
     @_require_cache
@@ -717,7 +723,7 @@ class NeoFoodClub:
 
     @_require_cache
     def _gambit_indices(
-        self, *, five_bet: int | None = None, random: bool = False
+        self, *, five_bet: int | None = None, random: bool = False,
     ) -> np.ndarray:
         if five_bet is not None:
             bins = self._data_dict["bins"]
@@ -778,13 +784,13 @@ class NeoFoodClub:
 
     @_require_cache
     def make_gambit_bets(
-        self, *, five_bet: int | None = None, random: bool = False
+        self, *, five_bet: int | None = None, random: bool = False,
     ) -> Bets:
         """:class:`Bets`: Creates a Bets object that consists of the top-unit permutations
         of a single full-arena bet.
         """
         return Bets._from_generator(
-            indices=self._gambit_indices(five_bet=five_bet, random=random), nfc=self
+            indices=self._gambit_indices(five_bet=five_bet, random=random), nfc=self,
         )
 
     @_require_cache
@@ -813,6 +819,7 @@ class NeoFoodClub:
         ------
         ~neofoodclub.InvalidData
         The amount of selected pirates is not between 1 and 3.
+
         """
         amount_of_pirates = sum(bool(pirate_binary & mask) for mask in Math.BIT_MASKS)
 
@@ -823,7 +830,7 @@ class NeoFoodClub:
             raise InvalidData("You must pick 3 pirates at most.")
 
         return Bets._from_generator(
-            indices=self._tenbet_indices(pirate_binary), nfc=self
+            indices=self._tenbet_indices(pirate_binary), nfc=self,
         )
 
     @_require_cache
@@ -852,6 +859,7 @@ class NeoFoodClub:
         ------
         ~neofoodclub.NoPositiveArenas
             There are no positive arenas, so a bustproof set can not be made.
+
         """
         arenas = self.arenas
         positives = arenas.positives
@@ -918,19 +926,19 @@ class NeoFoodClub:
 
     @overload
     def make_bets_from_indices(
-        self, indices: Sequence[Sequence[int]], /, *, amounts_hash: str | None
+        self, indices: Sequence[Sequence[int]], /, *, amounts_hash: str | None,
     ) -> Bets:
         ...
 
     @overload
     def make_bets_from_indices(
-        self, indices: Sequence[Sequence[int]], /, *, amounts: Sequence[int]
+        self, indices: Sequence[Sequence[int]], /, *, amounts: Sequence[int],
     ) -> Bets:
         ...
 
     @overload
     def make_bets_from_indices(
-        self, indices: Sequence[Sequence[int]], /, *, amount: int
+        self, indices: Sequence[Sequence[int]], /, *, amount: int,
     ) -> Bets:
         ...
 
@@ -950,6 +958,7 @@ class NeoFoodClub:
         ------
         ~neofoodclub.InvalidAmountHash
         The amount hash contains invalid characters.
+
         """
         bets = Bets.from_binary(*Math.bets_indices_to_bet_binaries(indices), nfc=self)
         if amounts_hash:
@@ -969,7 +978,7 @@ class NeoFoodClub:
 
     @overload
     def make_bets_from_hash(
-        self, bets_hash: str, /, *, amounts_hash: str | None
+        self, bets_hash: str, /, *, amounts_hash: str | None,
     ) -> Bets:
         ...
 
@@ -999,6 +1008,7 @@ class NeoFoodClub:
             The bet hash contains invalid characters.
         ~neofoodclub.InvalidAmountHash
             The amount hash contains invalid characters.
+
         """
         if not BET_HASH_REGEX.fullmatch(bets_hash):
             raise InvalidBetHash
@@ -1046,6 +1056,7 @@ class NeoFoodClub:
         ------
         ~neofoodclub.InvalidAmountHash
         The amount hash contains invalid characters.
+
         """
         bets = Bets.from_binary(*binaries, nfc=self)
         if amounts_hash:

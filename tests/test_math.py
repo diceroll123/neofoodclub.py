@@ -91,7 +91,7 @@ def test_make_probabilities() -> None:
             (1, 11, 13, 2, 2),
             (1, 2, 13, 13, 11),
             (1, 5, 11, 7, 2),
-        )
+        ),
     )
     assert len(probs) == 5
 

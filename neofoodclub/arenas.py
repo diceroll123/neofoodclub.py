@@ -32,7 +32,7 @@ class Arena:
     )
 
     def __init__(
-        self, *, nfc: NeoFoodClub, arena_id: int, pirate_ids: Sequence[int]
+        self, *, nfc: NeoFoodClub, arena_id: int, pirate_ids: Sequence[int],
     ) -> None:
         self.nfc: NeoFoodClub = nfc
         self._id = arena_id
@@ -130,7 +130,7 @@ class Arenas:
             if p.id == pirate_id:
                 return p
         raise ValueError(
-            f"Could not find pirate with ID {pirate_id}. Only 1 through 20 are valid."
+            f"Could not find pirate with ID {pirate_id}. Only 1 through 20 are valid.",
         )
 
     def get_pirates_by_id(self, *pirate_ids: int) -> tuple[Pirate, ...]:

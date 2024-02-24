@@ -28,7 +28,7 @@ class OddsChange:
     )
 
     def __init__(
-        self, *, index: int, data: OddsChangeDict, round_data: dict[str, Any]
+        self, *, index: int, data: OddsChangeDict, round_data: dict[str, Any],
     ) -> None:
         self._index = index
         self._data = data  # to check against each other
@@ -73,7 +73,7 @@ class OddsChange:
     def pirate(self) -> PartialPirate:
         """:class:`PartialPirate`: Returns a partial pirate object, which is a convenience object storing the pirate's ID."""
         return PartialPirate(
-            self._round_data["pirates"][self.arena_index][self.pirate_index - 1]
+            self._round_data["pirates"][self.arena_index][self.pirate_index - 1],
         )
 
     @property

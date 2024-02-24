@@ -14,7 +14,7 @@ def test_tenbet_generation_three_pirates(nfc: NeoFoodClub, pirate_binary: int) -
 
 @pytest.mark.parametrize("pirate_binary", [0x0, 0x8888, 0x88888])
 def test_tenbet_generation_zero_and_five_pirates(
-    nfc: NeoFoodClub, pirate_binary: int
+    nfc: NeoFoodClub, pirate_binary: int,
 ) -> None:
     with pytest.raises(InvalidData):
         nfc.make_tenbet_bets(pirate_binary)

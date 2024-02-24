@@ -65,6 +65,7 @@ class PartialPirate(PirateMixin):
         The pirate's name.
     image: :class:`str`
         The pirates image.
+
     """
 
     def __init__(self, _id: int) -> None:
@@ -87,6 +88,7 @@ class Pirate(PirateMixin):
         The pirate's name.
     image: :class:`str`
         The pirates image.
+
     """
 
     __slots__ = (

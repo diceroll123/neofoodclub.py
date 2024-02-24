@@ -17,6 +17,7 @@ class Chance:
         The sum of the probabilities per Chance where `value` <= this Chance's `value`.
     tail: :class:`float`
         The difference of the sum of the probabilities per Chance where `value` < this Chance's `value`, from 1.
+
     """
 
     value: int

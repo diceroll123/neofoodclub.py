@@ -40,6 +40,7 @@ class Modifier:
         This flag value flips the algorithms upside-down, essentially giving you the Min TER bets instead of Max TER.
     ALL_MODIFIERS: :class:`int`
         This value is all of the other flag values, bitwise-or'd together. Only use this if you want true chaos.
+
     """
 
     __slots__ = (
@@ -103,7 +104,7 @@ class Modifier:
     def time(self, val: datetime.time) -> None:
         if not isinstance(val, datetime.time):
             raise TypeError(
-                f"Expected datetime.time but received {val.__class__.__name__}"
+                f"Expected datetime.time but received {val.__class__.__name__}",
             )
         self._time = val
         if self._nfc:
@@ -133,18 +134,18 @@ class Modifier:
     def custom_odds(self, val: dict[int, int]) -> None:
         if not isinstance(val, dict):
             raise TypeError(
-                f"Expected Dict[int, int] but received {val.__class__.__name__}"
+                f"Expected Dict[int, int] but received {val.__class__.__name__}",
             )
 
         for k, v in val.items():
             if k not in range(1, 21):
                 raise ValueError(
-                    f"Expected int between 1 and 20 for Pirate ID but received {k}"
+                    f"Expected int between 1 and 20 for Pirate ID but received {k}",
                 )
 
             if v not in range(2, 14):
                 raise ValueError(
-                    f"Expected int between 2 and 13 for Pirate Odds but received {v}"
+                    f"Expected int between 2 and 13 for Pirate Odds but received {v}",
                 )
 
         self._custom_odds = val

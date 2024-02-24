@@ -161,7 +161,7 @@ def test_modifier_time_rollback_changes(nfc: NeoFoodClub) -> None:
 def test_modifier_time_rollforward_changes(nfc: NeoFoodClub) -> None:
     new_nfc = nfc.copy()
     new_nfc.modifier = Modifier(
-        custom_time=datetime.time(hour=23, minute=47, second=20)
+        custom_time=datetime.time(hour=23, minute=47, second=20),
     )
 
     assert new_nfc.custom_odds == new_nfc.current_odds

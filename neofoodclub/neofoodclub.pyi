@@ -14,7 +14,7 @@ def make_probabilities(
 ) -> list[list[float]]: ...
 @staticmethod
 def make_round_dicts(
-    stds: Sequence[Sequence[float]], odds: tuple[tuple[int, ...], ...]
+    stds: Sequence[Sequence[float]], odds: tuple[tuple[int, ...], ...],
 ) -> tuple[
     npt.NDArray[np.int_],
     npt.NDArray[np.float64],
@@ -38,6 +38,7 @@ class Math:
             The index of the pirate in the arena. Can be 0 to 4. If 0, then there is no pirate.
         arena: :class:`int`
             The arena's index. Can be 0 to 4.
+
         """
 
     @staticmethod
@@ -52,6 +53,7 @@ class Math:
         ----------
         bets_indices: Sequence[:class:`int`]
             A sequence of integers from 0 to 4 to represent a bet.
+
         """
 
     @staticmethod
@@ -62,6 +64,7 @@ class Math:
         ----------
         bet_binary: :class:`int`
             An integer representing a bet.
+
         """
 
     @staticmethod
@@ -72,6 +75,7 @@ class Math:
         ----------
         bets_hash: :class:`str`
             The hash of bet amounts.
+
         """
 
     @staticmethod
@@ -82,11 +86,12 @@ class Math:
         ----------
         bets_hash: :class:`str`
             The hash of bet amounts.
+
         """
 
     @staticmethod
     def bets_indices_to_bet_binaries(
-        bets_indices: Sequence[Sequence[int]], /
+        bets_indices: Sequence[Sequence[int]], /,
     ) -> tuple[int, ...]:
         """Tuple[:class:`int`, ...]: Returns the bet-binary representations of the bets indices provided.
 
@@ -94,6 +99,7 @@ class Math:
         ----------
         bets_indices: Sequence[Sequence[:class:`int`]]
             A sequence of a sequence of integers from 0 to 4 to represent a bet.
+
         """
 
     @staticmethod
@@ -104,6 +110,7 @@ class Math:
         ----------
         bets_hash: :class:`str`
             The hash of bet amounts.
+
         """
 
     @staticmethod
@@ -116,6 +123,7 @@ class Math:
         ----------
         bet_amounts: Sequence[int]
             A sequence of bet amount integers.
+
         """
 
     @staticmethod
@@ -126,6 +134,7 @@ class Math:
         ----------
         bets_indices: Sequence[Sequence[:class:`int`]]
             A sequence of a sequence of integers from 0 to 4 to represent a bet.
+
         """
 
     @staticmethod
@@ -136,6 +145,7 @@ class Math:
         ----------
         amounts_hash: :class:`str`
             The hash of bet amounts.
+
         """
     @staticmethod
     def build_chance_objects(

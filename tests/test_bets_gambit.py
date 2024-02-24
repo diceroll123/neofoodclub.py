@@ -49,7 +49,7 @@ def test_random_gambit_bets(nfc: NeoFoodClub) -> None:
     ],
 )
 def test_gambit_bets_equivalence(
-    nfc: NeoFoodClub, five_bet: int, bets_hash: str
+    nfc: NeoFoodClub, five_bet: int, bets_hash: str,
 ) -> None:
     bets = nfc.make_gambit_bets(five_bet=five_bet)
     assert bets.bets_hash == bets_hash

@@ -28,6 +28,7 @@ class Odds:
         The Chance object with the highest probability value.
     partial_rate: :class:`float`
         The sum of probabilities where you'd make a partial return.
+
     """
 
     __slots__ = (
@@ -42,7 +43,7 @@ class Odds:
     def __init__(self, bets: Bets) -> None:
         self._odds_values = bets.nfc._data_dict["odds"][bets._indices]
         self._odds = Math.build_chance_objects(
-            bets.indices, self._odds_values, bets.nfc._stds
+            bets.indices, self._odds_values, bets.nfc._stds,
         )
 
         # highest odds
@@ -52,7 +53,7 @@ class Odds:
         self.bust: Chance | None = self._odds[0] if self._odds[0].value == 0 else None
 
         self.most_likely_winner: Chance = max(
-            self._odds[1 if self.bust else 0 :], key=lambda o: o.probability
+            self._odds[1 if self.bust else 0 :], key=lambda o: o.probability,
         )
 
         amount_of_bets = max(0, min(len(bets), 15))

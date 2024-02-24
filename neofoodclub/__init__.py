@@ -4,14 +4,13 @@ __license__ = "MIT"
 __copyright__ = "Copyright 2021-present diceroll123"
 __version__ = "0.0.1a"
 
-from .neofoodclub import *
-
 from .arenas import *
 from .bets import *
 from .chance import *
 from .errors import *
 from .models import *
 from .modifier import *
+from .neofoodclub import *
 from .nfc import *
 from .odds import *
 from .odds_change import *

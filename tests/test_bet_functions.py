@@ -91,7 +91,7 @@ def test_bet_equivalence_with_amount(
     nfc: NeoFoodClub,
 ) -> None:
     mer_from_hash = nfc.make_bets_from_hash(
-        "eukucjuoycaulucepkyrtukyw", amounts_hash="CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS"
+        "eukucjuoycaulucepkyrtukyw", amounts_hash="CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS",
     )
     mer_from_indices = nfc.make_bets_from_indices(
         (
@@ -125,7 +125,7 @@ def test_bet_equivalence_with_amount(
     )
 
     mer_control = nfc.make_bets_from_hash(
-        "eukucjuoycaulucepkyrtukyw", amounts=[8000] * 10
+        "eukucjuoycaulucepkyrtukyw", amounts=[8000] * 10,
     )
 
     mer_control_two = nfc.make_bets_from_hash("eukucjuoycaulucepkyrtukyw", amount=8000)
@@ -141,13 +141,13 @@ def test_bet_hash_encoding(nfc: NeoFoodClub, crazy_test_hash: str) -> None:
 
 
 def test_bet_indices_encoding(
-    nfc: NeoFoodClub, crazy_test_indices: Tuple[Tuple[int, ...], ...]
+    nfc: NeoFoodClub, crazy_test_indices: Tuple[Tuple[int, ...], ...],
 ) -> None:
     assert nfc.make_bets_from_indices(crazy_test_indices).indices == crazy_test_indices
 
 
 def test_bet_indices_with_amount(
-    nfc: NeoFoodClub, crazy_test_indices: Tuple[Tuple[int, ...], ...]
+    nfc: NeoFoodClub, crazy_test_indices: Tuple[Tuple[int, ...], ...],
 ) -> None:
     assert (
         nfc.make_bets_from_indices(crazy_test_indices, amount=8000).indices
@@ -156,7 +156,7 @@ def test_bet_indices_with_amount(
 
 
 def test_bet_binaries_encoding(
-    nfc: NeoFoodClub, crazy_test_binaries: Tuple[int, ...]
+    nfc: NeoFoodClub, crazy_test_binaries: Tuple[int, ...],
 ) -> None:
     assert (
         tuple(nfc.make_bets_from_binaries(*crazy_test_binaries)) == crazy_test_binaries
@@ -164,7 +164,7 @@ def test_bet_binaries_encoding(
 
 
 def test_bet_binaries_with_amount(
-    nfc: NeoFoodClub, crazy_test_binaries: Tuple[int, ...]
+    nfc: NeoFoodClub, crazy_test_binaries: Tuple[int, ...],
 ) -> None:
     assert (
         tuple(nfc.make_bets_from_binaries(*crazy_test_binaries, amount=8000))
@@ -181,7 +181,7 @@ def test_expected_ratio_equality(crazy_bets: Bets) -> None:
 
 
 def test_net_expected_equality_with_amount(
-    nfc_with_bet_amount: NeoFoodClub, crazy_test_hash: str
+    nfc_with_bet_amount: NeoFoodClub, crazy_test_hash: str,
 ) -> None:
     # There's a discrepancy between what the website says vs what this says.
     # When it comes to expected ratio and net expected, the inconsistent
@@ -199,7 +199,7 @@ def test_net_expected_equality_with_amount(
     ],
 )
 def test_bets_from_binary_error(
-    nfc: NeoFoodClub, bet_binaries: Tuple[int, ...]
+    nfc: NeoFoodClub, bet_binaries: Tuple[int, ...],
 ) -> None:
     with pytest.raises(InvalidData):
         Bets.from_binary(*bet_binaries, nfc=nfc)
@@ -336,7 +336,7 @@ def test_bet_get_win_np(nfc: NeoFoodClub) -> None:
     ],
 )
 def test_indices_to_bet_hash(
-    bet_hash: str, bet_indices: Sequence[Sequence[int]]
+    bet_hash: str, bet_indices: Sequence[Sequence[int]],
 ) -> None:
     assert Math.bets_hash_value(bet_indices) == bet_hash
 
@@ -345,7 +345,7 @@ def test_bet_with_trailing_none_in_amounts(
     nfc: NeoFoodClub,
 ) -> None:
     nine_bets = nfc.make_bets_from_hash(
-        "abaakaebapkddapudaaqkbaaa", amounts_hash="EmxCoKCoKCglDKUCYqEXkByWBpqzGO"
+        "abaakaebapkddapudaaqkbaaa", amounts_hash="EmxCoKCoKCglDKUCYqEXkByWBpqzGO",
     )
     assert len(nine_bets) == 9
     assert len(nine_bets.bet_amounts) == 9
