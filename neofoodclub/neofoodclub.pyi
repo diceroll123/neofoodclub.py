@@ -32,8 +32,8 @@ def pirates_binary(bets_indices: Sequence[int]) -> int:
         A sequence of integers from 0 to 4 to represent a bet.
     """
 
-def binary_to_indices(bet_binary: int) -> list[int]:
-    """List[int, ...]: Returns the bet indices of a bet-binary value.
+def binary_to_indices(bet_binary: int) -> tuple[int]:
+    """Tuple[int, ...]: Returns the bet indices of a bet-binary value.
 
     Parameters
     ----------

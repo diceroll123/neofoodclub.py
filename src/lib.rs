@@ -40,13 +40,15 @@ fn pirates_binary(bets_indices: [u8; 5]) -> u32 {
 }
 
 #[pyfunction]
-fn binary_to_indices(binary: u32) -> [u8; 5] {
-    neofoodclub::math::binary_to_indices(binary)
+fn binary_to_indices(py: Python, binary: u32) -> PyResult<&PyTuple> {
+    let elements = neofoodclub::math::binary_to_indices(binary);
+    Ok(PyTuple::new(py, elements))
 }
 
 #[pyfunction]
-fn bets_hash_to_bet_indices(bets_hash: &str) -> Vec<[u8; 5]> {
-    neofoodclub::math::bets_hash_to_bet_indices(bets_hash)
+fn bets_hash_to_bet_indices<'a>(py: Python<'a>, bets_hash: &'a str) -> PyResult<&'a PyTuple> {
+    let elements = neofoodclub::math::bets_hash_to_bet_indices(bets_hash);
+    Ok(PyTuple::new(py, elements))
 }
 
 #[pyfunction]
