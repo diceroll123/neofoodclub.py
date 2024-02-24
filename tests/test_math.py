@@ -2,11 +2,8 @@ from typing import Sequence
 
 import pytest
 
-from neofoodclub.math import (
-    amounts_hash_to_bet_amounts,
-    bet_amounts_to_amounts_hash,
-    bets_hash_to_bets_count,
-    binary_to_indices,
+from neofoodclub import (
+    Math,
     make_probabilities,
 )
 
@@ -23,7 +20,7 @@ from neofoodclub.math import (
     ],
 )
 def test_binary_to_indices(bet_binary: int, expected: Sequence[int]) -> None:
-    assert expected == binary_to_indices(bet_binary)
+    assert expected == Math.binary_to_indices(bet_binary)
 
 
 @pytest.mark.parametrize(
@@ -45,7 +42,7 @@ def test_binary_to_indices(bet_binary: int, expected: Sequence[int]) -> None:
     ],
 )
 def test_amounts_hash_to_bet_amounts(amount_hash: str, expected: Sequence[int]) -> None:
-    assert expected == amounts_hash_to_bet_amounts(amount_hash)
+    assert expected == Math.amounts_hash_to_bet_amounts(amount_hash)
 
 
 @pytest.mark.parametrize(
@@ -67,7 +64,7 @@ def test_amounts_hash_to_bet_amounts(amount_hash: str, expected: Sequence[int]) 
     ],
 )
 def test_bet_amounts_to_amounts_hash(expected: str, bet_amounts: Sequence[int]) -> None:
-    assert bet_amounts_to_amounts_hash(bet_amounts) == expected
+    assert Math.bet_amounts_to_amounts_hash(bet_amounts) == expected
 
 
 @pytest.mark.parametrize(
@@ -81,7 +78,7 @@ def test_bet_amounts_to_amounts_hash(expected: str, bet_amounts: Sequence[int]) 
     ],
 )
 def test_bets_hash_to_bets_count(bets_hash: str, expected: int) -> None:
-    assert expected == bets_hash_to_bets_count(bets_hash)
+    assert expected == Math.bets_hash_to_bets_count(bets_hash)
 
 
 def test_make_probabilities() -> None:
@@ -100,4 +97,4 @@ def test_make_probabilities() -> None:
 
 
 def test_amount_hash_to_bet_amounts_below_50() -> None:
-    assert amounts_hash_to_bet_amounts("AaX") == (None,)
+    assert Math.amounts_hash_to_bet_amounts("AaX") == (None,)

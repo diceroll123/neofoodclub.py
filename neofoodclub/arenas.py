@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Iterator, Sequence
 
-from . import math
+from neofoodclub.neofoodclub import Math
+
 from .pirates import Pirate
 
 if TYPE_CHECKING:
@@ -151,7 +152,7 @@ class Arenas:
         """
         return tuple(
             self._arenas[arena][index - 1]
-            for arena, index in enumerate(math.binary_to_indices(binary))
+            for arena, index in enumerate(Math.binary_to_indices(binary))
             if index > 0
         )
 

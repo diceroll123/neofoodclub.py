@@ -3,7 +3,7 @@ from __future__ import annotations
 from itertools import starmap
 from typing import TYPE_CHECKING, Generator, Iterator
 
-from neofoodclub import math
+from neofoodclub.neofoodclub import Math
 
 if TYPE_CHECKING:
     from neofoodclub.bets import Bets
@@ -41,7 +41,7 @@ class Odds:
 
     def __init__(self, bets: Bets) -> None:
         self._odds_values = bets.nfc._data_dict["odds"][bets._indices]
-        self._odds = math.build_chance_objects(
+        self._odds = Math.build_chance_objects(
             bets.indices, self._odds_values, bets.nfc._stds
         )
 

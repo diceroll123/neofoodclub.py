@@ -3,7 +3,8 @@ from __future__ import annotations
 from itertools import starmap
 from typing import TYPE_CHECKING, Any
 
-from . import math
+from neofoodclub.neofoodclub import Math
+
 from .food_adjustments import NEGATIVE_FOOD, POSITIVE_FOOD
 
 if TYPE_CHECKING:
@@ -42,9 +43,7 @@ PIRATE_NAMES = {
 class PirateMixin:
     _id: int
 
-    __slots__ = (
-        "_id",
-    )
+    __slots__ = ("_id",)
 
     @property
     def name(self) -> str:
@@ -110,7 +109,7 @@ class Pirate(PirateMixin):
         self._index = index
         self._odds: int = nfc._data["customOdds"][arena][index]  # type: ignore
         self._opening_odds: int = nfc._data["openingOdds"][arena][index]
-        self._bin = math.pirate_binary(self._index, self._arena)
+        self._bin = Math.pirate_binary(self._index, self._arena)
         if nfc._stds:
             self._std = nfc._stds[arena][index]
             self._er = self._std * self._odds

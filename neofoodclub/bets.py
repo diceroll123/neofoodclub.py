@@ -5,9 +5,10 @@ from typing import TYPE_CHECKING, Any, Generator, Iterator, Sequence
 
 import numpy as np
 
-from neofoodclub import math, utils
+from neofoodclub import utils
 from neofoodclub.arenas import ARENA_NAMES
 from neofoodclub.errors import InvalidData
+from neofoodclub.neofoodclub import Math
 from neofoodclub.odds import Odds
 
 if TYPE_CHECKING:
@@ -104,7 +105,7 @@ class Bets:
                 f"Invalid bet amounts provided. Expected length: {self._indices.size}, but received {len(val)}."
             )
 
-        amts: npt.NDArray[np.int32] = np.array([v or math.BET_AMOUNT_MIN for v in val])
+        amts: npt.NDArray[np.int32] = np.array([v or Math.BET_AMOUNT_MIN for v in val])
 
         self._bet_amounts = utils.fix_bet_amounts(amts)
 
@@ -114,20 +115,20 @@ class Bets:
         making up these bets.
         """
         return tuple(
-            math.binary_to_indices(binary)
+            Math.binary_to_indices(binary)
             for binary in self.nfc._data_dict["bins"][self._indices]
         )
 
     @property
     def bets_hash(self) -> str:
         """:class:`str`: Returns a NeoFoodClub-compatible encoded hash of bet indices."""
-        return math.bets_hash_value(self.indices)
+        return Math.bets_hash_value(self.indices)
 
     @property
     def amounts_hash(self) -> str:
         """:class:`str`: Returns a NeoFoodClub-compatible encoded hash of bet amounts."""
         if np.all(self.bet_amounts > -1000):
-            return math.bet_amounts_to_amounts_hash(self.bet_amounts)  # type: ignore
+            return Math.bet_amounts_to_amounts_hash(self.bet_amounts)  # type: ignore
 
         return ""
 
@@ -200,7 +201,7 @@ class Bets:
     @property
     def is_crazy(self) -> bool:
         """:class:`bool`: Returns whether or not this set is "crazy". This returns True if all of the bets have all arenas filled. Mostly just for fun."""
-        return all(mask & bet for mask in math.BIT_MASKS for bet in self)
+        return all(mask & bet for mask in Math.BIT_MASKS for bet in self)
 
     @property
     def is_gambit(self) -> bool:

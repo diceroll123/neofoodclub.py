@@ -9,7 +9,6 @@ from dateutil import tz
 if TYPE_CHECKING:
     import numpy.typing as npt
 
-from . import math
 
 __all__ = (
     "fix_bet_amounts",
@@ -88,7 +87,9 @@ def fix_bet_amounts(amts: npt.NDArray[np.int32]) -> npt.NDArray[np.int32]:
     """
     # fix any values below 50 to be 50, to maintain working bets
     # floor any values above max bet amount
-    return np.clip(amts, math.BET_AMOUNT_MIN, math.BET_AMOUNT_MAX)
+    from neofoodclub import Math
+
+    return np.clip(amts, Math.BET_AMOUNT_MIN, Math.BET_AMOUNT_MAX)
 
 
 def get_dst_offset(today: datetime.datetime) -> datetime.timedelta:

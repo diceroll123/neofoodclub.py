@@ -2,7 +2,7 @@ from typing import Sequence, Tuple
 
 import pytest
 
-from neofoodclub import math
+from neofoodclub import Math
 from neofoodclub.bets import Bets
 from neofoodclub.errors import InvalidAmountHash, InvalidBetHash, InvalidData
 from neofoodclub.nfc import NeoFoodClub
@@ -338,7 +338,7 @@ def test_bet_get_win_np(nfc: NeoFoodClub) -> None:
 def test_indices_to_bet_hash(
     bet_hash: str, bet_indices: Sequence[Sequence[int]]
 ) -> None:
-    assert math.bets_hash_value(bet_indices) == bet_hash
+    assert Math.bets_hash_value(bet_indices) == bet_hash
 
 
 def test_bet_with_trailing_none_in_amounts(
