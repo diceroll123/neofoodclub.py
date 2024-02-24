@@ -1,13 +1,13 @@
 use itertools::iproduct;
+use neofoodclub::math::BET_AMOUNT_MAX;
+use neofoodclub::math::BET_AMOUNT_MIN;
 use numpy::{ndarray::Array1, PyArray1, ToPyArray};
 use pyo3::{prelude::*, types::PyTuple};
 use std::collections::{BTreeMap, HashMap};
 
 // WARNING: the literal integers in this file switches between hex and binary willy-nilly, mostly for readability.
 
-// each arena, as if they were full. this is impossible to actually do.
-// BIT_MASKS[i] will accept pirates from arena i and only them. BIT_MASKS[4] == 0b1111, BIT_MASKS[3] == 0b11110000, etc...
-const BIT_MASKS: [u32; 5] = [0xF0000, 0xF000, 0xF00, 0xF0, 0xF];
+static BIT_MASKS: [u32; 5] = neofoodclub::math::BIT_MASKS;
 
 // represents each arena with the same pirate index filled.
 // PIR_IB[i] will accept pirates of index i (from 0 to 3) PIR_IB[0] = 0b10001000100010001000, PIR_IB[1] = 0b01000100010001000100, PIR_IB[2] = 0b00100010001000100010, PIR_IB[3] = 0b00010001000100010001
@@ -64,6 +64,26 @@ fn bets_hash_value(bets_indices: Vec<[u8; 5]>) -> String {
 #[pyfunction]
 fn amounts_hash_to_bet_amounts<'a>(py: Python<'a>, amounts_hash: &'a str) -> PyResult<&'a PyTuple> {
     let elements = neofoodclub::math::amounts_hash_to_bet_amounts(amounts_hash);
+    Ok(PyTuple::new(py, elements))
+}
+
+#[pyfunction]
+fn bets_hash_to_bet_binaries<'a>(py: Python<'a>, bets_hash: &'a str) -> PyResult<&'a PyTuple> {
+    let elements = neofoodclub::math::bets_hash_to_bet_binaries(bets_hash);
+    Ok(PyTuple::new(py, elements))
+}
+
+#[pyfunction]
+fn bets_hash_to_bets_count(bets_hash: &str) -> usize {
+    neofoodclub::math::bets_hash_to_bets_count(bets_hash)
+}
+
+#[pyfunction]
+fn bets_indices_to_bet_binaries<'a>(
+    py: Python<'a>,
+    bets_indices: Vec<[u8; 5]>,
+) -> PyResult<&'a PyTuple> {
+    let elements = neofoodclub::math::bets_indices_to_bet_binaries(bets_indices);
     Ok(PyTuple::new(py, elements))
 }
 
@@ -317,15 +337,21 @@ fn build_chance_objects(
 #[pymodule]
 #[pyo3(name = "neofoodclub")]
 fn neofoodclub_rs(_py: Python, m: &PyModule) -> PyResult<()> {
-    m.add_function(wrap_pyfunction!(pirate_binary, m)?)?;
-    m.add_function(wrap_pyfunction!(pirates_binary, m)?)?;
-    m.add_function(wrap_pyfunction!(binary_to_indices, m)?)?;
-    m.add_function(wrap_pyfunction!(bets_hash_value, m)?)?;
-    m.add_function(wrap_pyfunction!(bets_hash_to_bet_indices, m)?)?;
-    m.add_function(wrap_pyfunction!(bet_amounts_to_amounts_hash, m)?)?;
     m.add_function(wrap_pyfunction!(amounts_hash_to_bet_amounts, m)?)?;
+    m.add_function(wrap_pyfunction!(bet_amounts_to_amounts_hash, m)?)?;
+    m.add_function(wrap_pyfunction!(bets_hash_to_bet_binaries, m)?)?;
+    m.add_function(wrap_pyfunction!(bets_hash_to_bet_indices, m)?)?;
+    m.add_function(wrap_pyfunction!(bets_hash_to_bets_count, m)?)?;
+    m.add_function(wrap_pyfunction!(bets_hash_value, m)?)?;
+    m.add_function(wrap_pyfunction!(bets_indices_to_bet_binaries, m)?)?;
+    m.add_function(wrap_pyfunction!(binary_to_indices, m)?)?;
+    m.add_function(wrap_pyfunction!(build_chance_objects, m)?)?;
     m.add_function(wrap_pyfunction!(make_probabilities, m)?)?;
     m.add_function(wrap_pyfunction!(make_round_dicts, m)?)?;
-    m.add_function(wrap_pyfunction!(build_chance_objects, m)?)?;
+    m.add_function(wrap_pyfunction!(pirate_binary, m)?)?;
+    m.add_function(wrap_pyfunction!(pirates_binary, m)?)?;
+    m.add("BET_AMOUNT_MAX", BET_AMOUNT_MAX)?;
+    m.add("BET_AMOUNT_MIN", BET_AMOUNT_MIN)?;
+    m.add("BIT_MASKS", BIT_MASKS)?;
     Ok(())
 }

@@ -1,14 +1,18 @@
 from __future__ import annotations
 
-from typing import Sequence
-
 import numpy as np
 
 from .neofoodclub import (
+    BET_AMOUNT_MAX,
+    BET_AMOUNT_MIN,
+    BIT_MASKS,
     amounts_hash_to_bet_amounts,
     bet_amounts_to_amounts_hash,
+    bets_hash_to_bet_binaries,
     bets_hash_to_bet_indices,
+    bets_hash_to_bets_count,
     bets_hash_value,
+    bets_indices_to_bet_binaries,
     binary_to_indices,
     build_chance_objects,
     make_probabilities,
@@ -34,57 +38,9 @@ __all__ = (
     "make_round_dicts",
     "FULL_BETS",
     "BIT_MASKS",
+    "BET_AMOUNT_MIN",
+    "BET_AMOUNT_MAX",
 )
-
-BET_AMOUNT_MIN = 50
-
-BET_AMOUNT_MAX = 70304
-# this fixed number is the max that NeoFoodClub can encode,
-# given the current bet (and bet amount) encoding specification
-
-# each arena, as if they were full. this is impossible to actually do.
-BIT_MASKS: tuple[int, ...] = (0xF0000, 0xF000, 0xF00, 0xF0, 0xF)
-
-# represents each arena with the same pirate index filled.
-# 0x88888 = (1, 1, 1, 1, 1), which is the first pirate in each arena, and so on.
-PIR_IB: tuple[int, ...] = (0x88888, 0x44444, 0x22222, 0x11111)
-
-
-def bets_hash_to_bet_binaries(bets_hash: str, /) -> tuple[int, ...]:
-    """Tuple[:class:`int`, ...]: Returns the bet-binary representations of the bets hash provided.
-
-    Parameters
-    ----------
-    bets_hash: :class:`str`
-        The hash of bet amounts.
-    """
-    return tuple(
-        pirates_binary(indices) for indices in bets_hash_to_bet_indices(bets_hash)
-    )
-
-
-def bets_indices_to_bet_binaries(
-    bets_indices: Sequence[Sequence[int]], /
-) -> tuple[int, ...]:
-    """Tuple[:class:`int`, ...]: Returns the bet-binary representations of the bets indices provided.
-
-    Parameters
-    ----------
-    bets_indices: Sequence[Sequence[:class:`int`]]
-        A sequence of a sequence of integers from 0 to 4 to represent a bet.
-    """
-    return tuple(pirates_binary(tuple(indices)) for indices in bets_indices)
-
-
-def bets_hash_to_bets_count(bets_hash: str, /) -> int:
-    """:class:`int`: Returns the amount of bets for a given bets hash.
-
-    Parameters
-    ----------
-    bets_hash: :class:`str`
-        The hash of bet amounts.
-    """
-    return len(bets_hash_to_bet_indices(bets_hash))
 
 
 # fmt: off

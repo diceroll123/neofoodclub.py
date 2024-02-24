@@ -8,6 +8,10 @@ if TYPE_CHECKING:
 
     from neofoodclub.chance import Chance
 
+BIT_MASKS: tuple[int, ...]
+BET_AMOUNT_MIN: int
+BET_AMOUNT_MAX: int
+
 def pirate_binary(index: int, arena: int) -> int:
     """:class:`int`: Returns the bet-binary representation of a pirate in an arena.
 
@@ -39,6 +43,35 @@ def binary_to_indices(bet_binary: int) -> tuple[int]:
     ----------
     bet_binary: :class:`int`
         An integer representing a bet.
+    """
+
+def bets_hash_to_bets_count(bets_hash: str, /) -> int:
+    """:class:`int`: Returns the amount of bets for a given bets hash.
+
+    Parameters
+    ----------
+    bets_hash: :class:`str`
+        The hash of bet amounts.
+    """
+
+def bets_hash_to_bet_binaries(bets_hash: str, /) -> tuple[int, ...]:
+    """Tuple[:class:`int`, ...]: Returns the bet-binary representations of the bets hash provided.
+
+    Parameters
+    ----------
+    bets_hash: :class:`str`
+        The hash of bet amounts.
+    """
+
+def bets_indices_to_bet_binaries(
+    bets_indices: Sequence[Sequence[int]], /
+) -> tuple[int, ...]:
+    """Tuple[:class:`int`, ...]: Returns the bet-binary representations of the bets indices provided.
+
+    Parameters
+    ----------
+    bets_indices: Sequence[Sequence[:class:`int`]]
+        A sequence of a sequence of integers from 0 to 4 to represent a bet.
     """
 
 def bets_hash_to_bet_indices(bets_hash: str) -> list[list[int]]:
