@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from string import ascii_lowercase, ascii_uppercase
 from typing import Sequence
 
 import numpy as np
 
 from .neofoodclub import (
+    amounts_hash_to_bet_amounts,
     bet_amounts_to_amounts_hash,
     bets_hash_to_bet_indices,
     bets_hash_value,
@@ -48,32 +48,6 @@ BIT_MASKS: tuple[int, ...] = (0xF0000, 0xF000, 0xF00, 0xF0, 0xF)
 # represents each arena with the same pirate index filled.
 # 0x88888 = (1, 1, 1, 1, 1), which is the first pirate in each arena, and so on.
 PIR_IB: tuple[int, ...] = (0x88888, 0x44444, 0x22222, 0x11111)
-
-
-def amounts_hash_to_bet_amounts(amounts_hash: str, /) -> tuple[int | None, ...]:
-    """Tuple[Optional[:class:`int`], ...]: Returns a tuple of bet amounts from the provided amounts hash.
-
-    Parameters
-    ----------
-    amounts_hash: :class:`str`
-        The hash of bet amounts.
-    """
-    nums: list[int | None] = []
-    chunked = [amounts_hash[i : i + 3] for i in range(0, len(amounts_hash), 3)]
-
-    for p in chunked:
-        e = 0
-        for n in p:
-            e *= 52
-            e += (ascii_lowercase + ascii_uppercase).index(n)
-
-        value = e - BET_AMOUNT_MAX
-        if value < BET_AMOUNT_MIN:
-            nums.append(None)
-        else:
-            nums.append(value)
-
-    return tuple(nums)
 
 
 def bets_hash_to_bet_binaries(bets_hash: str, /) -> tuple[int, ...]:

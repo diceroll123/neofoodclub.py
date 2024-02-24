@@ -70,6 +70,15 @@ def bets_hash_value(bets_indices: Sequence[Sequence[int]]) -> str:
         A sequence of a sequence of integers from 0 to 4 to represent a bet.
     """
 
+def amounts_hash_to_bet_amounts(amounts_hash: str, /) -> tuple[int | None, ...]:
+    """Tuple[Optional[:class:`int`], ...]: Returns a tuple of bet amounts from the provided amounts hash.
+
+    Parameters
+    ----------
+    amounts_hash: :class:`str`
+        The hash of bet amounts.
+    """
+
 def make_probabilities(
     opening_odds: Sequence[Sequence[int]],
 ) -> list[list[float]]: ...

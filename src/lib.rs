@@ -1,6 +1,6 @@
 use itertools::iproduct;
 use numpy::{ndarray::Array1, PyArray1, ToPyArray};
-use pyo3::prelude::*;
+use pyo3::{prelude::*, types::PyTuple};
 use std::collections::{BTreeMap, HashMap};
 
 // WARNING: the literal integers in this file switches between hex and binary willy-nilly, mostly for readability.
@@ -57,6 +57,12 @@ fn bet_amounts_to_amounts_hash(bet_amounts: Vec<u32>) -> String {
 #[pyfunction]
 fn bets_hash_value(bets_indices: Vec<[u8; 5]>) -> String {
     neofoodclub::math::bets_hash_value(bets_indices)
+}
+
+#[pyfunction]
+fn amounts_hash_to_bet_amounts<'a>(py: Python<'a>, amounts_hash: &'a str) -> PyResult<&'a PyTuple> {
+    let elements = neofoodclub::math::amounts_hash_to_bet_amounts(amounts_hash);
+    Ok(PyTuple::new(py, elements))
 }
 
 #[pyfunction]
@@ -315,6 +321,7 @@ fn neofoodclub_rs(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(bets_hash_value, m)?)?;
     m.add_function(wrap_pyfunction!(bets_hash_to_bet_indices, m)?)?;
     m.add_function(wrap_pyfunction!(bet_amounts_to_amounts_hash, m)?)?;
+    m.add_function(wrap_pyfunction!(amounts_hash_to_bet_amounts, m)?)?;
     m.add_function(wrap_pyfunction!(make_probabilities, m)?)?;
     m.add_function(wrap_pyfunction!(make_round_dicts, m)?)?;
     m.add_function(wrap_pyfunction!(build_chance_objects, m)?)?;
