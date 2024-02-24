@@ -1,12 +1,11 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Sequence
 
 if TYPE_CHECKING:
     import numpy as np
     import numpy.typing as npt
-
-    from neofoodclub.chance import Chance
 
 @staticmethod
 def make_probabilities(
@@ -14,7 +13,8 @@ def make_probabilities(
 ) -> list[list[float]]: ...
 @staticmethod
 def make_round_dicts(
-    stds: Sequence[Sequence[float]], odds: tuple[tuple[int, ...], ...],
+    stds: Sequence[Sequence[float]],
+    odds: tuple[tuple[int, ...], ...],
 ) -> tuple[
     npt.NDArray[np.int_],
     npt.NDArray[np.float64],
@@ -22,6 +22,28 @@ def make_round_dicts(
     npt.NDArray[np.float64],
     npt.NDArray[np.int_],
 ]: ...
+@dataclass
+class Chance:
+    """Represents the probabilities of a singular chance of odds.
+    This class is not to be constructed manually.
+
+    Attributes
+    ----------
+    value: :class:`int`
+        The actual odds of this instance. For example, if value == 0, this is the Chance object of busting.
+    probability: :class:`float`
+        The probability that this outcome will occur.
+    cumulative: :class:`float`
+        The sum of the probabilities per Chance where `value` <= this Chance's `value`.
+    tail: :class:`float`
+        The difference of the sum of the probabilities per Chance where `value` < this Chance's `value`, from 1.
+
+    """
+
+    value: int
+    probability: float
+    cumulative: float
+    tail: float
 
 class Math:
     BIT_MASKS: tuple[int, ...]
@@ -91,7 +113,8 @@ class Math:
 
     @staticmethod
     def bets_indices_to_bet_binaries(
-        bets_indices: Sequence[Sequence[int]], /,
+        bets_indices: Sequence[Sequence[int]],
+        /,
     ) -> tuple[int, ...]:
         """Tuple[:class:`int`, ...]: Returns the bet-binary representations of the bets indices provided.
 

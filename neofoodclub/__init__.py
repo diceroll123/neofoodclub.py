@@ -6,7 +6,6 @@ __version__ = "0.0.1a"
 
 from .arenas import *
 from .bets import *
-from .chance import *
 from .errors import *
 from .models import *
 from .modifier import *
