@@ -2,7 +2,7 @@ use pyo3::{prelude::*, types::PyTuple};
 
 use crate::chance::Chance;
 
-#[pyclass]
+#[pyclass(name = "Math", module = "math", frozen)]
 pub struct Math;
 
 #[pymethods]
@@ -11,10 +11,10 @@ impl Math {
     const BIT_MASKS: [u32; 5] = neofoodclub::math::BIT_MASKS;
 
     #[classattr]
-    pub const BET_AMOUNT_MIN: u32 = 50;
+    pub const BET_AMOUNT_MIN: u32 = neofoodclub::math::BET_AMOUNT_MIN;
 
     #[classattr]
-    pub const BET_AMOUNT_MAX: u32 = 70304;
+    pub const BET_AMOUNT_MAX: u32 = neofoodclub::math::BET_AMOUNT_MAX;
 
     #[staticmethod]
     fn pirate_binary(index: u8, arena: u8) -> u32 {
