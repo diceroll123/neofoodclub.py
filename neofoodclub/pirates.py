@@ -12,7 +12,6 @@ if TYPE_CHECKING:
 
 __all__ = (
     "Pirate",
-    "PartialPirate",
     "PIRATE_NAMES",
 )
 
@@ -52,31 +51,6 @@ class PirateMixin:
     @property
     def image(self) -> str:
         return f"http://images.neopets.com/pirates/fc/fc_pirate_{self._id}.gif"
-
-
-class PartialPirate(PirateMixin):
-    """Represents a "partial" pirate that only has an ID.
-
-    Attributes
-    ----------
-    id: :class:`int`
-        The pirate's ID.
-    name: :class:`str`
-        The pirate's name.
-    image: :class:`str`
-        The pirates image.
-
-    """
-
-    def __init__(self, _id: int) -> None:
-        self._id = _id
-
-    @property
-    def id(self) -> int:
-        return self._id
-
-    def __repr__(self) -> str:
-        return f"<NaivePirate name={self.name!r}>"
 
 
 class Pirate(PirateMixin):

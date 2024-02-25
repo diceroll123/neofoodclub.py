@@ -1,5 +1,6 @@
 pub mod chance;
 pub mod math;
+pub mod pirates;
 
 use itertools::iproduct;
 use numpy::{ndarray::Array1, PyArray1, ToPyArray};
@@ -158,6 +159,7 @@ fn make_round_dicts<'py>(
 #[pyo3(name = "neofoodclub")]
 fn neofoodclub_rs(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<math::Math>()?;
+    m.add_class::<pirates::PartialPirate>()?;
     m.add_function(wrap_pyfunction!(make_probabilities, m)?)?;
     m.add_function(wrap_pyfunction!(make_round_dicts, m)?)?;
     Ok(())

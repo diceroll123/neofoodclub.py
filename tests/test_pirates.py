@@ -1,5 +1,5 @@
+from neofoodclub import PartialPirate
 from neofoodclub.nfc import NeoFoodClub
-from neofoodclub.pirates import PartialPirate
 
 
 def test_partialpirate() -> None:

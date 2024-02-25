@@ -25,4 +25,5 @@ __all__ = (
     "Odds",
     "OddsChange",
     "Pirate",
+    "PartialPirate",
 )

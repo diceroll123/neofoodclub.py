@@ -176,3 +176,25 @@ class Math:
         bet_odds: Sequence[int],
         probabilities: Sequence[Sequence[float]],
     ) -> list[Chance]: ...
+
+class PartialPirate:
+    """Represents a "partial" pirate that only has an ID.
+
+    Attributes
+    ----------
+    id: :class:`int`
+        The pirate's ID.
+    name: :class:`str`
+        The pirate's name.
+    image: :class:`str`
+        The pirates image.
+
+    """
+
+    def __init__(self, id: int) -> None: ...
+    @property
+    def id(self) -> int: ...
+    @property
+    def name(self) -> str: ...
+    @property
+    def image(self) -> str: ...
