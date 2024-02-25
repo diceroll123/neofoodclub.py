@@ -2,8 +2,6 @@ use pyo3::{prelude::*, types::PyTuple};
 
 use crate::chance::Chance;
 
-// WARNING: the literal integers in this file switches between hex and binary willy-nilly, mostly for readability.
-
 #[pyclass]
 pub struct Math;
 

@@ -28,7 +28,11 @@ class OddsChange:
     )
 
     def __init__(
-        self, *, index: int, data: OddsChangeDict, round_data: dict[str, Any],
+        self,
+        *,
+        index: int,
+        data: OddsChangeDict,
+        round_data: dict[str, Any],
     ) -> None:
         self._index = index
         self._data = data  # to check against each other
