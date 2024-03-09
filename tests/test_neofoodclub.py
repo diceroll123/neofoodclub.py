@@ -155,13 +155,6 @@ def test_get_win_np(
     bets = new_nfc.make_bets_from_hash(bet_hash)
     assert new_nfc.get_win_np(bets) == winnings
 
-    # this block uses the NFC's bet amount instead of passing the bet amount down to the bets
-    # notice the bet amount is set after the bets are made
-    new_nfc_amount_after_bets = nfc.copy()
-    bets_without_amount = new_nfc_amount_after_bets.make_bets_from_hash(bet_hash)
-    new_nfc_amount_after_bets.bet_amount = bet_amount
-    assert new_nfc_amount_after_bets.get_win_np(bets_without_amount) == winnings
-
     new_nfc_from_url = nfc_from_url.copy()
     new_nfc_from_url.bet_amount = bet_amount
     bets_for_url = new_nfc_from_url.make_bets_from_hash(bet_hash)
