@@ -1,4 +1,4 @@
-from neofoodclub.nfc import NeoFoodClub
+from neofoodclub import NeoFoodClub
 
 
 def test_unit_bets_empty(nfc: NeoFoodClub) -> None:

@@ -512,7 +512,8 @@ class NeoFoodClub:
 
             if self.timestamp:
                 timestamp = self.timestamp.replace(
-                    microsecond=0, tzinfo=datetime.timezone.utc,
+                    microsecond=0,
+                    tzinfo=datetime.timezone.utc,
                 ).isoformat()
                 params.append(("timestamp", timestamp))
 
@@ -533,7 +534,6 @@ class NeoFoodClub:
         *,
         bet_amount: int | None = None,
         modifier: Modifier | None = None,
-        cache: bool = True,
     ) -> NeoFoodClub:
         """:class:`NeoFoodClub`: Create a NeoFoodClub object using just a URL.
 
@@ -647,7 +647,7 @@ class NeoFoodClub:
                     # if it works, let it through.
                     data[key] = timestamp_string
 
-        return cls(data, bet_amount=bet_amount, modifier=modifier, cache=cache)
+        return cls(data, bet_amount=bet_amount, modifier=modifier)
 
     def copy(self, *, keep_custom: bool = False, cache: bool = True) -> NeoFoodClub:
         """:class:`NeoFoodClub`: Returns a deep copy of this NeoFoodClub instance."""
@@ -655,7 +655,6 @@ class NeoFoodClub:
             self.to_dict(keep_custom=keep_custom),
             bet_amount=self._bet_amount,
             modifier=self._modifier,
-            cache=cache,
         )
 
     def __repr__(self) -> str:
@@ -692,7 +691,8 @@ class NeoFoodClub:
     def make_max_ter_bets(self) -> Bets:
         """:class:`Bets`: Creates a Bets object that consists of the highest ERs."""
         return Bets._from_generator(
-            indices=np.argsort(self._max_ter_indices()), nfc=self,
+            indices=np.argsort(self._max_ter_indices()),
+            nfc=self,
         )
 
     @_require_cache
@@ -723,7 +723,10 @@ class NeoFoodClub:
 
     @_require_cache
     def _gambit_indices(
-        self, *, five_bet: int | None = None, random: bool = False,
+        self,
+        *,
+        five_bet: int | None = None,
+        random: bool = False,
     ) -> np.ndarray:
         if five_bet is not None:
             bins = self._data_dict["bins"]
@@ -784,13 +787,17 @@ class NeoFoodClub:
 
     @_require_cache
     def make_gambit_bets(
-        self, *, five_bet: int | None = None, random: bool = False,
+        self,
+        *,
+        five_bet: int | None = None,
+        random: bool = False,
     ) -> Bets:
         """:class:`Bets`: Creates a Bets object that consists of the top-unit permutations
         of a single full-arena bet.
         """
         return Bets._from_generator(
-            indices=self._gambit_indices(five_bet=five_bet, random=random), nfc=self,
+            indices=self._gambit_indices(five_bet=five_bet, random=random),
+            nfc=self,
         )
 
     @_require_cache
@@ -830,7 +837,8 @@ class NeoFoodClub:
             raise InvalidData("You must pick 3 pirates at most.")
 
         return Bets._from_generator(
-            indices=self._tenbet_indices(pirate_binary), nfc=self,
+            indices=self._tenbet_indices(pirate_binary),
+            nfc=self,
         )
 
     @_require_cache
@@ -926,19 +934,31 @@ class NeoFoodClub:
 
     @overload
     def make_bets_from_indices(
-        self, indices: Sequence[Sequence[int]], /, *, amounts_hash: str | None,
+        self,
+        indices: Sequence[Sequence[int]],
+        /,
+        *,
+        amounts_hash: str | None,
     ) -> Bets:
         ...
 
     @overload
     def make_bets_from_indices(
-        self, indices: Sequence[Sequence[int]], /, *, amounts: Sequence[int],
+        self,
+        indices: Sequence[Sequence[int]],
+        /,
+        *,
+        amounts: Sequence[int],
     ) -> Bets:
         ...
 
     @overload
     def make_bets_from_indices(
-        self, indices: Sequence[Sequence[int]], /, *, amount: int,
+        self,
+        indices: Sequence[Sequence[int]],
+        /,
+        *,
+        amount: int,
     ) -> Bets:
         ...
 
@@ -978,7 +998,11 @@ class NeoFoodClub:
 
     @overload
     def make_bets_from_hash(
-        self, bets_hash: str, /, *, amounts_hash: str | None,
+        self,
+        bets_hash: str,
+        /,
+        *,
+        amounts_hash: str | None,
     ) -> Bets:
         ...
 

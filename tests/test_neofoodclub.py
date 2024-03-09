@@ -10,17 +10,17 @@ from neofoodclub.errors import InvalidData
 
 
 def test_nfc_reset(nfc: NeoFoodClub) -> None:
-    new_nfc = nfc.copy(cache=False)
+    new_nfc = nfc.copy()
 
     # making a bet will run the wrapper's reset
-    assert len(new_nfc.make_bets_from_binaries(0x1)) == 1
+    assert len(new_nfc.make_bets_from_binaries([0x1])) == 1
 
 
 def test_nfc_copy(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
     # making sure that setting the bet amount in a copy will in fact not touch the original
     # just testing to make sure the copy was a deep copy
     def copy(n: NeoFoodClub) -> None:
-        new_nfc = n.copy(cache=False)
+        new_nfc = n.copy()
         new_nfc.bet_amount = 8000
         assert new_nfc.bet_amount != n.bet_amount
 
@@ -30,7 +30,7 @@ def test_nfc_copy(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
 
 def test_bet_amount(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
     def amount(n: NeoFoodClub) -> None:
-        new_nfc = n.copy(cache=False)
+        new_nfc = n.copy()
         new_nfc.bet_amount = 8000
         assert new_nfc.bet_amount == 8000
 
@@ -40,7 +40,7 @@ def test_bet_amount(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
 
 def test_modifier(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
     def modify(n: NeoFoodClub) -> None:
-        new_nfc = n.copy(cache=False)
+        new_nfc = n.copy()
         new_nfc.modifier = Modifier(Modifier.REVERSE)
         assert new_nfc.modifier == Modifier(Modifier.REVERSE)
 
@@ -50,7 +50,7 @@ def test_modifier(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
 
 def test_modified(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
     def modify(n: NeoFoodClub) -> None:
-        new_nfc = n.copy(cache=False)
+        new_nfc = n.copy()
         new_nfc.modifier = Modifier(custom_odds={1: 2})
         assert new_nfc.modified is True
 
@@ -59,24 +59,24 @@ def test_modified(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
 
 
 def test_not_modified(nfc: NeoFoodClub) -> None:
-    new_nfc = nfc.copy(cache=False)
+    new_nfc = nfc.copy()
     assert new_nfc.modified is False
 
 
 def test_modified_opening_odds(nfc: NeoFoodClub) -> None:
-    new_nfc = nfc.copy(cache=False)
+    new_nfc = nfc.copy()
     new_nfc.modifier = Modifier(Modifier.OPENING)
     assert new_nfc.modified is True
 
 
 def test_modified_time(nfc: NeoFoodClub) -> None:
-    new_nfc = nfc.copy(cache=False)
+    new_nfc = nfc.copy()
     new_nfc.modifier = Modifier(custom_time=datetime.time(hour=12, minute=0))
     assert new_nfc.modified is True
 
 
 def test_with_modifier(nfc: NeoFoodClub) -> None:
-    new_nfc = nfc.copy(cache=False)
+    new_nfc = nfc.copy()
     m = Modifier(Modifier.ALL_MODIFIERS)
     assert new_nfc.with_modifier(m).modifier == m
 
@@ -101,13 +101,13 @@ def test_changes_count(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
 
 
 def test_cc_perk(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
-    new_nfc = nfc.copy(cache=False)
+    new_nfc = nfc.copy()
     new_nfc.modifier = Modifier(cc_perk=True)
     bets = new_nfc.make_max_ter_bets()
     assert len(bets) == 15
     assert new_nfc.max_amount_of_bets == 15
 
-    new_nfc = nfc_from_url.copy(cache=False)
+    new_nfc = nfc_from_url.copy()
     new_nfc.modifier = Modifier(cc_perk=True)
     bets = new_nfc.make_max_ter_bets()
     assert len(bets) == 15
@@ -122,7 +122,10 @@ def test_cc_perk(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
     ],
 )
 def test_get_win_units(
-    nfc: NeoFoodClub, nfc_from_url: NeoFoodClub, bet_hash: str, winnings: int,
+    nfc: NeoFoodClub,
+    nfc_from_url: NeoFoodClub,
+    bet_hash: str,
+    winnings: int,
 ) -> None:
     bets = nfc.make_bets_from_hash(bet_hash)
     assert nfc.get_win_units(bets) == winnings
@@ -196,7 +199,7 @@ def test_change_bet_amount_twice(nfc: NeoFoodClub) -> None:
     # this runs the bet_amount setter code which recalculates
     # the inner dicts instead of making new ones
     # this is more for code coverage than testing anything
-    new_nfc = nfc.copy(cache=False)
+    new_nfc = nfc.copy()
 
     assert new_nfc._data_dict == {}
     new_nfc.bet_amount = 8000

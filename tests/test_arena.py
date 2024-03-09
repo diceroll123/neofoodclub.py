@@ -1,7 +1,7 @@
 import math
 from typing import List, Tuple
 
-from neofoodclub.nfc import NeoFoodClub
+from neofoodclub import NeoFoodClub
 
 
 def test_first_arena_name_and_id(nfc: NeoFoodClub) -> None:
@@ -16,13 +16,13 @@ def test_first_arena_best(nfc: NeoFoodClub) -> None:
         ("Crossblades", 5, 0x10000),
         ("Puffo", 13, 0x40000),
     ]
-    compare = [(p.name, p.odds, p.binary) for p in nfc.arenas[0].best]
+    compare = [(p.name, p.current_odds, p.binary) for p in nfc.arenas[0].best]
     assert best_in_first_arena == compare
 
 
 def test_first_arena_pirate_ids(nfc: NeoFoodClub) -> None:
     pirate_ids = (2, 8, 14, 11)  # Sproggie, Puffo, Fairfax, Crossblades
-    assert pirate_ids == nfc.arenas[0].ids
+    assert pirate_ids == nfc.arenas[0].pirate_ids
 
 
 def test_first_arena_odds(nfc: NeoFoodClub) -> None:
@@ -34,7 +34,7 @@ def test_first_arena_ratio(nfc: NeoFoodClub) -> None:
 
 
 def test_first_arena_negative(nfc: NeoFoodClub) -> None:
-    assert nfc.arenas[0].negative is True
+    assert nfc.arenas[0].is_negative is True
 
 
 def test_first_arena_foods(nfc: NeoFoodClub) -> None:
@@ -43,7 +43,3 @@ def test_first_arena_foods(nfc: NeoFoodClub) -> None:
 
 def test_first_arena_get_pirate_using_getitem(nfc: NeoFoodClub) -> None:
     assert nfc.arenas[0][0].name == "Sproggie"
-
-
-def test_arena_iter(nfc: NeoFoodClub) -> None:
-    assert len(list(nfc.arenas[0])) == 4

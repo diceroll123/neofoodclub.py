@@ -2,9 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Iterator, Sequence
 
-from neofoodclub.neofoodclub import Math
-
-from .pirates import Pirate
+from neofoodclub.neofoodclub import Math, Pirate
 
 if TYPE_CHECKING:
     from .nfc import NeoFoodClub

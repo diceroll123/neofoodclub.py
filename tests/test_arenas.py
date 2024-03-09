@@ -1,6 +1,6 @@
 import pytest
 
-from neofoodclub.nfc import NeoFoodClub
+from neofoodclub import NeoFoodClub
 
 
 def test_arenas_get_pirate_by_id(nfc: NeoFoodClub) -> None:
@@ -8,13 +8,13 @@ def test_arenas_get_pirate_by_id(nfc: NeoFoodClub) -> None:
 
 
 def test_arenas_get_pirates_by_id(nfc: NeoFoodClub) -> None:
-    pirates = nfc.arenas.get_pirates_by_id(2, 8, 14, 11)
+    pirates = nfc.arenas.get_pirates_by_id([2, 8, 14, 11])
 
     assert pirates == nfc.arenas[0].pirates
 
 
 def test_arenas_all_pirates(nfc: NeoFoodClub) -> None:
-    assert len(nfc.arenas.all_pirates) == 20
+    assert len(nfc.arenas.get_all_pirates_flat()) == 20
 
 
 def test_arenas_get_pirates_from_binary(nfc: NeoFoodClub) -> None:
@@ -23,7 +23,7 @@ def test_arenas_get_pirates_from_binary(nfc: NeoFoodClub) -> None:
 
 
 def test_arenas_pirates(nfc: NeoFoodClub) -> None:
-    assert len(nfc.arenas.pirates) == 5
+    assert len(nfc.arenas.get_all_pirates()) == 5
 
 
 def test_arenas_pirate_ids(nfc: NeoFoodClub) -> None:
@@ -35,7 +35,7 @@ def test_arenas_get_arena(nfc: NeoFoodClub) -> None:
 
 
 def test_arenas_iter(nfc: NeoFoodClub) -> None:
-    assert len(list(nfc.arenas)) == 5
+    assert len(list(nfc.arenas.arenas)) == 5
 
 
 def test_arenas_get_pirate_by_id_wrong(nfc: NeoFoodClub) -> None:

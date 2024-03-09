@@ -1,8 +1,13 @@
+pub mod arena;
+pub mod bets;
 pub mod chance;
 pub mod math;
+pub mod modifier;
+pub mod nfc;
+pub mod odds;
 pub mod pirates;
 
-use itertools::iproduct;
+use neofoodclub;
 use numpy::{ndarray::Array1, PyArray1, ToPyArray};
 use pyo3::prelude::*;
 
@@ -104,8 +109,8 @@ fn make_probabilities(opening_odds: Vec<Vec<u32>>) -> Vec<Vec<f64>> {
 #[pyfunction]
 fn make_round_dicts<'py>(
     py: Python<'py>,
-    stds: Vec<Vec<f64>>,
-    odds: Vec<Vec<u32>>,
+    stds: [[f64; 5]; 5],
+    odds: [[u8; 5]; 5],
 ) -> (
     &PyArray1<u32>,
     &PyArray1<f64>,
@@ -113,45 +118,14 @@ fn make_round_dicts<'py>(
     &PyArray1<f64>,
     &PyArray1<u32>,
 ) {
-    let mut _bins: Array1<u32> = Array1::zeros(3124);
-    let mut _stds: Array1<f64> = Array1::zeros(3124);
-    let mut _odds: Array1<u32> = Array1::zeros(3124);
-    let mut _ers: Array1<f64> = Array1::zeros(3124);
-    let mut _maxbets: Array1<u32> = Array1::zeros(3124);
-
-    let mut arr_index = 0;
-
-    // the first iteration is an empty bet, so we skip it with skip(1)
-    for (a, b, c, d, e) in iproduct!(0..5, 0..5, 0..5, 0..5, 0..5).skip(1) {
-        let mut total_bin: u32 = 0;
-        let mut total_stds: f64 = 1.0;
-        let mut total_odds: u32 = 1;
-
-        let nums = vec![a, b, c, d, e];
-        for (arena, index) in nums.iter().enumerate() {
-            if *index == 0 {
-                continue;
-            }
-            total_bin += 1 << (19 - (index - 1 + arena * 4));
-            total_stds *= stds[arena][*index];
-            total_odds *= odds[arena][*index];
-        }
-
-        _bins[arr_index] = total_bin;
-        _stds[arr_index] = total_stds;
-        _odds[arr_index] = total_odds;
-        _ers[arr_index] = total_stds * total_odds as f64;
-        _maxbets[arr_index] = (1_000_000.0 / total_odds as f64).ceil() as u32;
-
-        arr_index += 1;
-    }
+    let dicts = neofoodclub::math::make_round_dicts(stds, odds);
 
     (
-        _bins.to_pyarray(py),
-        _stds.to_pyarray(py),
-        _odds.to_pyarray(py),
-        _ers.to_pyarray(py),
-        _maxbets.to_pyarray(py),
+        Array1::from_vec(dicts.bins).to_pyarray(py),
+        Array1::from_vec(dicts.probs).to_pyarray(py),
+        Array1::from_vec(dicts.odds).to_pyarray(py),
+        Array1::from_vec(dicts.ers).to_pyarray(py),
+        Array1::from_vec(dicts.maxbets).to_pyarray(py),
     )
 }
 
@@ -159,7 +133,9 @@ fn make_round_dicts<'py>(
 #[pyo3(name = "neofoodclub")]
 fn neofoodclub_rs(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<math::Math>()?;
+    m.add_class::<nfc::NeoFoodClub>()?;
     m.add_class::<pirates::PartialPirate>()?;
+    m.add_class::<pirates::Pirate>()?;
     m.add_function(wrap_pyfunction!(make_probabilities, m)?)?;
     m.add_function(wrap_pyfunction!(make_round_dicts, m)?)?;
     Ok(())

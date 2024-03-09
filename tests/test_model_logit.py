@@ -1,4 +1,4 @@
-from neofoodclub.nfc import NeoFoodClub
+from neofoodclub import NeoFoodClub
 
 
 def test_mer_bets_With_bet_amouunt(
@@ -7,7 +7,7 @@ def test_mer_bets_With_bet_amouunt(
     bets = nfc_with_bet_amount_logit_model.make_max_ter_bets()
 
     # this may break if the logit data changes!
-    assert set(bets) == {
+    assert set(bets.binaries) == {
         0x408,
         0x88008,
         0x82008,

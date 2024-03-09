@@ -1,14 +1,35 @@
 use pyo3::prelude::*;
 
-#[derive(Debug, Clone)]
 #[pyclass]
 pub struct Chance {
-    #[pyo3(get)]
-    pub value: u32,
-    #[pyo3(get)]
-    pub probability: f64,
-    #[pyo3(get)]
-    pub cumulative: f64,
-    #[pyo3(get)]
-    pub tail: f64,
+    inner: neofoodclub::chance::Chance,
+}
+
+impl Chance {
+    pub fn from_chance(chance: neofoodclub::chance::Chance) -> Self {
+        Chance { inner: chance }
+    }
+}
+
+#[pymethods]
+impl Chance {
+    #[getter]
+    fn value(&self) -> u32 {
+        self.inner.value
+    }
+
+    #[getter]
+    fn probability(&self) -> f64 {
+        self.inner.probability
+    }
+
+    #[getter]
+    fn cumulative(&self) -> f64 {
+        self.inner.cumulative
+    }
+
+    #[getter]
+    fn tail(&self) -> f64 {
+        self.inner.tail
+    }
 }

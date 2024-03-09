@@ -10,10 +10,8 @@ from .errors import *
 from .models import *
 from .modifier import *
 from .neofoodclub import *
-from .nfc import *
 from .odds import *
 from .odds_change import *
-from .pirates import *
 
 __all__ = (
     "Math",

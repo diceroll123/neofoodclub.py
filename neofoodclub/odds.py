@@ -6,12 +6,10 @@ from typing import TYPE_CHECKING, Generator, Iterator
 from neofoodclub.neofoodclub import Math
 
 if TYPE_CHECKING:
+    from neofoodclub import Chance
     from neofoodclub.bets import Bets
-    from neofoodclub.chance import Chance
 
-__all__ = (
-    "Odds",
-)
+__all__ = ("Odds",)
 
 
 class Odds:
@@ -43,7 +41,9 @@ class Odds:
     def __init__(self, bets: Bets) -> None:
         self._odds_values = bets.nfc._data_dict["odds"][bets._indices]
         self._odds = Math.build_chance_objects(
-            bets.indices, self._odds_values, bets.nfc._stds,
+            bets.indices,
+            self._odds_values,
+            bets.nfc._stds,
         )
 
         # highest odds
@@ -53,7 +53,8 @@ class Odds:
         self.bust: Chance | None = self._odds[0] if self._odds[0].value == 0 else None
 
         self.most_likely_winner: Chance = max(
-            self._odds[1 if self.bust else 0 :], key=lambda o: o.probability,
+            self._odds[1 if self.bust else 0 :],
+            key=lambda o: o.probability,
         )
 
         amount_of_bets = max(0, min(len(bets), 15))

@@ -6,7 +6,7 @@ from neofoodclub.models import BaseModel
 from neofoodclub.neofoodclub import make_probabilities
 
 if TYPE_CHECKING:
-    from neofoodclub.nfc import NeoFoodClub
+    from neofoodclub import NeoFoodClub
 
 
 class OriginalModel(BaseModel):

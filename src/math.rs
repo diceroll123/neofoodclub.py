@@ -39,7 +39,7 @@ impl Math {
     }
 
     #[staticmethod]
-    fn bet_amounts_to_amounts_hash(bet_amounts: Vec<u32>) -> String {
+    fn bet_amounts_to_amounts_hash(bet_amounts: Vec<Option<u32>>) -> String {
         neofoodclub::math::bet_amounts_to_amounts_hash(&bet_amounts)
     }
 
@@ -87,15 +87,7 @@ impl Math {
         let py_structs: Vec<PyObject> =
             neofoodclub::math::build_chance_objects(&bets, &bet_odds, probabilities)
                 .into_iter()
-                .map(|chance| {
-                    Chance {
-                        value: chance.value,
-                        probability: chance.probability,
-                        cumulative: chance.cumulative,
-                        tail: chance.tail,
-                    }
-                    .into_py(py)
-                })
+                .map(|chance| Chance::from_chance(chance).into_py(py))
                 .collect();
 
         Ok(PyTuple::new(py, py_structs))

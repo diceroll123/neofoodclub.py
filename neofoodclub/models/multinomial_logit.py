@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from neofoodclub.models import BaseModel
 
 if TYPE_CHECKING:
-    from neofoodclub.nfc import NeoFoodClub
+    from neofoodclub import NeoFoodClub
 
 __all__ = [
     "MultinomialLogitModel",

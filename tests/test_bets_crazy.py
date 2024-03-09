@@ -1,5 +1,5 @@
+from neofoodclub import NeoFoodClub
 from neofoodclub.bets import Bets
-from neofoodclub.nfc import NeoFoodClub
 
 
 def test_crazy_bet_generator(nfc: NeoFoodClub) -> None:

@@ -1,5 +1,4 @@
-from neofoodclub import PartialPirate
-from neofoodclub.nfc import NeoFoodClub
+from neofoodclub import NeoFoodClub, PartialPirate
 
 
 def test_partialpirate() -> None:
@@ -31,7 +30,7 @@ def test_pirate_fa_cached(nfc: NeoFoodClub) -> None:
 
 
 def test_pirate_arena_id(nfc: NeoFoodClub) -> None:
-    assert nfc.arenas[0].pirates[0].arena == 0
+    assert nfc.arenas[0].pirates[0].arena_id == 0
 
 
 def test_pirate_index(nfc: NeoFoodClub) -> None:
@@ -43,11 +42,11 @@ def test_pirate_opening_odds(nfc: NeoFoodClub) -> None:
 
 
 def test_pirate_positive_foods(nfc: NeoFoodClub) -> None:
-    assert nfc.arenas[0].pirates[0].positive_foods == (4, 1, 33, 7, 10)
+    assert nfc.arenas[0].pirates[0].positive_foods(nfc) == (4, 1, 33, 7, 10)
 
 
 def test_pirate_negative_foods(nfc: NeoFoodClub) -> None:
-    assert nfc.arenas[0].pirates[0].negative_foods == (25, 11)
+    assert nfc.arenas[0].pirates[0].negative_foods(nfc) == (25, 11)
 
 
 def test_pirate_std_and_er(nfc: NeoFoodClub) -> None:
@@ -64,8 +63,8 @@ def test_pirate_without_data(nfc_no_cache: NeoFoodClub) -> None:
 
 def test_pirate_without_foods(nfc_no_foods: NeoFoodClub) -> None:
     pirate = nfc_no_foods.arenas[0].pirates[0]
-    assert pirate.positive_foods == ()
-    assert pirate.negative_foods == ()
+    assert pirate.positive_foods(nfc_no_foods) is None
+    assert pirate.negative_foods(nfc_no_foods) is None
 
 
 def test_pirate_won(nfc: NeoFoodClub) -> None:
@@ -75,10 +74,10 @@ def test_pirate_won(nfc: NeoFoodClub) -> None:
     fairfax = shipwreck.pirates[2]
     crossblades = shipwreck.pirates[3]
 
-    assert sproggie.won is True
-    assert puffo.won is False
-    assert fairfax.won is False
-    assert crossblades.won is False
+    assert sproggie.is_winner is True
+    assert puffo.is_winner is False
+    assert fairfax.is_winner is False
+    assert crossblades.is_winner is False
 
 
 def test_pirate_equality(nfc: NeoFoodClub) -> None:

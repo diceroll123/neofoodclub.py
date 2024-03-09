@@ -14,7 +14,7 @@ from neofoodclub.odds import Odds
 if TYPE_CHECKING:
     import numpy.typing as npt
 
-    from neofoodclub.nfc import NeoFoodClub
+    from neofoodclub import NeoFoodClub
 
 __all__ = ("Bets",)
 
@@ -87,7 +87,8 @@ class Bets:
 
     @bet_amounts.setter
     def bet_amounts(
-        self, val: Sequence[int | None] | npt.NDArray[np.int32] | None,
+        self,
+        val: Sequence[int | None] | npt.NDArray[np.int32] | None,
     ) -> None:
         if val is None:
             self._bet_amounts: npt.NDArray[np.int32] = np.array(
@@ -144,7 +145,10 @@ class Bets:
 
     @classmethod
     def _from_generator(
-        cls, *, indices: npt.NDArray[np.int16], nfc: NeoFoodClub,
+        cls,
+        *,
+        indices: npt.NDArray[np.int16],
+        nfc: NeoFoodClub,
     ) -> Bets:
         # here is where we will take indices and sort as needed
         # to avoid confusion with "manually" making bets

@@ -3,8 +3,7 @@ import datetime
 import numpy as np
 from dateutil import tz
 
-from neofoodclub import Math, utils
-from neofoodclub.nfc import NeoFoodClub
+from neofoodclub import Math, NeoFoodClub, utils
 from neofoodclub.utils import fix_bet_amounts
 
 
