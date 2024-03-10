@@ -1,3 +1,4 @@
+use neofoodclub::bets::BetAmounts;
 use pyo3::{prelude::*, types::PyTuple};
 
 use crate::{nfc::NeoFoodClub, odds::Odds};
@@ -49,7 +50,12 @@ impl Bets {
 
     #[setter(bet_amounts)]
     fn set_amounts(&mut self, amounts: Option<Vec<Option<u32>>>) {
-        self.inner.bet_amounts = amounts;
+        match amounts {
+            Some(amounts) => self
+                .inner
+                .set_bet_amounts(&Some(BetAmounts::Amounts(amounts))),
+            None => self.inner.bet_amounts = None,
+        }
     }
 
     #[getter]

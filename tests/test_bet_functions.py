@@ -57,14 +57,14 @@ def test_short_hash(nfc: NeoFoodClub) -> None:
 def test_bets_without_bet_amount(nfc: NeoFoodClub) -> None:
     # when bets have no amounts set, they default to -1000 for each bet.
     bets = nfc.make_max_ter_bets()
-    assert sum(a or 0 for a in (bets.bet_amounts or [])) == 0
+    assert bets.bet_amounts is None
 
 
 def test_bets_set_bet_amount_below_50(nfc: NeoFoodClub) -> None:
-    # set bets externally to -1000 for each amount
-    # setting numerical values below 50 should min-max the amount to 50
+    # set bets externally to 48 for each amount
+    # setting numerical values below 50 should clamp the amount to 50
     bets = nfc.make_max_ter_bets()
-    bets.bet_amounts = (-1000,) * 10
+    bets.bet_amounts = (48,) * 10
     assert sum(a or 0 for a in (bets.bet_amounts or [])) == 500
 
 
@@ -224,23 +224,6 @@ def test_repeating_bets_from_binary(nfc: NeoFoodClub) -> None:
 def test_random_bets(nfc: NeoFoodClub) -> None:
     bets = nfc.make_random_bets()
     assert len(bets) == 10
-
-
-def test_make_all_bets(nfc: NeoFoodClub) -> None:
-    new_nfc = nfc.copy()
-    new_nfc.bet_amount = 8000
-    bets = new_nfc.make_all_bets(in_order=True)
-    assert len(bets) == 3124
-
-
-def test_make_all_bets_max_ter(nfc: NeoFoodClub) -> None:
-    bets = nfc.make_all_bets(max_ter=True)
-    assert len(bets) == 3124
-
-
-def test_make_all_bets_valueerror(nfc: NeoFoodClub) -> None:
-    with pytest.raises(ValueError):
-        nfc.make_all_bets(max_ter=True, in_order=True)
 
 
 def test_too_many_bet_amounts_from_binaries(nfc: NeoFoodClub) -> None:

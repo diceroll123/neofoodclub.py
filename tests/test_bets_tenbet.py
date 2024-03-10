@@ -7,7 +7,7 @@ from neofoodclub import InvalidData, NeoFoodClub
 def test_tenbet_generation_three_pirates(nfc: NeoFoodClub, pirate_binary: int) -> None:
     assert all(
         bet & pirate_binary == pirate_binary
-        for bet in nfc.make_tenbet_bets(pirate_binary)
+        for bet in nfc.make_tenbet_bets(pirate_binary).binaries
     )
 
 

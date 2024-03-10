@@ -128,9 +128,12 @@ impl NeoFoodClub {
         }
     }
 
-    #[getter]
     fn make_random_bets(&self) -> Bets {
         Bets::from_bets(self.inner.make_random_bets())
+    }
+
+    fn make_tenbet_bets(&self, pirates_binary: u32) -> Bets {
+        Bets::from_bets(self.inner.make_tenbet_bets(pirates_binary))
     }
 
     fn make_max_ter_bets(&self) -> Bets {
