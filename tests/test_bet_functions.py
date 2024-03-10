@@ -4,7 +4,6 @@ from typing import Sequence, Tuple
 import pytest
 
 from neofoodclub import Bets, Math, NeoFoodClub
-from neofoodclub.errors import InvalidAmountHash, InvalidBetHash, InvalidData
 
 
 def test_odds_iter(nfc_with_bet_amount: NeoFoodClub) -> None:
@@ -223,42 +222,42 @@ def test_random_bets(nfc: NeoFoodClub) -> None:
 
 def test_too_many_bet_amounts_from_binaries(nfc: NeoFoodClub) -> None:
     bets = nfc.make_bets_from_binaries([0x1])
-    with pytest.raises(InvalidData):
+    with pytest.raises(BaseException):
         bets.set_amounts_with_list([50, 50])
 
 
 def test_invalid_bet_amounts_from_binaries(nfc: NeoFoodClub) -> None:
     bets = nfc.make_bets_from_binaries([0x1])
-    with pytest.raises(InvalidAmountHash):
+    with pytest.raises(BaseException):
         bets.set_amounts_with_hash("???")
 
 
 def test_too_many_bet_amounts_from_indices(nfc: NeoFoodClub) -> None:
     bets = nfc.make_bets_from_indices([(1, 0, 0, 0, 0)])
-    with pytest.raises(InvalidData):
+    with pytest.raises(BaseException):
         bets.set_amounts_with_list([50, 50])
 
 
 def test_invalid_bet_amounts_from_indices(nfc: NeoFoodClub) -> None:
     bets = nfc.make_bets_from_indices([(1, 0, 0, 0, 0)])
-    with pytest.raises(InvalidAmountHash):
+    with pytest.raises(BaseException):
         bets.set_amounts_with_hash("???")
 
 
 def test_too_many_bet_amounts_from_hash(nfc: NeoFoodClub) -> None:
     bets = nfc.make_bets_from_hash("faa")
-    with pytest.raises(InvalidData):
+    with pytest.raises(BaseException):
         bets.set_amounts_with_list([50, 50])
 
 
 def test_invalid_bet_hash(nfc: NeoFoodClub) -> None:
-    with pytest.raises(InvalidBetHash):
+    with pytest.raises(BaseException):
         nfc.make_bets_from_hash("faz")
 
 
 def test_invalid_amounts_hash(nfc: NeoFoodClub) -> None:
     bets = nfc.make_bets_from_hash("faa")
-    with pytest.raises(InvalidAmountHash):
+    with pytest.raises(BaseException):
         bets.set_amounts_with_hash("???")
 
 

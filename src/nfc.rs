@@ -1,4 +1,5 @@
 use pyo3::{
+    exceptions::PyValueError,
     prelude::*,
     types::{PyTuple, PyType},
 };
@@ -143,8 +144,13 @@ impl NeoFoodClub {
         Bets::from_bets(self.inner.make_random_bets())
     }
 
-    fn make_tenbet_bets(&self, pirates_binary: u32) -> Bets {
-        Bets::from_bets(self.inner.make_tenbet_bets(pirates_binary))
+    fn make_tenbet_bets(&self, pirates_binary: u32) -> PyResult<Bets> {
+        let bets = self.inner.make_tenbet_bets(pirates_binary);
+
+        match bets {
+            Ok(bets) => Ok(Bets::from_bets(bets)),
+            Err(s) => Err(PyValueError::new_err(s)),
+        }
     }
 
     fn make_max_ter_bets(&self) -> Bets {
