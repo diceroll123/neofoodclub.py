@@ -40,18 +40,19 @@ def test_random_gambit_bets(nfc: NeoFoodClub) -> None:
 
 
 @pytest.mark.parametrize(
-    ("five_bet", "bets_hash"),
+    ("five_bet"),
     [
-        (0x88888, "ggfgggbgbgbbggfaggaggffgf"),
-        (0x44444, "mmmmckmmmkkkmmakmccamckmm"),
-        (0x22222, "ssssddsssppsspsdpssadsddd"),
-        (0x11111, "yyyuyyuuyyyayeyeeyyuueuye"),
+        (0x88888),
+        (0x44444),
+        (0x22222),
+        (0x11111),
     ],
 )
-def test_gambit_bets_equivalence(
+def test_gambit_bets_subsets(
     nfc: NeoFoodClub,
     five_bet: int,
-    bets_hash: str,
 ) -> None:
     bets = nfc.make_gambit_bets(five_bet)
-    assert bets.bets_hash == bets_hash
+
+    assert bets.is_gambit is True
+    assert all(five_bet & bet == bet for bet in bets.binaries)

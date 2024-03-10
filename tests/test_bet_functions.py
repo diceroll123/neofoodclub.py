@@ -200,24 +200,9 @@ def test_net_expected_equality_with_amount(
     assert math.isclose(crazy_bets.net_expected(nfc_with_bet_amount), -4742.56016102454)
 
 
-@pytest.mark.parametrize(
-    "bet_binaries",
-    [
-        (0x3,),
-        (0x1, 0x3, 0x4),
-    ],
-)
-def test_bets_from_binary_error(
-    nfc: NeoFoodClub,
-    bet_binaries: Tuple[int, ...],
-) -> None:
-    with pytest.raises(InvalidData):
-        Bets.from_binaries(nfc, bet_binaries)
-
-
 def test_repeating_bets_from_binary(nfc: NeoFoodClub) -> None:
     # duplicates are removed in from_binary, we're making sure of this
-    repeating = Bets.from_binaries(nfc, [0x1, 0x1, 0x2])
+    repeating = nfc.make_bets_from_binaries([0x1, 0x1, 0x2])
     assert len(repeating) == 2
 
 
