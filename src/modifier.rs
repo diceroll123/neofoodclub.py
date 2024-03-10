@@ -1,7 +1,10 @@
+use std::collections::HashMap;
+
 use neofoodclub::modifier::ModifierFlags;
 use pyo3::prelude::*;
 
 #[pyclass]
+#[derive(Clone)]
 pub struct Modifier {
     pub inner: neofoodclub::modifier::Modifier,
 }
@@ -30,9 +33,9 @@ impl Modifier {
     const CHARITY_CORNER: i32 = ModifierFlags::CHARITY_CORNER.bits();
 
     #[new]
-    pub fn new(value: i32) -> Self {
+    pub fn new(value: i32, custom_odds: Option<HashMap<u8, u8>>) -> Self {
         Modifier {
-            inner: neofoodclub::modifier::Modifier::new(value),
+            inner: neofoodclub::modifier::Modifier::new(value, custom_odds),
         }
     }
 

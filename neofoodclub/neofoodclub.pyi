@@ -181,10 +181,16 @@ class Modifier:
     REVERSE: int
     CHARITY_CORNER: int
 
-    def __init__(self, modifier_value: int = 0) -> None: ...
+    def __init__(
+        self, modifier_value: int = 0, custom_odds: dict[int, int] | None = None
+    ) -> None: ...
     @property
     def value(self) -> int:
         """:class:`int`: The value of the modifier."""
+
+    @property
+    def custom_odds(self) -> dict[int, int] | None:
+        """Optional[Dict[:class:`int`, :class:`int`]]: The custom odds of the modifier."""
 
     @property
     def is_empty(self) -> bool:

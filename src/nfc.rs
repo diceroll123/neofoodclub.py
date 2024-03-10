@@ -36,6 +36,11 @@ impl NeoFoodClub {
         Modifier::from_modifier(self.inner.modifier.clone())
     }
 
+    #[setter]
+    fn set_modifier(&mut self, modifier: Modifier) {
+        self.inner.modifier = modifier.inner;
+    }
+
     fn copy(&self) -> Self {
         NeoFoodClub {
             inner: self.inner.copy(),
