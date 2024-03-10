@@ -344,9 +344,38 @@ class Bets:
     def bet_amounts(self) -> tuple[int | None, ...] | None:
         """Optional[Tuple[Optional[:class:`int`], ...]]: The amounts of the bets."""
 
-    @bet_amounts.setter
-    def bet_amounts(self, value: tuple[int | None, ...] | None) -> None:
-        """Optional[Tuple[Optional[:class:`int`], ...]]: The amounts of the bets."""
+    def remove_amounts(self) -> None:
+        """Removes the bet amounts from the bets."""
+
+    def set_amounts_with_hash(self, amounts_hash: str) -> None:
+        """Sets the bet amounts with a hash.
+
+        Parameters
+        ----------
+        amounts_hash: :class:`str`
+            The hash of the bet amounts.
+
+        """
+
+    def set_amounts_with_int(self, amount: int) -> None:
+        """Sets the bet amounts with an integer.
+
+        Parameters
+        ----------
+        amount: :class:`int`
+            The bet amount.
+
+        """
+
+    def set_amounts_with_list(self, amounts: Sequence[int]) -> None:
+        """Sets the bet amounts with a sequence of integers.
+
+        Parameters
+        ----------
+        amounts: Sequence[:class:`int`]
+            The bet amounts.
+
+        """
 
     @property
     def odds(self) -> Odds:

@@ -30,14 +30,23 @@ impl Bets {
         }
     }
 
-    #[setter(bet_amounts)]
-    fn set_amounts(&mut self, amounts: Option<Vec<Option<u32>>>) {
-        match amounts {
-            Some(amounts) => self
-                .inner
-                .set_bet_amounts(&Some(BetAmounts::Amounts(amounts))),
-            None => self.inner.bet_amounts = None,
-        }
+    fn remove_amounts(&mut self) {
+        self.inner.bet_amounts = None;
+    }
+
+    fn set_amounts_with_hash(&mut self, hash: String) {
+        self.inner
+            .set_bet_amounts(&Some(BetAmounts::AmountHash(hash)));
+    }
+
+    fn set_amounts_with_int(&mut self, amount: u32) {
+        self.inner
+            .set_bet_amounts(&Some(BetAmounts::from_amount(amount, self.inner.len())));
+    }
+
+    fn set_amounts_with_list(&mut self, amounts: Vec<Option<u32>>) {
+        self.inner
+            .set_bet_amounts(&Some(BetAmounts::Amounts(amounts)));
     }
 
     #[getter]

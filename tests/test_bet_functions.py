@@ -41,8 +41,10 @@ def test_make_url(nfc_with_bet_amount: NeoFoodClub) -> None:
             (3, 4, 4, 0, 2),
             (0, 4, 4, 4, 2),
         ),
-        amounts_hash="CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS",
     )
+
+    bets.set_amounts_with_hash("CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS")
+
     assert (
         bets.make_url(include_domain=True)
         == "https://neofood.club/#round=7956&b=eukucjuoycaulucepkyrtukyw&a=CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS"
@@ -64,13 +66,13 @@ def test_bets_set_bet_amount_below_50(nfc: NeoFoodClub) -> None:
     # set bets externally to 48 for each amount
     # setting numerical values below 50 should clamp the amount to 50
     bets = nfc.make_max_ter_bets()
-    bets.bet_amounts = (48,) * 10
+    bets.set_amounts_with_list((48,) * 10)
     assert sum(a or 0 for a in (bets.bet_amounts or [])) == 500
 
 
 def test_bets_set_bet_amount_none(nfc: NeoFoodClub) -> None:
     bets = nfc.make_max_ter_bets()
-    bets.bet_amounts = None
+    bets.remove_amounts()
     assert bets.amounts_hash is None
 
 
@@ -93,8 +95,10 @@ def test_bet_equivalence_with_amount(
 ) -> None:
     mer_from_hash = nfc.make_bets_from_hash(
         "eukucjuoycaulucepkyrtukyw",
-        amounts_hash="CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS",
     )
+
+    mer_from_hash.set_amounts_with_hash("CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS")
+
     mer_from_indices = nfc.make_bets_from_indices(
         (
             (0, 4, 4, 0, 2),
@@ -108,8 +112,10 @@ def test_bet_equivalence_with_amount(
             (3, 4, 4, 0, 2),
             (0, 4, 4, 4, 2),
         ),
-        amounts_hash="CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS",
     )
+
+    mer_from_indices.set_amounts_with_hash("CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS")
+
     mer_from_binaries = nfc.make_bets_from_binaries(
         (
             0x1104,
@@ -123,15 +129,17 @@ def test_bet_equivalence_with_amount(
             0x21104,
             0x1114,
         ),
-        amounts_hash="CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS",
     )
 
-    mer_control = nfc.make_bets_from_hash(
-        "eukucjuoycaulucepkyrtukyw",
-        amounts=(8000,) * 10,
-    )
+    mer_from_binaries.set_amounts_with_hash("CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS")
 
-    mer_control_two = nfc.make_bets_from_hash("eukucjuoycaulucepkyrtukyw", amount=8000)
+    mer_control = nfc.make_bets_from_hash("eukucjuoycaulucepkyrtukyw")
+
+    mer_control.set_amounts_with_list((8000,) * 10)
+
+    mer_control_two = nfc.make_bets_from_hash("eukucjuoycaulucepkyrtukyw")
+
+    mer_control_two.set_amounts_with_int(8000)
 
     assert mer_control == mer_from_hash
     assert mer_control == mer_from_indices
@@ -154,10 +162,11 @@ def test_bet_indices_with_amount(
     nfc: NeoFoodClub,
     crazy_test_indices: Tuple[Tuple[int, ...], ...],
 ) -> None:
-    assert (
-        nfc.make_bets_from_indices(crazy_test_indices, amount=8000).indices
-        == crazy_test_indices
-    )
+    bets = nfc.make_bets_from_indices(crazy_test_indices)
+
+    bets.set_amounts_with_int(8000)
+
+    assert bets.indices == crazy_test_indices
 
 
 def test_bet_binaries_encoding(
@@ -173,10 +182,11 @@ def test_bet_binaries_with_amount(
     nfc: NeoFoodClub,
     crazy_test_binaries: Tuple[int, ...],
 ) -> None:
-    assert (
-        nfc.make_bets_from_binaries(crazy_test_binaries, amount=8000).binaries
-        == crazy_test_binaries
-    )
+    bets = nfc.make_bets_from_binaries(crazy_test_binaries)
+
+    bets.set_amounts_with_int(8000)
+
+    assert bets.binaries == crazy_test_binaries
 
 
 def test_expected_return_equality(nfc: NeoFoodClub, crazy_bets: Bets) -> None:
@@ -212,28 +222,33 @@ def test_random_bets(nfc: NeoFoodClub) -> None:
 
 
 def test_too_many_bet_amounts_from_binaries(nfc: NeoFoodClub) -> None:
+    bets = nfc.make_bets_from_binaries([0x1])
     with pytest.raises(InvalidData):
-        nfc.make_bets_from_binaries(0x1, amounts=[50, 50])
+        bets.set_amounts_with_list([50, 50])
 
 
 def test_invalid_bet_amounts_from_binaries(nfc: NeoFoodClub) -> None:
+    bets = nfc.make_bets_from_binaries([0x1])
     with pytest.raises(InvalidAmountHash):
-        nfc.make_bets_from_binaries(0x1, amounts_hash="???")
+        bets.set_amounts_with_hash("???")
 
 
 def test_too_many_bet_amounts_from_indices(nfc: NeoFoodClub) -> None:
+    bets = nfc.make_bets_from_indices([(1, 0, 0, 0, 0)])
     with pytest.raises(InvalidData):
-        nfc.make_bets_from_indices([(1, 0, 0, 0, 0)], amounts=[50, 50])
+        bets.set_amounts_with_list([50, 50])
 
 
 def test_invalid_bet_amounts_from_indices(nfc: NeoFoodClub) -> None:
+    bets = nfc.make_bets_from_indices([(1, 0, 0, 0, 0)])
     with pytest.raises(InvalidAmountHash):
-        nfc.make_bets_from_indices([(1, 0, 0, 0, 0)], amounts_hash="???")
+        bets.set_amounts_with_hash("???")
 
 
 def test_too_many_bet_amounts_from_hash(nfc: NeoFoodClub) -> None:
+    bets = nfc.make_bets_from_hash("faa")
     with pytest.raises(InvalidData):
-        nfc.make_bets_from_hash("faa", amounts=[50, 50])
+        bets.set_amounts_with_list([50, 50])
 
 
 def test_invalid_bet_hash(nfc: NeoFoodClub) -> None:
@@ -242,8 +257,9 @@ def test_invalid_bet_hash(nfc: NeoFoodClub) -> None:
 
 
 def test_invalid_amounts_hash(nfc: NeoFoodClub) -> None:
+    bets = nfc.make_bets_from_hash("faa")
     with pytest.raises(InvalidAmountHash):
-        nfc.make_bets_from_hash("faa", amounts_hash="???")
+        bets.set_amounts_with_hash("???")
 
 
 def test_bet_get_win_units(nfc: NeoFoodClub) -> None:
@@ -252,7 +268,7 @@ def test_bet_get_win_units(nfc: NeoFoodClub) -> None:
 
 def test_bet_get_win_np(nfc: NeoFoodClub) -> None:
     bets = nfc.make_bets_from_hash("faa")
-    bets.bet_amounts = (8000,)
+    bets.set_amounts_with_list((8000,))
     assert nfc.get_win_np(bets) == 16000
 
 
@@ -325,7 +341,9 @@ def test_bet_with_trailing_none_in_amounts(
 ) -> None:
     nine_bets = nfc.make_bets_from_hash(
         "abaakaebapkddapudaaqkbaaa",
-        amounts_hash="EmxCoKCoKCglDKUCYqEXkByWBpqzGO",
     )
+
+    nine_bets.set_amounts_with_hash("EmxCoKCoKCglDKUCYqEXkByWBpqzGO")
+
     assert len(nine_bets) == 9
-    assert len(nine_bets.bet_amounts) == 9
+    assert len(nine_bets.bet_amounts or []) == 9
