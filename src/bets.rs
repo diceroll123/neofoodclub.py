@@ -62,8 +62,8 @@ impl Bets {
     }
 
     #[getter]
-    fn binaries(&self) -> Vec<u32> {
-        self.inner.get_binaries()
+    fn binaries<'a>(&self, py: Python<'a>) -> PyResult<&'a PyTuple> {
+        Ok(PyTuple::new(py, &self.inner.get_binaries()))
     }
 
     #[getter]
@@ -81,10 +81,12 @@ impl Bets {
         self.inner.is_bustproof()
     }
 
+    #[getter]
     fn is_crazy(&self) -> bool {
         self.inner.is_crazy()
     }
 
+    #[getter]
     fn is_gambit(&self) -> bool {
         self.inner.is_gambit()
     }
@@ -98,12 +100,22 @@ impl Bets {
     }
 
     #[getter]
-    fn indices(&self) -> Vec<[u8; 5]> {
-        self.inner.get_indices()
+    fn indices<'a>(&self, py: Python<'a>) -> PyResult<&'a PyTuple> {
+        let indicies = self.inner.get_indices();
+        let py_indicies: Vec<&'a PyTuple> = indicies
+            .iter()
+            .map(|index| PyTuple::new(py, index))
+            .collect();
+
+        Ok(PyTuple::new(py, py_indicies))
     }
 
-    fn net_expected_value(&self, nfc: &NeoFoodClub) -> f64 {
+    fn net_expected(&self, nfc: &NeoFoodClub) -> f64 {
         self.inner.net_expected(&nfc.inner)
+    }
+
+    fn expected_return(&self, nfc: &NeoFoodClub) -> f64 {
+        self.inner.expected_return(&nfc.inner)
     }
 
     fn __repr__(&self) -> String {
@@ -115,6 +127,6 @@ impl Bets {
     }
 
     fn __eq__(&self, other: &Self) -> bool {
-        self.indices() == other.indices()
+        self.inner.get_indices() == other.inner.get_indices()
     }
 }

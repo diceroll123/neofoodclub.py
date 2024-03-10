@@ -1,9 +1,9 @@
+import math
 from typing import Sequence, Tuple
 
 import pytest
 
-from neofoodclub import Math, NeoFoodClub
-from neofoodclub.bets import Bets
+from neofoodclub import Bets, Math, NeoFoodClub
 from neofoodclub.errors import InvalidAmountHash, InvalidBetHash, InvalidData
 
 
@@ -179,12 +179,12 @@ def test_bet_binaries_with_amount(
     )
 
 
-def test_expected_ratio_equality(crazy_bets: Bets) -> None:
+def test_expected_return_equality(nfc: NeoFoodClub, crazy_bets: Bets) -> None:
     # There's a discrepancy between what the website says vs what this says.
     # When it comes to expected ratio and net expected, the inconsistent
     # floating point accuracy across different programming languages shows.
 
-    assert crazy_bets.expected_ratio == 3.419054697690152
+    assert crazy_bets.expected_return(nfc) == 3.419054697690152
 
 
 def test_net_expected_equality_with_amount(
@@ -196,7 +196,8 @@ def test_net_expected_equality_with_amount(
     # floating point accuracy across different programming languages shows.
 
     crazy_bets = nfc_with_bet_amount.make_bets_from_hash(crazy_test_hash)
-    assert crazy_bets.net_expected(nfc_with_bet_amount) == -4742.560161024547
+
+    assert math.isclose(crazy_bets.net_expected(nfc_with_bet_amount), -4742.56016102454)
 
 
 @pytest.mark.parametrize(
@@ -211,12 +212,12 @@ def test_bets_from_binary_error(
     bet_binaries: Tuple[int, ...],
 ) -> None:
     with pytest.raises(InvalidData):
-        Bets.from_binary(*bet_binaries, nfc=nfc)
+        Bets.from_binaries(nfc, bet_binaries)
 
 
 def test_repeating_bets_from_binary(nfc: NeoFoodClub) -> None:
     # duplicates are removed in from_binary, we're making sure of this
-    repeating = Bets.from_binary(0x1, 0x1, 0x2, nfc=nfc)
+    repeating = Bets.from_binaries(nfc, [0x1, 0x1, 0x2])
     assert len(repeating) == 2
 
 

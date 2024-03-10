@@ -186,4 +186,12 @@ impl NeoFoodClub {
     fn get_win_np(&self, bets: &Bets) -> u32 {
         self.inner.get_win_np(&bets.inner)
     }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<NeoFoodClub round={:?} bet_amount={:?}>",
+            self.inner.round(),
+            self.inner.bet_amount
+        )
+    }
 }

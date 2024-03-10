@@ -377,6 +377,15 @@ class Bets:
     def net_expected(self, nfc: NeoFoodClub) -> float:
         """:class:`float`: Returns the net expected value of the bets."""
 
+    def expected_return(self, nfc: NeoFoodClub) -> float:
+        """:class:`float`: Returns the expected return of the bets."""
+
+    def fill_bet_amounts(self, nfc: NeoFoodClub) -> None:
+        """
+        Fills the bet amounts of the bets such that they are either capped to what
+        would equal 1M per bet,or the max bet amount, using `nfc.bet_amount`.
+        """
+
 class Arena:
     @property
     def id(self) -> int:
