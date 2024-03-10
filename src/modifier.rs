@@ -1,3 +1,4 @@
+use neofoodclub::modifier::ModifierFlags;
 use pyo3::prelude::*;
 
 #[pyclass]
@@ -13,6 +14,28 @@ impl Modifier {
 
 #[pymethods]
 impl Modifier {
+    #[classattr]
+    const EMPTY: i32 = ModifierFlags::EMPTY.bits();
+
+    #[classattr]
+    const GENERAL: i32 = ModifierFlags::GENERAL.bits();
+
+    #[classattr]
+    const OPENING_ODDS: i32 = ModifierFlags::OPENING_ODDS.bits();
+
+    #[classattr]
+    const REVERSE: i32 = ModifierFlags::REVERSE.bits();
+
+    #[classattr]
+    const CHARITY_CORNER: i32 = ModifierFlags::CHARITY_CORNER.bits();
+
+    #[new]
+    pub fn new(value: i32) -> Self {
+        Modifier {
+            inner: neofoodclub::modifier::Modifier::new(value),
+        }
+    }
+
     #[getter]
     fn value(&self) -> i32 {
         self.inner.value

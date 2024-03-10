@@ -65,7 +65,7 @@ def test_not_modified(nfc: NeoFoodClub) -> None:
 
 def test_modified_opening_odds(nfc: NeoFoodClub) -> None:
     new_nfc = nfc.copy()
-    new_nfc.modifier = Modifier(Modifier.OPENING)
+    new_nfc.modifier = Modifier(Modifier.OPENING_ODDS)
     assert new_nfc.modified is True
 
 

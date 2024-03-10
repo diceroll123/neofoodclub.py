@@ -175,6 +175,13 @@ class Math:
     ) -> list[Chance]: ...
 
 class Modifier:
+    EMPTY: int
+    GENERAL: int
+    OPENING_ODDS: int
+    REVERSE: int
+    CHARITY_CORNER: int
+
+    def __init__(self, modifier_value: int = 0) -> None: ...
     @property
     def value(self) -> int:
         """:class:`int`: The value of the modifier."""
@@ -187,17 +194,26 @@ class Modifier:
     def is_general(self) -> bool:
         """:class:`bool`: Whether or not the modifier is general."""
 
+    @is_general.setter
+    def is_general(self, value: bool) -> None: ...
     @property
     def is_opening_odds(self) -> bool:
         """:class:`bool`: Whether or not the modifier is opening odds."""
 
+    @is_opening_odds.setter
+    def is_opening_odds(self, value: bool) -> None: ...
     @property
     def is_reverse(self) -> bool:
         """:class:`bool`: Whether or not the modifier is reverse."""
 
+    @is_reverse.setter
+    def is_reverse(self, value: bool) -> None: ...
     @property
-    def is_cc_perk(self) -> bool:
+    def is_charity_corner(self) -> bool:
         """:class:`bool`: Whether or not the modifier has the Charity Corner perk on."""
+
+    @is_charity_corner.setter
+    def is_charity_corner(self, value: bool) -> None: ...
 
 class PartialPirate:
     """Represents a "partial" pirate that only has an ID.
@@ -651,3 +667,11 @@ class NeoFoodClub:
             The index of the arena to get.
 
         """
+
+    @property
+    def modifier(self) -> Modifier:
+        """:class:`Modifier`: Returns the modifier object."""
+
+    @modifier.setter
+    def modifier(self, value: Modifier) -> None:
+        """:class:`Modifier`: Sets the modifier object."""

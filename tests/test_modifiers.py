@@ -2,8 +2,7 @@ import datetime
 
 import pytest
 
-from neofoodclub import NeoFoodClub
-from neofoodclub.modifier import Modifier
+from neofoodclub import Modifier, NeoFoodClub
 
 
 def test_empty_modifier() -> None:
@@ -11,15 +10,15 @@ def test_empty_modifier() -> None:
     assert m.value == 0
 
 
-def test_cc_perk_modifier() -> None:
+def test_is_charity_corner_modifier() -> None:
     m = Modifier()
-    m.cc_perk = True
-    assert m.cc_perk is True
+    m.is_charity_corner = True
+    assert m.is_charity_corner is True
 
 
-def test_cc_perk_modifier_from_init() -> None:
+def test_is_charity_corner_modifier_from_init() -> None:
     m = Modifier(cc_perk=True)
-    assert m.cc_perk is True
+    assert m.is_charity_corner is True
 
 
 def test_general_modifier() -> None:
@@ -28,7 +27,7 @@ def test_general_modifier() -> None:
 
 
 def test_opening_odds_modifier() -> None:
-    m = Modifier(Modifier.OPENING)
+    m = Modifier(Modifier.OPENING_ODDS)
     assert m.opening_odds is True
 
 
@@ -45,11 +44,11 @@ def test_full_modifier() -> None:
 
 
 def test_from_type_modifier() -> None:
-    m = Modifier.from_type(Modifier.LETTERS, cc_perk=True)
+    m = Modifier.from_type(Modifier.LETTERS, is_charity_corner=True)
     assert m.general is True
     assert m.opening_odds is True
     assert m.reverse is True
-    assert m.cc_perk is True
+    assert m.is_charity_corner is True
 
 
 def test_modifier_letters_equality() -> None:
@@ -67,7 +66,7 @@ def test_modifier_custom_odds() -> None:
 def test_modifier_copy_equality() -> None:
     m = Modifier(
         Modifier.ALL_MODIFIERS,
-        cc_perk=True,
+        is_charity_corner=True,
         custom_odds={1: 2},
         custom_time=datetime.time(hour=12, minute=0),
     )
@@ -96,10 +95,10 @@ def test_modifier_time_typeerror() -> None:
         m.time = ""  # type: ignore
 
 
-def test_modifier_cc_perk_typeerror() -> None:
+def test_modifier_is_charity_corner_typeerror() -> None:
     with pytest.raises(TypeError):
         m = Modifier()
-        m.cc_perk = ""  # type: ignore
+        m.is_charity_corner = ""  # type: ignore
 
 
 def test_modifier_custom_odds_typeerror() -> None:

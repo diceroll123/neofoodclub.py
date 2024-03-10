@@ -6,6 +6,7 @@ use pyo3::{
 use crate::{
     arena::{Arena, Arenas},
     bets::Bets,
+    modifier::Modifier,
     pirates::Pirate,
 };
 
@@ -28,6 +29,11 @@ impl NeoFoodClub {
         NeoFoodClub {
             inner: neofoodclub::nfc::NeoFoodClub::from_url(url, bet_amount, None, None),
         }
+    }
+
+    #[getter]
+    fn modifier(&self) -> Modifier {
+        Modifier::from_modifier(self.inner.modifier.clone())
     }
 
     fn copy(&self) -> Self {
