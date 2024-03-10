@@ -318,14 +318,6 @@ class Odds:
         """List[:class:`Chance`]: The chances of the odds."""
 
 class Bets:
-    @classmethod
-    def from_binaries(cls, nfc: NeoFoodClub, bets_binaries: Sequence[int]) -> Bets: ...
-    @classmethod
-    def from_hash(cls, nfc: NeoFoodClub, bets_hash: str) -> Bets: ...
-    @classmethod
-    def from_indices(
-        cls, nfc: NeoFoodClub, bets_indices: Sequence[Sequence[int]]
-    ) -> Bets: ...
     @property
     def bet_amounts(self) -> tuple[int | None, ...] | None:
         """Optional[Tuple[Optional[:class:`int`], ...]]: The amounts of the bets."""

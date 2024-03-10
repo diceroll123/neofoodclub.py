@@ -9,24 +9,6 @@ pub struct Bets {
 }
 
 impl Bets {
-    pub fn from_binaries(nfc: &NeoFoodClub, binaries: Vec<u32>) -> Self {
-        Bets {
-            inner: neofoodclub::bets::Bets::from_binaries(&nfc.inner, binaries),
-        }
-    }
-
-    pub fn from_hash(nfc: &NeoFoodClub, hash: &str) -> Self {
-        Bets {
-            inner: neofoodclub::bets::Bets::from_hash(&nfc.inner, hash),
-        }
-    }
-
-    pub fn from_indices(nfc: &NeoFoodClub, indices: Vec<[u8; 5]>) -> Self {
-        Bets {
-            inner: neofoodclub::bets::Bets::from_indices(&nfc.inner, indices),
-        }
-    }
-
     pub fn from_bets(bets: neofoodclub::bets::Bets) -> Self {
         Bets { inner: bets }
     }
