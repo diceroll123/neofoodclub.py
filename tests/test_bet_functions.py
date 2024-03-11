@@ -45,7 +45,12 @@ def test_make_url(nfc_with_bet_amount: NeoFoodClub) -> None:
     bets.set_amounts_with_hash("CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS")
 
     assert (
-        bets.make_url(include_domain=True)
+        bets.make_url(nfc_with_bet_amount, include_domain=True, all_data=False)
+        == "https://neofood.club/#round=7956&b=eukucjuoycaulucepkyrtukyw&a=CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS"
+    )
+
+    assert (
+        nfc_with_bet_amount.make_url(bets, include_domain=True, all_data=False)
         == "https://neofood.club/#round=7956&b=eukucjuoycaulucepkyrtukyw&a=CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS"
     )
 

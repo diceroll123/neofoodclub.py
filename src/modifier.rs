@@ -32,6 +32,9 @@ impl Modifier {
     #[classattr]
     const CHARITY_CORNER: i32 = ModifierFlags::CHARITY_CORNER.bits();
 
+    #[classattr]
+    const ALL_MODIFIERS: i32 = ModifierFlags::all().bits();
+
     #[new]
     pub fn new(value: i32, custom_odds: Option<HashMap<u8, u8>>) -> Self {
         Modifier {
@@ -63,5 +66,10 @@ impl Modifier {
     #[getter]
     pub fn is_charity_corner(&self) -> bool {
         self.inner.is_charity_corner()
+    }
+
+    #[getter]
+    pub fn custom_odds(&self) -> Option<HashMap<u8, u8>> {
+        self.inner.custom_odds.clone()
     }
 }

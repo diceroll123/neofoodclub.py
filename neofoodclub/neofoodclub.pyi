@@ -180,6 +180,7 @@ class Modifier:
     OPENING_ODDS: int
     REVERSE: int
     CHARITY_CORNER: int
+    ALL_MODIFIERS: int
 
     def __init__(
         self, modifier_value: int = 0, custom_odds: dict[int, int] | None = None
@@ -200,26 +201,17 @@ class Modifier:
     def is_general(self) -> bool:
         """:class:`bool`: Whether or not the modifier is general."""
 
-    @is_general.setter
-    def is_general(self, value: bool) -> None: ...
     @property
     def is_opening_odds(self) -> bool:
         """:class:`bool`: Whether or not the modifier is opening odds."""
 
-    @is_opening_odds.setter
-    def is_opening_odds(self, value: bool) -> None: ...
     @property
     def is_reverse(self) -> bool:
         """:class:`bool`: Whether or not the modifier is reverse."""
 
-    @is_reverse.setter
-    def is_reverse(self, value: bool) -> None: ...
     @property
     def is_charity_corner(self) -> bool:
         """:class:`bool`: Whether or not the modifier has the Charity Corner perk on."""
-
-    @is_charity_corner.setter
-    def is_charity_corner(self, value: bool) -> None: ...
 
 class PartialPirate:
     """Represents a "partial" pirate that only has an ID.
@@ -427,6 +419,22 @@ class Bets:
         """
         Fills the bet amounts of the bets such that they are either capped to what
         would equal 1M per bet,or the max bet amount, using `nfc.bet_amount`.
+        """
+
+    def make_url(
+        self, nfc: NeoFoodClub, include_domain: bool = False, all_data: bool = False
+    ) -> str:
+        """Returns a URL for the bets.
+
+        Parameters
+        ----------
+        nfc: :class:`NeoFoodClub`
+            The NeoFoodClub object to use.
+        include_domain: :class:`bool`
+            Whether or not to include the domain in the URL.
+        all_data: :class:`bool`
+            Whether or not to include all data in the URL.
+
         """
 
 class Arena:
@@ -710,3 +718,19 @@ class NeoFoodClub:
     @modifier.setter
     def modifier(self, value: Modifier) -> None:
         """:class:`Modifier`: Sets the modifier object."""
+
+    def make_url(
+        self, bets: Bets, include_domain: bool = False, all_data: bool = False
+    ) -> str:
+        """Returns a URL to the bets provided.
+
+        Parameters
+        ----------
+        bets: :class:`Bets`
+            The bets to make a URL for.
+        include_domain: :class:`bool`
+            Whether or not to include the domain in the URL.
+        all_data: :class:`bool`
+            Whether or not to include all data in the URL.
+
+        """

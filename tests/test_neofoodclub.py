@@ -233,17 +233,17 @@ def test_outdated_lock_none(nfc: NeoFoodClub) -> None:
     assert new_nfc.is_outdated_lock is True
 
 
-def test_winners_pirates(nfc: NeoFoodClub) -> None:
-    assert len(nfc.winners_pirates) == 5
+def test_winning_pirates(nfc: NeoFoodClub) -> None:
+    assert len(nfc.winning_pirates) == 5  # type: ignore
 
 
-def test_winners_pirates_empty(nfc: NeoFoodClub) -> None:
+def test_winning_pirates_empty(nfc: NeoFoodClub) -> None:
     data = nfc.to_dict()
     # monkeypatching in no winners
     data["winners"] = (0, 0, 0, 0, 0)
 
     new_nfc = NeoFoodClub(data)
-    assert len(new_nfc.winners_pirates) == 0
+    assert len(new_nfc.winning_pirates or []) == 0
 
 
 def test_from_url_exception() -> None:

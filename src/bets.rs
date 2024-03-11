@@ -126,4 +126,8 @@ impl Bets {
     fn __eq__(&self, other: &Self) -> bool {
         self.inner.get_indices() == other.inner.get_indices()
     }
+
+    pub fn make_url(&self, nfc: &NeoFoodClub, include_domain: bool, all_data: bool) -> String {
+        self.inner.make_url(&nfc.inner, include_domain, all_data)
+    }
 }

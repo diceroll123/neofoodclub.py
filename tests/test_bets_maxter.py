@@ -1,5 +1,4 @@
-from neofoodclub import NeoFoodClub
-from neofoodclub.modifier import Modifier
+from neofoodclub import Modifier, NeoFoodClub
 
 
 def test_mer_bets_binaries_no_bet_amount(nfc: NeoFoodClub) -> None:
@@ -46,5 +45,7 @@ def test_mer_bet_amounts(nfc_with_bet_amount: NeoFoodClub) -> None:
 def test_mer_reverse(nfc_with_bet_amount: NeoFoodClub) -> None:
     new_nfc = nfc_with_bet_amount.copy()
     new_nfc.modifier = Modifier(Modifier.REVERSE)
+
     bets = new_nfc.make_max_ter_bets()
-    assert bets.bet_amounts.sum() == 68181
+
+    assert sum(bets.bet_amounts) == 68181  # type: ignore

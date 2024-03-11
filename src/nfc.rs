@@ -37,7 +37,7 @@ impl NeoFoodClub {
         Modifier::from_modifier(self.inner.modifier.clone())
     }
 
-    #[setter]
+    #[setter(modifier)]
     fn set_modifier(&mut self, modifier: Modifier) {
         self.inner.modifier = modifier.inner;
     }
@@ -213,5 +213,9 @@ impl NeoFoodClub {
             self.inner.round(),
             self.inner.bet_amount
         )
+    }
+
+    fn make_url(&self, bets: &Bets, include_domain: bool, all_data: bool) -> String {
+        self.inner.make_url(&bets.inner, include_domain, all_data)
     }
 }
