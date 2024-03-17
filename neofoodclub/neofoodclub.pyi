@@ -753,3 +753,6 @@ class NeoFoodClub:
     @property
     def changes(self) -> tuple[OddsChange, ...]:
         """Tuple[:class:`OddsChange`, ...]: Returns the changes in the round."""
+
+    def to_json(self) -> str:
+        """:class:`str`: Returns the JSON representation of the NeoFoodClub object."""
