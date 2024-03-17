@@ -223,12 +223,12 @@ def nfc_with_bet_amount_logit_model(test_round_data_json: str) -> NeoFoodClub:
 
 @pytest.fixture()
 def nfc_from_url(test_round_url) -> NeoFoodClub:
-    return NeoFoodClub.from_url(test_round_url)
+    return NeoFoodClub.from_url(test_round_url, bet_amount=None)
 
 
 @pytest.fixture()
 def nfc_no_foods(test_round_url_no_food: str) -> NeoFoodClub:
-    return NeoFoodClub.from_url(test_round_url_no_food)
+    return NeoFoodClub.from_url(test_round_url_no_food, bet_amount=None)
 
 
 @pytest.fixture()
