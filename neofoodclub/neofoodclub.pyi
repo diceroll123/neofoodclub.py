@@ -20,6 +20,14 @@ def make_round_dicts(stds: Sequence[Sequence[float]], odds: tuple[tuple[int, ...
 # fmt: on
 
 @dataclass
+class OddsChange:
+    t: str
+    old: int
+    new: int
+    arena: int
+    pirate: int
+
+@dataclass
 class Chance:
     """Represents the probabilities of a singular chance of odds.
     This class is not to be constructed manually.
@@ -734,3 +742,7 @@ class NeoFoodClub:
             Whether or not to include all data in the URL.
 
         """
+
+    @property
+    def changes(self) -> tuple[OddsChange, ...]:
+        """Tuple[:class:`OddsChange`, ...]: Returns the changes in the round."""
