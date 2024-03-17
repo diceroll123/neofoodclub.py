@@ -24,8 +24,24 @@ class OddsChange:
     t: str
     old: int
     new: int
-    arena: int
-    pirate: int
+
+    def pirate(self, nfc: NeoFoodClub) -> PartialPirate:
+        """:class:`PartialPirate`: The pirate that changed odds."""
+
+    @property
+    def pirate_index(self) -> int:
+        """:class:`int`: The index of the pirate that changed odds."""
+
+    @property
+    def arena_index(self) -> int:
+        """:class:`int`: The index of the arena that changed odds."""
+
+    @property
+    def arena(self) -> str:
+        """:class:`str`: The name of the arena that changed odds."""
+
+    def pirate_id(self, nfc: NeoFoodClub) -> int:
+        """:class:`int`: The ID of the pirate that changed odds."""
 
 @dataclass
 class Chance:
@@ -220,6 +236,10 @@ class Modifier:
     @property
     def is_charity_corner(self) -> bool:
         """:class:`bool`: Whether or not the modifier has the Charity Corner perk on."""
+
+    @property
+    def modified(self) -> bool:
+        """:class:`bool`: Whether or not the modifier is modifying actual data."""
 
     def __eq__(self, other: object) -> bool: ...
 
@@ -753,6 +773,18 @@ class NeoFoodClub:
     @property
     def changes(self) -> tuple[OddsChange, ...]:
         """Tuple[:class:`OddsChange`, ...]: Returns the changes in the round."""
+
+    @property
+    def custom_odds(self) -> dict[int, int] | None:
+        """Optional[Dict[:class:`int`, :class:`int`]]: The custom odds of the modifier."""
+
+    @property
+    def pirates(self) -> list[list[int]]:
+        """List[List[:class:`int`]]: Returns the pirates in the round."""
+
+    @property
+    def modified(self) -> bool:
+        """:class:`bool`: Whether or not the round data is modified."""
 
     @property
     def is_outdated_lock(self) -> bool:

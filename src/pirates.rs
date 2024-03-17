@@ -11,7 +11,7 @@ pub struct PartialPirate {
 #[pymethods]
 impl PartialPirate {
     #[new]
-    fn new(id: usize) -> Self {
+    pub fn new(id: usize) -> Self {
         PartialPirate {
             inner: neofoodclub::pirates::PartialPirate { id },
         }

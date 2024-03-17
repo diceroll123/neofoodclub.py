@@ -1,12 +1,14 @@
 use pyo3::prelude::*;
 
+use crate::nfc::NeoFoodClub;
+
 #[pyclass]
 pub struct OddsChange {
-    inner: neofoodclub::nfc::Change,
+    inner: neofoodclub::oddschange::OddsChange,
 }
 
-impl From<neofoodclub::nfc::Change> for OddsChange {
-    fn from(change: neofoodclub::nfc::Change) -> Self {
+impl From<neofoodclub::oddschange::OddsChange> for OddsChange {
+    fn from(change: neofoodclub::oddschange::OddsChange) -> Self {
         OddsChange { inner: change }
     }
 }
@@ -24,17 +26,26 @@ impl OddsChange {
     }
 
     #[getter]
-    fn pirate(&self) -> u8 {
-        self.inner.pirate
+    fn pirate_index(&self) -> usize {
+        self.inner.pirate_index()
     }
 
     #[getter]
-    fn arena(&self) -> u8 {
-        self.inner.arena
+    fn arena_index(&self) -> usize {
+        self.inner.arena_index()
+    }
+
+    #[getter]
+    fn arena(&self) -> &str {
+        self.inner.arena()
     }
 
     #[getter]
     fn timestamp(&self) -> String {
         self.inner.t.to_string()
+    }
+
+    fn pirate(&self, nfc: &NeoFoodClub) -> crate::pirates::PartialPirate {
+        crate::pirates::PartialPirate::new(self.inner.pirate_id(&nfc.inner))
     }
 }

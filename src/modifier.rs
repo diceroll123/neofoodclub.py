@@ -73,6 +73,11 @@ impl Modifier {
         self.inner.custom_odds.clone()
     }
 
+    #[getter]
+    pub fn modified(&self) -> bool {
+        self.inner.modified()
+    }
+
     pub fn __eq__(&self, other: &Modifier) -> bool {
         self.inner == other.inner
     }

@@ -1,6 +1,6 @@
 import datetime
 import json
-from typing import Any, Dict, Optional
+from typing import Optional
 
 import orjson
 import pytest
@@ -70,7 +70,9 @@ def test_modified_opening_odds(nfc: NeoFoodClub) -> None:
 
 def test_modified_time(nfc: NeoFoodClub) -> None:
     new_nfc = nfc.copy()
-    new_nfc.modifier = Modifier(custom_time=datetime.time(hour=12, minute=0))
+    new_nfc.modifier = Modifier(
+        Modifier.EMPTY, custom_time=datetime.time(hour=12, minute=0)
+    )
     assert new_nfc.modified is True
 
 
@@ -160,15 +162,13 @@ def test_get_win_np(
     assert new_nfc_from_url.get_win_np(bets_for_url) == winnings
 
 
-def test_changes(nfc_no_cache: NeoFoodClub, test_round_data: Dict[str, Any]) -> None:
+def test_changes(nfc_no_cache: NeoFoodClub) -> None:
     # doing it all at once since it's literally one object
-    assert nfc_no_cache.changes[0].index == 0
-    assert nfc_no_cache.changes[0].data == test_round_data["changes"][0]
     assert nfc_no_cache.changes[0].old == 5
     assert nfc_no_cache.changes[0].new == 6
     assert nfc_no_cache.changes[0].pirate_index == 4
     assert nfc_no_cache.changes[0].arena_index == 1
-    assert nfc_no_cache.changes[0].pirate.name == "Squire"
+    assert nfc_no_cache.changes[0].pirate(nfc_no_cache).name == "Squire"
     assert nfc_no_cache.changes[0].arena == "Lagoon"
 
 

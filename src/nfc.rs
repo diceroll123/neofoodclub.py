@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use pyo3::{
     exceptions::PyValueError,
     prelude::*,
@@ -109,6 +111,12 @@ impl NeoFoodClub {
     }
 
     #[getter]
+    fn pirates<'a>(&self, py: Python<'a>) -> PyResult<&'a PyTuple> {
+        let elements = self.inner.pirates();
+        Ok(PyTuple::new(py, elements))
+    }
+
+    #[getter]
     fn timestamp(&self) -> Option<String> {
         self.inner.timestamp()
     }
@@ -116,6 +124,11 @@ impl NeoFoodClub {
     #[getter]
     fn last_change(&self) -> Option<String> {
         self.inner.last_change()
+    }
+
+    #[getter]
+    fn modified(&self) -> bool {
+        self.inner.modified()
     }
 
     #[getter]
@@ -236,6 +249,10 @@ impl NeoFoodClub {
 
     fn make_url(&self, bets: &Bets, include_domain: bool, all_data: bool) -> String {
         self.inner.make_url(&bets.inner, include_domain, all_data)
+    }
+
+    fn custom_odds(&self) -> Option<HashMap<u8, u8>> {
+        self.inner.custom_odds().cloned()
     }
 
     #[getter]
