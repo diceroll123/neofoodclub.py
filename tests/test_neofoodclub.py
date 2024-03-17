@@ -51,7 +51,7 @@ def test_modifier(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
 def test_modified(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
     def modify(n: NeoFoodClub) -> None:
         new_nfc = n.copy()
-        new_nfc.modifier = Modifier(custom_odds={1: 2})
+        new_nfc.modifier = Modifier(Modifier.EMPTY, custom_odds={1: 2})
         assert new_nfc.modified is True
 
     modify(nfc)
@@ -102,13 +102,13 @@ def test_changes_count(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
 
 def test_cc_perk(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
     new_nfc = nfc.copy()
-    new_nfc.modifier = Modifier(cc_perk=True)
+    new_nfc.modifier = Modifier(Modifier.CHARITY_CORNER)
     bets = new_nfc.make_max_ter_bets()
     assert len(bets) == 15
     assert new_nfc.max_amount_of_bets == 15
 
     new_nfc = nfc_from_url.copy()
-    new_nfc.modifier = Modifier(cc_perk=True)
+    new_nfc.modifier = Modifier(Modifier.CHARITY_CORNER)
     bets = new_nfc.make_max_ter_bets()
     assert len(bets) == 15
     assert new_nfc.max_amount_of_bets == 15
