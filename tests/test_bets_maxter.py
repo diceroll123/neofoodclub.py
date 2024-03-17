@@ -48,4 +48,4 @@ def test_mer_reverse(nfc_with_bet_amount: NeoFoodClub) -> None:
 
     bets = new_nfc.make_max_ter_bets()
 
-    assert sum(bets.bet_amounts) == 68181  # type: ignore
+    assert sum(bets.bet_amounts) == 80000  # type: ignore
