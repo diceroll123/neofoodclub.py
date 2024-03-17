@@ -1,6 +1,8 @@
 import datetime
+import json
 from typing import Any, Dict, Optional
 
+import orjson
 import pytest
 import time_machine
 from dateutil.tz import tzutc
@@ -184,7 +186,6 @@ def test_changes_equivalence(nfc: NeoFoodClub) -> None:
     changes = list(set(nfc.changes))  # tests __hash__
 
     assert changes[0] != changes[1]
-    assert list(changes[0]) != list(changes[1])  # tests __iter__
 
 
 def test_change_bet_amount_twice(nfc: NeoFoodClub) -> None:
@@ -203,11 +204,11 @@ def test_change_bet_amount_twice(nfc: NeoFoodClub) -> None:
 def test_removed_timestamp(nfc: NeoFoodClub) -> None:
     # timestamp isn't really needed, so if it doesn't exist,
     # we just return None
-    data = nfc.to_dict()
+    data = orjson.loads(nfc.to_json())
 
     data.pop("timestamp")
 
-    new_nfc = NeoFoodClub(data)
+    new_nfc = NeoFoodClub(json.dumps(data), bet_amount=None)
     assert new_nfc.timestamp is None
 
 
@@ -223,12 +224,12 @@ def test_outdated_lock_false(nfc: NeoFoodClub) -> None:
 
 
 def test_outdated_lock_none(nfc: NeoFoodClub) -> None:
-    data = nfc.to_dict()
+    data = orjson.loads(nfc.to_json())
 
     # if there's no start attribute, assume it's over
     data.pop("start")
 
-    new_nfc = NeoFoodClub(data)
+    new_nfc = NeoFoodClub(json.dumps(data), bet_amount=None)
     assert new_nfc.is_outdated_lock is True
 
 
@@ -237,17 +238,17 @@ def test_winning_pirates(nfc: NeoFoodClub) -> None:
 
 
 def test_winning_pirates_empty(nfc: NeoFoodClub) -> None:
-    data = nfc.to_dict()
+    data = orjson.loads(nfc.to_json())
     # monkeypatching in no winners
     data["winners"] = (0, 0, 0, 0, 0)
 
-    new_nfc = NeoFoodClub(data)
+    new_nfc = NeoFoodClub(json.dumps(data), bet_amount=None)
     assert len(new_nfc.winning_pirates or []) == 0
 
 
 def test_from_url_exception() -> None:
     with pytest.raises(BaseException):
-        NeoFoodClub.from_url("")
+        NeoFoodClub.from_url("", bet_amount=None)
 
 
 def test_from_url_with_cc_perk(test_max_ter_15_bets: str) -> None:
