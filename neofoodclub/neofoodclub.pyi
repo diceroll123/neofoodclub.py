@@ -503,8 +503,8 @@ class Arena:
         """
 
 class Arenas:
-    def get_pirate_by_id(self, id: int) -> Pirate:
-        """:class:`Pirate`: Returns a pirate by ID.
+    def get_pirate_by_id(self, id: int) -> Pirate | None:
+        """Optional[:class:`Pirate`]: Returns a pirate by ID, if it exists.
 
         Parameters
         ----------

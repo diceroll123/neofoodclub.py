@@ -39,5 +39,5 @@ def test_arenas_iter(nfc: NeoFoodClub) -> None:
 
 
 def test_arenas_get_pirate_by_id_wrong(nfc: NeoFoodClub) -> None:
-    with pytest.raises(ValueError):
-        nfc.arenas.get_pirate_by_id(21)
+    pirate = nfc.arenas.get_pirate_by_id(21)
+    assert pirate is None
