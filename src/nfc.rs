@@ -8,6 +8,7 @@ use crate::{
     arena::{Arena, Arenas},
     bets::Bets,
     modifier::Modifier,
+    odds_change::OddsChange,
     pirates::Pirate,
 };
 
@@ -124,6 +125,17 @@ impl NeoFoodClub {
         match elements {
             Some(e) => Ok(Some(PyTuple::new(py, e))),
             None => Ok(None),
+        }
+    }
+
+    #[getter]
+    fn changes(&self) -> Vec<OddsChange> {
+        match self.inner.changes() {
+            Some(changes) => changes
+                .iter()
+                .map(|c| OddsChange::from(c.clone()))
+                .collect(),
+            None => Vec::new(),
         }
     }
 
