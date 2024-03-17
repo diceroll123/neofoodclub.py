@@ -5,6 +5,7 @@ pub mod math;
 pub mod modifier;
 pub mod nfc;
 pub mod odds;
+pub mod odds_change;
 pub mod pirates;
 
 use neofoodclub;
