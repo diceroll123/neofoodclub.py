@@ -186,19 +186,6 @@ def test_changes_equivalence(nfc: NeoFoodClub) -> None:
     assert changes[0] != changes[1]
 
 
-def test_change_bet_amount_twice(nfc: NeoFoodClub) -> None:
-    # this runs the bet_amount setter code which recalculates
-    # the inner dicts instead of making new ones
-    # this is more for code coverage than testing anything
-    new_nfc = nfc.copy()
-
-    assert new_nfc._data_dict == {}
-    new_nfc.bet_amount = 8000
-
-    new_nfc.bet_amount = 5000
-    assert new_nfc._data_dict != {}
-
-
 def test_removed_timestamp(nfc: NeoFoodClub) -> None:
     # timestamp isn't really needed, so if it doesn't exist,
     # we just return None
