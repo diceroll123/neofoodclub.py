@@ -5,8 +5,8 @@ pub struct Arena {
     pub inner: neofoodclub::arena::Arena,
 }
 
-impl Arena {
-    pub fn from_arena(arena: neofoodclub::arena::Arena) -> Self {
+impl From<neofoodclub::arena::Arena> for Arena {
+    fn from(arena: neofoodclub::arena::Arena) -> Self {
         Arena { inner: arena }
     }
 }
@@ -48,7 +48,7 @@ impl Arena {
         self.inner
             .best()
             .iter()
-            .map(|p| crate::pirates::Pirate::from_pirate(*p))
+            .map(|p| crate::pirates::Pirate::from(*p))
             .collect()
     }
 
@@ -73,7 +73,7 @@ impl Arena {
         self.inner
             .pirates
             .iter()
-            .map(|p| crate::pirates::Pirate::from_pirate(*p))
+            .map(|p| crate::pirates::Pirate::from(*p))
             .collect()
     }
 
@@ -87,7 +87,7 @@ impl Arena {
             .inner
             .get_pirate_by_index(index)
             .expect("list index out of range");
-        crate::pirates::Pirate::from_pirate(*pirate)
+        crate::pirates::Pirate::from(*pirate)
     }
 }
 
@@ -96,8 +96,8 @@ pub struct Arenas {
     inner: neofoodclub::arena::Arenas,
 }
 
-impl Arenas {
-    pub fn from_arenas(arenas: neofoodclub::arena::Arenas) -> Self {
+impl From<neofoodclub::arena::Arenas> for Arenas {
+    fn from(arenas: neofoodclub::arena::Arenas) -> Self {
         Arenas { inner: arenas }
     }
 }
@@ -109,21 +109,21 @@ impl Arenas {
         self.inner
             .arenas
             .iter()
-            .map(|a| Arena::from_arena(a.clone()))
+            .map(|a| Arena::from(a.clone()))
             .collect()
     }
 
     fn get_pirate_by_id(&self, id: u8) -> Option<crate::pirates::Pirate> {
         self.inner
             .get_pirate_by_id(id)
-            .map(|p| crate::pirates::Pirate::from_pirate(*p))
+            .map(|p| crate::pirates::Pirate::from(*p))
     }
 
     fn get_pirates_by_id(&self, ids: Vec<u8>) -> Vec<crate::pirates::Pirate> {
         self.inner
             .get_pirates_by_id(&ids)
             .iter()
-            .map(|p| crate::pirates::Pirate::from_pirate(**p))
+            .map(|p| crate::pirates::Pirate::from(**p))
             .collect()
     }
 
@@ -131,7 +131,7 @@ impl Arenas {
         self.inner
             .get_all_pirates_flat()
             .iter()
-            .map(|p| crate::pirates::Pirate::from_pirate(**p))
+            .map(|p| crate::pirates::Pirate::from(**p))
             .collect()
     }
 
@@ -139,7 +139,7 @@ impl Arenas {
         self.inner
             .get_pirates_from_binary(binary)
             .iter()
-            .map(|p| crate::pirates::Pirate::from_pirate(**p))
+            .map(|p| crate::pirates::Pirate::from(**p))
             .collect()
     }
 
@@ -149,7 +149,7 @@ impl Arenas {
             .iter()
             .map(|p| {
                 p.iter()
-                    .map(|pirate| crate::pirates::Pirate::from_pirate(*pirate))
+                    .map(|pirate| crate::pirates::Pirate::from(*pirate))
                     .collect()
             })
             .collect()
@@ -160,7 +160,7 @@ impl Arenas {
         self.inner
             .best()
             .iter()
-            .map(|a| Arena::from_arena(a.clone()))
+            .map(|a| Arena::from(a.clone()))
             .collect()
     }
 
@@ -179,17 +179,17 @@ impl Arenas {
         self.inner
             .positives()
             .iter()
-            .map(|a| Arena::from_arena(a.clone()))
+            .map(|a| Arena::from(a.clone()))
             .collect()
     }
 
     fn get_arena(&self, id: usize) -> Arena {
         let arena = self.inner.get_arena(id).expect("list index out of range");
-        Arena::from_arena(arena.clone())
+        Arena::from(arena.clone())
     }
 
     fn __getitem__(&self, id: usize) -> Arena {
         let arena = self.inner.get_arena(id).expect("list index out of range");
-        Arena::from_arena(arena.clone())
+        Arena::from(arena.clone())
     }
 }

@@ -5,8 +5,8 @@ pub struct Chance {
     inner: neofoodclub::chance::Chance,
 }
 
-impl Chance {
-    pub fn from_chance(chance: neofoodclub::chance::Chance) -> Self {
+impl From<neofoodclub::chance::Chance> for Chance {
+    fn from(chance: neofoodclub::chance::Chance) -> Self {
         Chance { inner: chance }
     }
 }

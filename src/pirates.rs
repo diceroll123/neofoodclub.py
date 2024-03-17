@@ -38,8 +38,8 @@ pub struct Pirate {
     inner: neofoodclub::pirates::Pirate,
 }
 
-impl Pirate {
-    pub fn from_pirate(pirate: neofoodclub::pirates::Pirate) -> Self {
+impl From<neofoodclub::pirates::Pirate> for Pirate {
+    fn from(pirate: neofoodclub::pirates::Pirate) -> Self {
         Pirate { inner: pirate }
     }
 }

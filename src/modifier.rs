@@ -9,8 +9,8 @@ pub struct Modifier {
     pub inner: neofoodclub::modifier::Modifier,
 }
 
-impl Modifier {
-    pub fn from_modifier(modifier: neofoodclub::modifier::Modifier) -> Self {
+impl From<neofoodclub::modifier::Modifier> for Modifier {
+    fn from(modifier: neofoodclub::modifier::Modifier) -> Self {
         Modifier { inner: modifier }
     }
 }

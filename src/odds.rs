@@ -7,8 +7,8 @@ pub struct Odds {
     inner: neofoodclub::odds::Odds,
 }
 
-impl Odds {
-    pub fn from_odds(odds: neofoodclub::odds::Odds) -> Self {
+impl From<neofoodclub::odds::Odds> for Odds {
+    fn from(odds: neofoodclub::odds::Odds) -> Self {
         Odds { inner: odds }
     }
 }
@@ -17,17 +17,17 @@ impl Odds {
 impl Odds {
     #[getter]
     fn best(&self) -> Chance {
-        Chance::from_chance(self.inner.best.clone())
+        Chance::from(self.inner.best.clone())
     }
 
     #[getter]
     fn bust(&self) -> Option<Chance> {
-        self.inner.bust.clone().map(|c| Chance::from_chance(c))
+        self.inner.bust.clone().map(|c| Chance::from(c))
     }
 
     #[getter]
     fn most_likely_winner(&self) -> Chance {
-        Chance::from_chance(self.inner.most_likely_winner.clone())
+        Chance::from(self.inner.most_likely_winner.clone())
     }
 
     #[getter]
@@ -40,7 +40,7 @@ impl Odds {
         self.inner
             .chances
             .iter()
-            .map(|c| Chance::from_chance(c.clone()))
+            .map(|c| Chance::from(c.clone()))
             .collect()
     }
 }

@@ -87,7 +87,7 @@ impl Math {
         let py_structs: Vec<PyObject> =
             neofoodclub::math::build_chance_objects(&bets, &bet_odds, probabilities)
                 .into_iter()
-                .map(|chance| Chance::from_chance(chance).into_py(py))
+                .map(|chance| Chance::from(chance).into_py(py))
                 .collect();
 
         Ok(PyTuple::new(py, py_structs))

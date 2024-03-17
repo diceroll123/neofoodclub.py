@@ -35,7 +35,7 @@ impl NeoFoodClub {
 
     #[getter]
     fn modifier(&self) -> Modifier {
-        Modifier::from_modifier(self.inner.modifier.clone())
+        Modifier::from(self.inner.modifier.clone())
     }
 
     #[setter(modifier)]
@@ -52,12 +52,12 @@ impl NeoFoodClub {
     #[getter]
     fn arenas(&self) -> Arenas {
         let elements = self.inner.arenas.clone();
-        Arenas::from_arenas(elements)
+        Arenas::from(elements)
     }
 
     fn get_arena(&self, index: usize) -> Arena {
         let arena = self.inner.arenas.get_arena(index).expect("Invalid index");
-        Arena::from_arena(arena)
+        Arena::from(arena)
     }
 
     #[getter(bet_amount)]
@@ -147,68 +147,68 @@ impl NeoFoodClub {
     #[getter]
     fn get_winning_pirates(&self) -> Option<Vec<Pirate>> {
         match self.inner.winning_pirates() {
-            Some(pirates) => Some(pirates.iter().map(|p| Pirate::from_pirate(**p)).collect()),
+            Some(pirates) => Some(pirates.iter().map(|p| Pirate::from(**p)).collect()),
             None => None,
         }
     }
 
     fn make_random_bets(&self) -> Bets {
-        Bets::from_bets(self.inner.make_random_bets())
+        Bets::from(self.inner.make_random_bets())
     }
 
     fn make_tenbet_bets(&self, pirates_binary: u32) -> PyResult<Bets> {
         let bets = self.inner.make_tenbet_bets(pirates_binary);
 
         match bets {
-            Ok(bets) => Ok(Bets::from_bets(bets)),
+            Ok(bets) => Ok(Bets::from(bets)),
             Err(s) => Err(PyValueError::new_err(s)),
         }
     }
 
     fn make_max_ter_bets(&self) -> Bets {
-        Bets::from_bets(self.inner.make_max_ter_bets())
+        Bets::from(self.inner.make_max_ter_bets())
     }
 
     fn make_gambit_bets(&self, pirates_binary: u32) -> Bets {
-        Bets::from_bets(self.inner.make_gambit_bets(pirates_binary))
+        Bets::from(self.inner.make_gambit_bets(pirates_binary))
     }
 
     fn make_best_gambit_bets(&self) -> Bets {
-        Bets::from_bets(self.inner.make_best_gambit_bets())
+        Bets::from(self.inner.make_best_gambit_bets())
     }
 
     fn make_winning_gambit_bets(&self) -> Option<Bets> {
         match self.inner.make_winning_gambit_bets() {
-            Some(bets) => Some(Bets::from_bets(bets)),
+            Some(bets) => Some(Bets::from(bets)),
             None => None,
         }
     }
 
     fn make_random_gambit_bets(&self) -> Bets {
-        Bets::from_bets(self.inner.make_random_gambit_bets())
+        Bets::from(self.inner.make_random_gambit_bets())
     }
 
     fn make_crazy_bets(&self) -> Bets {
-        Bets::from_bets(self.inner.make_crazy_bets())
+        Bets::from(self.inner.make_crazy_bets())
     }
 
     fn make_bustproof_bets(&self) -> Option<Bets> {
         match self.inner.make_bustproof_bets() {
-            Some(bets) => Some(Bets::from_bets(bets)),
+            Some(bets) => Some(Bets::from(bets)),
             None => None,
         }
     }
 
     fn make_bets_from_hash(&self, bets_hash: &str) -> Bets {
-        Bets::from_bets(self.inner.make_bets_from_hash(bets_hash))
+        Bets::from(self.inner.make_bets_from_hash(bets_hash))
     }
 
     fn make_bets_from_binaries(&self, binaries: Vec<u32>) -> Bets {
-        Bets::from_bets(self.inner.make_bets_from_binaries(binaries))
+        Bets::from(self.inner.make_bets_from_binaries(binaries))
     }
 
     fn make_bets_from_indices(&self, indices: Vec<[u8; 5]>) -> Bets {
-        Bets::from_bets(self.inner.make_bets_from_indices(indices))
+        Bets::from(self.inner.make_bets_from_indices(indices))
     }
 
     fn get_win_units(&self, bets: &Bets) -> u32 {

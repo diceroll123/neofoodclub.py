@@ -8,8 +8,8 @@ pub struct Bets {
     pub inner: neofoodclub::bets::Bets,
 }
 
-impl Bets {
-    pub fn from_bets(bets: neofoodclub::bets::Bets) -> Self {
+impl From<neofoodclub::bets::Bets> for Bets {
+    fn from(bets: neofoodclub::bets::Bets) -> Self {
         Bets { inner: bets }
     }
 }
@@ -51,7 +51,7 @@ impl Bets {
 
     #[getter]
     fn odds(&self) -> Odds {
-        Odds::from_odds(self.inner.odds.clone())
+        Odds::from(self.inner.odds.clone())
     }
 
     fn __len__(&self) -> usize {
