@@ -72,4 +72,8 @@ impl Modifier {
     pub fn custom_odds(&self) -> Option<HashMap<u8, u8>> {
         self.inner.custom_odds.clone()
     }
+
+    pub fn __eq__(&self, other: &Modifier) -> bool {
+        self.inner == other.inner
+    }
 }

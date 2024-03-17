@@ -221,6 +221,8 @@ class Modifier:
     def is_charity_corner(self) -> bool:
         """:class:`bool`: Whether or not the modifier has the Charity Corner perk on."""
 
+    def __eq__(self, other: object) -> bool: ...
+
 class PartialPirate:
     """Represents a "partial" pirate that only has an ID.
 
