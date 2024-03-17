@@ -238,6 +238,11 @@ impl NeoFoodClub {
         self.inner.make_url(&bets.inner, include_domain, all_data)
     }
 
+    #[getter]
+    fn is_outdated_lock(&self) -> bool {
+        self.inner.is_outdated_lock()
+    }
+
     fn to_json(&self) -> String {
         self.inner.to_json()
     }

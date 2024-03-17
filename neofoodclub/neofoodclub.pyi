@@ -754,5 +754,9 @@ class NeoFoodClub:
     def changes(self) -> tuple[OddsChange, ...]:
         """Tuple[:class:`OddsChange`, ...]: Returns the changes in the round."""
 
+    @property
+    def is_outdated_lock(self) -> bool:
+        """:class:`bool`: Returns whether or not this round is to be considered over. 24 hours after the start time."""
+
     def to_json(self) -> str:
         """:class:`str`: Returns the JSON representation of the NeoFoodClub object."""

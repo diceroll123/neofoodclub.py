@@ -4,8 +4,6 @@ from typing import Any, Dict, Optional
 
 import orjson
 import pytest
-import time_machine
-from dateutil.tz import tzutc
 
 from neofoodclub import Modifier, NeoFoodClub
 
@@ -218,9 +216,12 @@ def test_outdated_lock(nfc: NeoFoodClub) -> None:
     assert nfc.is_outdated_lock is True
 
 
-@time_machine.travel(datetime.datetime(2021, 2, 16, 12, 0, 0, 0, tzinfo=tzutc()))
 def test_outdated_lock_false(nfc: NeoFoodClub) -> None:
-    assert nfc.is_outdated_lock is False
+    now = datetime.datetime.now(datetime.timezone.utc)
+    data = orjson.loads(nfc.to_json())
+    data["start"] = now.isoformat()
+    new_nfc = NeoFoodClub(json.dumps(data), bet_amount=None)
+    assert new_nfc.is_outdated_lock is False
 
 
 def test_outdated_lock_none(nfc: NeoFoodClub) -> None:
