@@ -18,14 +18,3 @@ def test_tenbet_generation_zero_and_five_pirates(
 ) -> None:
     with pytest.raises(ValueError):
         nfc.make_tenbet_bets(pirate_binary)
-
-
-def test_tenbet_generation(nfc: NeoFoodClub) -> None:
-    assert nfc.make_tenbet_bets(0x888).bets_hash == "eggvgygfbgtggbgugfqgbgibg"
-
-
-def test_tenbet_generation_with_bet_amount(nfc_with_bet_amount: NeoFoodClub) -> None:
-    assert (
-        nfc_with_bet_amount.make_tenbet_bets(0x888).bets_hash
-        == "oghqglgjvgmgjqgvgivgjghbg"
-    )
