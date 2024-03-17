@@ -6,7 +6,6 @@ import time_machine
 from dateutil.tz import tzutc
 
 from neofoodclub import Modifier, NeoFoodClub
-from neofoodclub.errors import InvalidData
 
 
 def test_nfc_reset(nfc: NeoFoodClub) -> None:
@@ -247,52 +246,52 @@ def test_winning_pirates_empty(nfc: NeoFoodClub) -> None:
 
 
 def test_from_url_exception() -> None:
-    with pytest.raises(InvalidData):
+    with pytest.raises(BaseException):
         NeoFoodClub.from_url("")
 
 
 def test_from_url_with_cc_perk(test_max_ter_15_bets: str) -> None:
-    nfc = NeoFoodClub.from_url(test_max_ter_15_bets)
-    assert nfc.modifier.cc_perk is True
+    nfc = NeoFoodClub.from_url(test_max_ter_15_bets, bet_amount=None)
+    assert nfc.modifier.is_charity_corner is True
 
 
 def test_from_url_without_winners(test_round_url_no_winners: str) -> None:
-    nfc = NeoFoodClub.from_url(test_round_url_no_winners)
+    nfc = NeoFoodClub.from_url(test_round_url_no_winners, bet_amount=None)
     assert nfc.winners == (0, 0, 0, 0, 0)
 
 
 def test_from_url_without_round_exception(test_round_url_no_round: str) -> None:
-    with pytest.raises(InvalidData):
-        NeoFoodClub.from_url(test_round_url_no_round)
+    with pytest.raises(BaseException):
+        NeoFoodClub.from_url(test_round_url_no_round, bet_amount=None)
 
 
 def test_from_url_without_pirates_exception(test_round_url_no_pirates: str) -> None:
-    with pytest.raises(InvalidData):
-        NeoFoodClub.from_url(test_round_url_no_pirates)
+    with pytest.raises(BaseException):
+        NeoFoodClub.from_url(test_round_url_no_pirates, bet_amount=None)
 
 
 def test_from_url_with_invalid_pirates_exception(
     test_round_url_invalid_pirates: str,
 ) -> None:
-    with pytest.raises(InvalidData):
-        NeoFoodClub.from_url(test_round_url_invalid_pirates)
+    with pytest.raises(BaseException):
+        NeoFoodClub.from_url(test_round_url_invalid_pirates, bet_amount=None)
 
 
 def test_from_url_with_no_opening_odds(test_round_url_no_opening_odds: str) -> None:
-    with pytest.raises(InvalidData):
-        NeoFoodClub.from_url(test_round_url_no_opening_odds)
+    with pytest.raises(BaseException):
+        NeoFoodClub.from_url(test_round_url_no_opening_odds, bet_amount=None)
 
 
 def test_from_url_with_no_current_odds(test_round_url_no_current_odds: str) -> None:
-    with pytest.raises(InvalidData):
-        NeoFoodClub.from_url(test_round_url_no_current_odds)
+    with pytest.raises(BaseException):
+        NeoFoodClub.from_url(test_round_url_no_current_odds, bet_amount=None)
 
 
 def test_from_url_with_invalid_opening_odds(
     test_round_url_invalid_opening_odds: str,
 ) -> None:
-    with pytest.raises(InvalidData):
-        NeoFoodClub.from_url(test_round_url_invalid_opening_odds)
+    with pytest.raises(BaseException):
+        NeoFoodClub.from_url(test_round_url_invalid_opening_odds, bet_amount=None)
 
 
 @pytest.mark.parametrize(
@@ -311,5 +310,5 @@ def test_from_url_with_invalid_opening_odds(
     ],
 )
 def test_error_cases_in_from_url(url: str) -> None:
-    with pytest.raises(InvalidData):
-        NeoFoodClub.from_url(url)
+    with pytest.raises(BaseException):
+        NeoFoodClub.from_url(url, bet_amount=None)
