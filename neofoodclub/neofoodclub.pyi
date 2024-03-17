@@ -409,8 +409,7 @@ class Bets:
     def is_guaranteed_win(self, nfc: NeoFoodClub) -> bool:
         """:class:`bool`: Whether or not the bets are guaranteed to win."""
 
-    @property
-    def odds_values(self) -> tuple[int, ...]:
+    def odds_values(self, nfc: NeoFoodClub) -> tuple[int, ...]:
         """Tuple[:class:`int`, ...]: The odds of the bets."""
 
     @property
