@@ -169,6 +169,13 @@ impl NeoFoodClub {
         Bets::from(self.inner.make_max_ter_bets())
     }
 
+    fn make_units_bets(&self, units: u32) -> Option<Bets> {
+        match self.inner.make_units_bets(units) {
+            Some(bets) => Some(Bets::from(bets)),
+            None => None,
+        }
+    }
+
     fn make_gambit_bets(&self, pirates_binary: u32) -> Bets {
         Bets::from(self.inner.make_gambit_bets(pirates_binary))
     }

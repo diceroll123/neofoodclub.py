@@ -668,6 +668,12 @@ class NeoFoodClub:
     def make_max_ter_bets(self) -> Bets:
         """:class:`Bets`: Returns a maxter bet object."""
 
+    def make_units_bets(self, units: int) -> Bets | None:
+        """Optional[:class:`Bets`]: Returns a bet object with the given amount of units.
+
+        If you provide too high of units, this will return None.
+        """
+
     def make_gambit_bets(self, pirates_binary: int) -> Bets:
         """:class:`Bets`: Returns a gambit bet object."""
 
