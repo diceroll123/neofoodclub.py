@@ -79,7 +79,7 @@ impl Arena {
 
     #[getter]
     fn odds(&self) -> f64 {
-        self.inner.odds.clone()
+        self.inner.odds
     }
 
     fn __getitem__(&self, index: u8) -> crate::pirates::Pirate {
@@ -88,6 +88,15 @@ impl Arena {
             .get_pirate_by_index(index)
             .expect("list index out of range");
         crate::pirates::Pirate::from(*pirate)
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<Arena name={:?} odds={:?} pirates={:?}>",
+            self.name(),
+            self.odds(),
+            self.inner.pirates
+        )
     }
 }
 
@@ -191,5 +200,9 @@ impl Arenas {
     fn __getitem__(&self, id: usize) -> Arena {
         let arena = self.inner.get_arena(id).expect("list index out of range");
         Arena::from(arena.clone())
+    }
+
+    fn __repr__(&self) -> String {
+        format!("<Arenas {:?}>", self.inner.arenas)
     }
 }

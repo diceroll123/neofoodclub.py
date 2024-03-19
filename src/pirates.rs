@@ -47,6 +47,7 @@ impl From<neofoodclub::pirates::Pirate> for Pirate {
 #[pymethods]
 impl Pirate {
     #[new]
+    #[allow(clippy::too_many_arguments)]
     fn new(
         id: u8,
         arena_id: u8,

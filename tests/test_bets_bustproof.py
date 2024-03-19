@@ -2,8 +2,7 @@ import json
 
 import orjson
 
-from neofoodclub import Modifier, NeoFoodClub
-from neofoodclub.bets import Bets
+from neofoodclub import Bets, Modifier, NeoFoodClub
 
 
 def test_bustproof_generator(nfc: NeoFoodClub) -> None:

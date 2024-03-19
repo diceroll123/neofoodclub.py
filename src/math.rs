@@ -69,21 +69,21 @@ impl Math {
     }
 
     #[staticmethod]
-    fn bets_indices_to_bet_binaries<'a>(
-        py: Python<'a>,
+    fn bets_indices_to_bet_binaries(
+        py: Python<'_>,
         bets_indices: Vec<[u8; 5]>,
-    ) -> PyResult<&'a PyTuple> {
+    ) -> PyResult<&PyTuple> {
         let elements = neofoodclub::math::bets_indices_to_bet_binaries(bets_indices);
         Ok(PyTuple::new(py, elements))
     }
 
     #[staticmethod]
-    fn build_chance_objects<'a>(
-        py: Python<'a>,
+    fn build_chance_objects(
+        py: Python<'_>,
         bets: Vec<[u8; 5]>,
         bet_odds: Vec<u32>,
         probabilities: [[f64; 5]; 5],
-    ) -> PyResult<&'a PyTuple> {
+    ) -> PyResult<&PyTuple> {
         let py_structs: Vec<PyObject> =
             neofoodclub::math::build_chance_objects(&bets, &bet_odds, probabilities)
                 .into_iter()

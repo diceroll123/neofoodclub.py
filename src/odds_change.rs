@@ -21,6 +21,7 @@ impl OddsChange {
     }
 
     #[getter]
+    #[allow(clippy::wrong_self_convention, clippy::new_ret_no_self)]
     fn new(&self) -> u8 {
         self.inner.new
     }

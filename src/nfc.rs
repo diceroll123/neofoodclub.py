@@ -212,10 +212,9 @@ impl NeoFoodClub {
 
     #[getter]
     fn get_winning_pirates(&self) -> Option<Vec<Pirate>> {
-        match self.inner.winning_pirates() {
-            Some(pirates) => Some(pirates.iter().map(|p| Pirate::from(**p)).collect()),
-            None => None,
-        }
+        self.inner
+            .winning_pirates()
+            .map(|pirates| pirates.iter().map(|p| Pirate::from(**p)).collect())
     }
 
     fn make_random_bets(&self) -> Bets {
@@ -236,10 +235,7 @@ impl NeoFoodClub {
     }
 
     fn make_units_bets(&self, units: u32) -> Option<Bets> {
-        match self.inner.make_units_bets(units) {
-            Some(bets) => Some(Bets::from(bets)),
-            None => None,
-        }
+        self.inner.make_units_bets(units).map(Bets::from)
     }
 
     fn make_gambit_bets(&self, pirates_binary: u32) -> Bets {
@@ -251,10 +247,7 @@ impl NeoFoodClub {
     }
 
     fn make_winning_gambit_bets(&self) -> Option<Bets> {
-        match self.inner.make_winning_gambit_bets() {
-            Some(bets) => Some(Bets::from(bets)),
-            None => None,
-        }
+        self.inner.make_winning_gambit_bets().map(Bets::from)
     }
 
     fn make_random_gambit_bets(&self) -> Bets {
@@ -266,10 +259,7 @@ impl NeoFoodClub {
     }
 
     fn make_bustproof_bets(&self) -> Option<Bets> {
-        match self.inner.make_bustproof_bets() {
-            Some(bets) => Some(Bets::from(bets)),
-            None => None,
-        }
+        self.inner.make_bustproof_bets().map(Bets::from)
     }
 
     fn make_bets_from_hash(&self, bets_hash: &str) -> Bets {

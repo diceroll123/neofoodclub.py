@@ -4,7 +4,6 @@ import pytest
 
 from neofoodclub import (
     Math,
-    make_probabilities,
 )
 
 
@@ -79,21 +78,6 @@ def test_bet_amounts_to_amounts_hash(expected: str, bet_amounts: Sequence[int]) 
 )
 def test_bets_hash_to_bets_count(bets_hash: str, expected: int) -> None:
     assert expected == Math.bets_hash_to_bets_count(bets_hash)
-
-
-def test_make_probabilities() -> None:
-    # this is more for code coverage purposes, to hit the `if std_total == 1: break`
-    # line in the make_probabilities method
-    probs = make_probabilities(
-        (
-            (1, 11, 4, 2, 3),
-            (1, 12, 8, 5, 2),
-            (1, 11, 13, 2, 2),
-            (1, 2, 13, 13, 11),
-            (1, 5, 11, 7, 2),
-        ),
-    )
-    assert len(probs) == 5
 
 
 def test_amount_hash_to_bet_amounts_below_50() -> None:

@@ -1,7 +1,6 @@
 import pytest
 
-from neofoodclub import NeoFoodClub
-from neofoodclub.bets import Bets
+from neofoodclub import Bets, NeoFoodClub
 
 
 def test_gambit_bet_generator(nfc: NeoFoodClub) -> None:
