@@ -18,6 +18,5 @@ fn neofoodclub_rs(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<nfc::NeoFoodClub>()?;
     m.add_class::<bets::Bets>()?;
     m.add_class::<pirates::PartialPirate>()?;
-    m.add_class::<pirates::Pirate>()?;
     Ok(())
 }

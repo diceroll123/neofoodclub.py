@@ -21,7 +21,6 @@ exclude_lines = [
 include = [
     "neofoodclub",
     "neofoodclub/types",
-    "neofoodclub/models",
 ]
 exclude = [
     "**/__pycache__",
