@@ -43,8 +43,8 @@ def test_mer_bet_amounts(nfc_with_bet_amount: NeoFoodClub) -> None:
 
 
 def test_mer_reverse(nfc_with_bet_amount: NeoFoodClub) -> None:
-    new_nfc = nfc_with_bet_amount.copy()
-    new_nfc.modifier = Modifier(Modifier.REVERSE)
+    modifier = Modifier(Modifier.REVERSE)
+    new_nfc = nfc_with_bet_amount.copy(None, modifier)
 
     bets = new_nfc.make_max_ter_bets()
 

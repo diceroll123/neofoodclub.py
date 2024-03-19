@@ -33,10 +33,9 @@ def test_not_bustproof(crazy_bets: Bets) -> None:
 
 def test_bustproof_with_two_positives(nfc: NeoFoodClub) -> None:
     # test with 2 positives
-    new_nfc = nfc.copy()
-    print(dir(Modifier))
     # setting Buck to 4 sets arena to positive, giving us 2 positives
-    new_nfc.modifier = Modifier(Modifier.EMPTY, custom_odds={19: 4})
+    modifier = Modifier(Modifier.EMPTY, custom_odds={19: 4})
+    new_nfc = nfc.copy(None, modifier)
     bets = new_nfc.make_bustproof_bets()
     assert bets is not None
     assert bets.is_bustproof is True
@@ -44,9 +43,9 @@ def test_bustproof_with_two_positives(nfc: NeoFoodClub) -> None:
 
 def test_bustproof_with_three_positives(nfc: NeoFoodClub) -> None:
     # test with 3 positives
-    new_nfc = nfc.copy()
     # setting Buck to 4 and Fairfax to 5 sets arenas to positive, giving us 3 positives
-    new_nfc.modifier = Modifier(Modifier.EMPTY, custom_odds={19: 4, 14: 5})
+    modifier = Modifier(Modifier.EMPTY, custom_odds={19: 4, 14: 5})
+    new_nfc = nfc.copy(None, modifier)
     bets = new_nfc.make_bustproof_bets()
     assert bets is not None
     assert bets.is_bustproof is True

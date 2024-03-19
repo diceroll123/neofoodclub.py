@@ -30,7 +30,11 @@ class Arena:
     )
 
     def __init__(
-        self, *, nfc: NeoFoodClub, arena_id: int, pirate_ids: Sequence[int],
+        self,
+        *,
+        nfc: NeoFoodClub,
+        arena_id: int,
+        pirate_ids: Sequence[int],
     ) -> None:
         self.nfc: NeoFoodClub = nfc
         self._id = arena_id

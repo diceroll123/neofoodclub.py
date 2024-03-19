@@ -7,11 +7,11 @@ __version__ = "0.0.1a"
 from .arenas import *
 from .bets import *
 from .errors import *
-from .models import *
 from .modifier import *
 from .neofoodclub import *
 from .odds import *
 from .odds_change import *
+from .probability_model import *
 
 __all__ = (
     "Math",
@@ -24,4 +24,5 @@ __all__ = (
     "OddsChange",
     "Pirate",
     "PartialPirate",
+    "ProbabilityModel",
 )

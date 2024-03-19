@@ -49,18 +49,6 @@ def test_pirate_negative_foods(nfc: NeoFoodClub) -> None:
     assert nfc.arenas[0].pirates[0].negative_foods(nfc) == (25, 11)
 
 
-def test_pirate_std_and_er(nfc: NeoFoodClub) -> None:
-    pirate = nfc.arenas[0].pirates[0]
-    assert pirate.std == 0.47500000000000014
-    assert pirate.er == 0.9500000000000003
-
-
-def test_pirate_without_data(nfc_no_cache: NeoFoodClub) -> None:
-    pirate = nfc_no_cache.arenas[0].pirates[0]
-    assert pirate.std is None
-    assert pirate.er is None
-
-
 def test_pirate_without_foods(nfc_no_foods: NeoFoodClub) -> None:
     pirate = nfc_no_foods.arenas[0].pirates[0]
     assert pirate.positive_foods(nfc_no_foods) is None

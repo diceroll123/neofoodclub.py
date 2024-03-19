@@ -207,7 +207,10 @@ class Modifier:
     ALL_MODIFIERS: int
 
     def __init__(
-        self, modifier_value: int = 0, custom_odds: dict[int, int] | None = None
+        self,
+        modifier_value: int = 0,
+        custom_odds: dict[int, int] | None = None,
+        custom_time: str | None = None,
     ) -> None: ...
     @property
     def value(self) -> int:
@@ -216,6 +219,10 @@ class Modifier:
     @property
     def custom_odds(self) -> dict[int, int] | None:
         """Optional[Dict[:class:`int`, :class:`int`]]: The custom odds of the modifier."""
+
+    @property
+    def custom_time(self) -> str | None:
+        """Optional[:class:`str`]: The custom time of the modifier."""
 
     @property
     def is_empty(self) -> bool:
@@ -241,6 +248,7 @@ class Modifier:
     def modified(self) -> bool:
         """:class:`bool`: Whether or not the modifier is modifying actual data."""
 
+    def copy(self) -> Modifier: ...
     def __eq__(self, other: object) -> bool: ...
 
 class PartialPirate:
@@ -601,18 +609,50 @@ class NeoFoodClub:
     """
 
     # fmt: off
-    def __init__(self, json_string: str, bet_amount: int | None): ...
+    def __init__(
+        self,
+        json_string: str,
+        bet_amount: int | None,
+        probability_model: int | None,
+        modifier: Modifier | None,
+    ): ...
 
     @classmethod
-    def from_json(cls, json_string: str, bet_amount: int | None) -> NeoFoodClub: ...
+    def from_json(
+        cls,
+        json_string: str,
+        bet_amount: int | None,
+        probability_model: int | None,
+        modifier: Modifier | None,
+    ): ...
 
     @classmethod
-    def from_url(cls, url: str, bet_amount: int | None) -> NeoFoodClub: ...
+    def from_url(
+        cls,
+        url: str,
+        bet_amount: int | None,
+        probability_model: int | None,
+        modifier: Modifier | None,
+    ): ...
 
     # fmt: on
+
     @classmethod
-    def copy(cls) -> NeoFoodClub:
-        """:class:`NeoFoodClub`: Returns a deep copy of the NeoFoodClub object."""
+    def copy(
+        cls,
+        probability_model: int | None,
+        modifier: Modifier | None,
+    ) -> NeoFoodClub:
+        """Returns a copy of the NeoFoodClub object with an optional modifier.
+
+        Parameters
+        ----------
+        probability_model: Optional[:class:`int`]
+            The probability model to use.
+        modifier: Optional[:class:`Modifier`]
+            The modifier to use.
+
+        """
 
     @property
     def bet_amount(self) -> int | None:
@@ -643,6 +683,10 @@ class NeoFoodClub:
     @property
     def start(self) -> datetime.datetime | None:
         """Optional[datetime.datetime]: When the round started in UTC, if applicable."""
+
+    @property
+    def start_nst(self) -> str | None:
+        """Optional[:class:`str`]: When the round started in NST, if applicable."""
 
     @property
     def current_odds(
@@ -749,10 +793,6 @@ class NeoFoodClub:
     @property
     def modifier(self) -> Modifier:
         """:class:`Modifier`: Returns the modifier object."""
-
-    @modifier.setter
-    def modifier(self, value: Modifier) -> None:
-        """:class:`Modifier`: Sets the modifier object."""
 
     def make_url(
         self, bets: Bets, include_domain: bool = False, all_data: bool = False

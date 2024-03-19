@@ -19,19 +19,69 @@ pub struct NeoFoodClub {
     pub inner: neofoodclub::nfc::NeoFoodClub,
 }
 
+fn convert_probability_model_int_to_enum(
+    probability_model: Option<u8>,
+) -> Option<neofoodclub::nfc::ProbabilityModel> {
+    match probability_model {
+        Some(0) => Some(neofoodclub::nfc::ProbabilityModel::OriginalModel),
+        Some(1) => Some(neofoodclub::nfc::ProbabilityModel::MultinomialLogitModel),
+        None => None,
+        _ => panic!("Invalid probability model"),
+    }
+}
+
 #[pymethods]
 impl NeoFoodClub {
     #[new]
-    fn new(json: &str, bet_amount: Option<u32>) -> Self {
+    fn new(
+        json: &str,
+        bet_amount: Option<u32>,
+        probability_model: Option<u8>,
+        modifier: Option<Modifier>,
+    ) -> Self {
         NeoFoodClub {
-            inner: neofoodclub::nfc::NeoFoodClub::from_json(json, bet_amount, None, None),
+            inner: neofoodclub::nfc::NeoFoodClub::from_json(
+                json,
+                bet_amount,
+                convert_probability_model_int_to_enum(probability_model),
+                modifier.map(|m| m.inner),
+            ),
         }
     }
 
     #[classmethod]
-    fn from_url(_cls: &PyType, url: &str, bet_amount: Option<u32>) -> Self {
+    fn from_json(
+        _cls: &PyType,
+        json: &str,
+        bet_amount: Option<u32>,
+        probability_model: Option<u8>,
+        modifier: Option<Modifier>,
+    ) -> Self {
         NeoFoodClub {
-            inner: neofoodclub::nfc::NeoFoodClub::from_url(url, bet_amount, None, None),
+            inner: neofoodclub::nfc::NeoFoodClub::from_json(
+                json,
+                bet_amount,
+                convert_probability_model_int_to_enum(probability_model),
+                modifier.map(|m| m.inner),
+            ),
+        }
+    }
+
+    #[classmethod]
+    fn from_url(
+        _cls: &PyType,
+        url: &str,
+        bet_amount: Option<u32>,
+        probability_model: Option<u8>,
+        modifier: Option<Modifier>,
+    ) -> Self {
+        NeoFoodClub {
+            inner: neofoodclub::nfc::NeoFoodClub::from_url(
+                url,
+                bet_amount,
+                convert_probability_model_int_to_enum(probability_model),
+                modifier.map(|m| m.inner),
+            ),
         }
     }
 
@@ -40,14 +90,12 @@ impl NeoFoodClub {
         Modifier::from(self.inner.modifier.clone())
     }
 
-    #[setter(modifier)]
-    fn set_modifier(&mut self, modifier: Modifier) {
-        self.inner.modifier = modifier.inner;
-    }
-
-    fn copy(&self) -> Self {
+    fn copy(&self, probability_model: Option<u8>, modifier: Option<Modifier>) -> Self {
         NeoFoodClub {
-            inner: self.inner.copy(),
+            inner: self.inner.copy(
+                convert_probability_model_int_to_enum(probability_model),
+                modifier.map(|m| m.inner),
+            ),
         }
     }
 
@@ -96,6 +144,11 @@ impl NeoFoodClub {
     #[getter]
     fn start(&self) -> Option<String> {
         self.inner.start()
+    }
+
+    #[getter]
+    fn start_nst(&self) -> Option<String> {
+        self.inner.start_nst().map(|t| t.to_rfc3339())
     }
 
     #[getter]
@@ -251,6 +304,7 @@ impl NeoFoodClub {
         self.inner.make_url(&bets.inner, include_domain, all_data)
     }
 
+    #[getter]
     fn custom_odds(&self) -> Option<HashMap<u8, u8>> {
         self.inner.custom_odds().cloned()
     }

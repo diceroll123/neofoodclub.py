@@ -1,7 +1,7 @@
-use std::collections::HashMap;
-
+use chrono::NaiveTime;
 use neofoodclub::modifier::ModifierFlags;
 use pyo3::prelude::*;
+use std::collections::HashMap;
 
 #[pyclass]
 #[derive(Clone)]
@@ -36,9 +36,17 @@ impl Modifier {
     const ALL_MODIFIERS: i32 = ModifierFlags::all().bits();
 
     #[new]
-    pub fn new(value: i32, custom_odds: Option<HashMap<u8, u8>>) -> Self {
+    pub fn new(
+        value: i32,
+        custom_odds: Option<HashMap<u8, u8>>,
+        custom_time: Option<String>,
+    ) -> Self {
         Modifier {
-            inner: neofoodclub::modifier::Modifier::new(value, custom_odds),
+            inner: neofoodclub::modifier::Modifier::new(
+                value,
+                custom_odds,
+                custom_time.map(|s| NaiveTime::parse_from_str(&s, "%H:%M:%S").unwrap()),
+            ),
         }
     }
 
@@ -74,11 +82,24 @@ impl Modifier {
     }
 
     #[getter]
+    pub fn custom_time(&self) -> Option<String> {
+        self.inner
+            .custom_time
+            .map(|t| t.format("%H:%M:%S").to_string())
+    }
+
+    #[getter]
     pub fn modified(&self) -> bool {
         self.inner.modified()
     }
 
     pub fn __eq__(&self, other: &Modifier) -> bool {
         self.inner == other.inner
+    }
+
+    pub fn copy(&self) -> Self {
+        Modifier {
+            inner: self.inner.copy(),
+        }
     }
 }
