@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Dict, Tuple
+from typing import Tuple
 
 import pytest
 
@@ -78,11 +78,6 @@ round_dict = {
         },
     ],
 }
-
-
-@pytest.fixture()
-def test_round_data() -> Dict[str, Any]:
-    return round_dict
 
 
 @pytest.fixture()
