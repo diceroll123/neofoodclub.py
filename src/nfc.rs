@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use pyo3::{
     exceptions::PyValueError,
     prelude::*,
@@ -292,11 +290,6 @@ impl NeoFoodClub {
 
     fn make_url(&self, bets: &Bets, include_domain: bool, all_data: bool) -> String {
         self.inner.make_url(&bets.inner, include_domain, all_data)
-    }
-
-    #[getter]
-    fn custom_odds(&self) -> Option<HashMap<u8, u8>> {
-        self.inner.custom_odds().cloned()
     }
 
     #[getter]
