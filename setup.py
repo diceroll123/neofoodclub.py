@@ -23,7 +23,6 @@ else:
 
 packages = [
     "neofoodclub",
-    "neofoodclub.types",
 ]
 
 package_data = {
