@@ -14,7 +14,7 @@ def make_probabilities(opening_odds: Sequence[Sequence[int]]) -> list[list[float
 
 @staticmethod
 def make_round_dicts(stds: Sequence[Sequence[float]], odds: tuple[tuple[int, ...], ...]) -> tuple[
-    npt.NDArray[np.int_], npt.NDArray[np.float64], npt.NDArray[np.int_], npt.NDArray[np.float64], npt.NDArray[np.int_]
+    npt.NDArray[np.int_], npt.NDArray[np.float64], npt.NDArray[np.int_], npt.NDArray[np.float64], npt.NDArray[np.int_],
 ]: ...
 
 # fmt: on
@@ -453,13 +453,15 @@ class Bets:
         """:class:`float`: Returns the expected return of the bets."""
 
     def fill_bet_amounts(self, nfc: NeoFoodClub) -> None:
-        """
-        Fills the bet amounts of the bets such that they are either capped to what
+        """Fills the bet amounts of the bets such that they are either capped to what
         would equal 1M per bet,or the max bet amount, using `nfc.bet_amount`.
         """
 
     def make_url(
-        self, nfc: NeoFoodClub, include_domain: bool = False, all_data: bool = False
+        self,
+        nfc: NeoFoodClub,
+        include_domain: bool = False,
+        all_data: bool = False,
     ) -> str:
         """Returns a URL for the bets.
 
@@ -530,6 +532,7 @@ class Arena:
         ----------
         key: :class:`int`
             The index of the pirate to get.
+
         """
 
 class Arenas:
@@ -588,6 +591,7 @@ class Arenas:
         ----------
         index: :class:`int`
             The index of the arena to get.
+
         """
 
     def __getitem__(self, key: int) -> Arena:
@@ -597,6 +601,7 @@ class Arenas:
         ----------
         key: :class:`int`
             The index of the arena to get.
+
         """
 
     @property
@@ -615,7 +620,7 @@ class NeoFoodClub:
         bet_amount: int | None,
         probability_model: int | None,
         modifier: Modifier | None,
-    ): ...
+    ) -> None: ...
 
     @classmethod
     def from_json(
@@ -795,7 +800,10 @@ class NeoFoodClub:
         """:class:`Modifier`: Returns the modifier object."""
 
     def make_url(
-        self, bets: Bets, include_domain: bool = False, all_data: bool = False
+        self,
+        bets: Bets,
+        include_domain: bool = False,
+        all_data: bool = False,
     ) -> str:
         """Returns a URL to the bets provided.
 
