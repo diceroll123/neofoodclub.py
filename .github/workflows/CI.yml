@@ -28,10 +28,10 @@ jobs:
           target: x86_64
           args: --release --find-interpreter --out dist
       - name: Upload wheels
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
-          name: wheels-macos-x86_64
-          path: dist/*
+          name: wheels
+          path: dist
 
   macos-universal:
     runs-on: macos-latest
@@ -47,10 +47,10 @@ jobs:
         with:
           args: --release --find-interpreter --target universal2-apple-darwin --out dist
       - name: Upload wheels
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
-          name: wheels-macos-universal
-          path: dist/*
+          name: wheels
+          path: dist
 
   windows:
     runs-on: windows-latest
@@ -71,10 +71,10 @@ jobs:
         with:
           args: --release --find-interpreter --out dist --target ${{ matrix.platform.target }}
       - name: Upload wheels
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
-          name: wheels-${{ matrix.platform.target }}
-          path: dist/*
+          name: wheels
+          path: dist
 
   linux:
     runs-on: ubuntu-latest
@@ -97,10 +97,10 @@ jobs:
           command: build
           args: --release --find-interpreter -o dist
       - name: Upload wheels
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
-          name: wheels-${{ matrix.target }}
-          path: dist/*
+          name: wheels
+          path: dist
 
   linux-cross:
     runs-on: ubuntu-latest
@@ -132,10 +132,10 @@ jobs:
           docker-options: ${{ matrix.platform.maturin_docker_options }}
           args: --release --find-interpreter -o dist
       - name: Upload wheels
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
-          name: wheels-${{ matrix.platform.target }}
-          path: dist/*
+          name: wheels
+          path: dist
 
   musllinux:
     runs-on: ubuntu-latest
@@ -157,10 +157,10 @@ jobs:
           manylinux: musllinux_1_2
           args: --release --find-interpreter -o dist
       - name: Upload wheels
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
-          name: wheels-${{ matrix.target }}
-          path: dist/*
+          name: wheels
+          path: dist
 
   musllinux-cross:
     runs-on: ubuntu-latest
@@ -186,10 +186,10 @@ jobs:
           args: --release --find-interpreter -o dist
           docker-options: ${{ matrix.platform.maturin_docker_options }}
       - name: Upload wheels
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
-          name: wheels-${{ matrix.platform.target }}
-          path: dist/*
+          name: wheels
+          path: dist
 
   release:
     name: Release
@@ -204,11 +204,9 @@ jobs:
       - windows
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v3
         with:
-          pattern: wheels-*
-          path: dist/*
-          merge-multiple: true
+          name: wheels
       - name: Publish to PyPI
         uses: PyO3/maturin-action@v1
         env:
