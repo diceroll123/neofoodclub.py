@@ -4,10 +4,10 @@ __license__ = "MIT"
 __copyright__ = "Copyright 2021-present diceroll123"
 __version__ = "0.0.1a"
 
-from .neofoodclub import *
-from .probability_model import *
+from .neofoodclub import *  # noqa
+from .probability_model import *  # noqa
 
-__all__ = (
+__all__ = (  # noqa
     "Math",
     "Arena",
     "Arenas",
