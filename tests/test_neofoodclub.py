@@ -58,7 +58,8 @@ def test_modified_opening_odds(nfc: NeoFoodClub) -> None:
 
 def test_modified_time(nfc: NeoFoodClub) -> None:
     modifier = Modifier(
-        Modifier.EMPTY, custom_time=datetime.time(hour=12, minute=0).isoformat()
+        Modifier.EMPTY,
+        custom_time=datetime.time(hour=12, minute=0).isoformat(),
     )
     new_nfc = nfc.copy(ProbabilityModel.ORIGINAL_MODEL.value, modifier)
     assert new_nfc.modified is True
@@ -139,7 +140,8 @@ def test_get_win_np(
     assert new_nfc.get_win_np(bets) == winnings
 
     new_nfc_from_url = nfc_from_url.copy(
-        ProbabilityModel.ORIGINAL_MODEL.value, nfc_from_url.modifier
+        ProbabilityModel.ORIGINAL_MODEL.value,
+        nfc_from_url.modifier,
     )
     new_nfc_from_url.bet_amount = bet_amount
     bets_for_url = new_nfc_from_url.make_bets_from_hash(bet_hash)
