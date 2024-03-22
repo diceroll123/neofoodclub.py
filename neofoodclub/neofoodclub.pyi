@@ -752,7 +752,7 @@ class NeoFoodClub:
         """:class:`Bets`: Returns the best gambit bet object, based on max ter."""
 
     def make_winning_gambit_bets(self) -> Bets:
-        """:class:`Bets`: Returns the winning gambit bet object, based on max ter."""
+        """:class:`Bets`: Returns the winning gambit bet object."""
 
     def make_random_gambit_bets(self) -> Bets:
         """:class:`Bets`: Returns a random gambit bet object."""
