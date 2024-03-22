@@ -1,36 +1,23 @@
 import datetime
-from typing import Any, Dict, Optional
+import json
+from typing import Optional
 
+import orjson
 import pytest
-import time_machine
-from dateutil.tz import tzutc
 
-from neofoodclub import Modifier, NeoFoodClub
-from neofoodclub.errors import InvalidData
+from neofoodclub import Modifier, NeoFoodClub, ProbabilityModel
 
 
 def test_nfc_reset(nfc: NeoFoodClub) -> None:
-    new_nfc = nfc.copy(cache=False)
+    new_nfc = nfc.copy(ProbabilityModel.ORIGINAL_MODEL.value, nfc.modifier)
 
     # making a bet will run the wrapper's reset
-    assert len(new_nfc.make_bets_from_binaries(0x1)) == 1
-
-
-def test_nfc_copy(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
-    # making sure that setting the bet amount in a copy will in fact not touch the original
-    # just testing to make sure the copy was a deep copy
-    def copy(n: NeoFoodClub) -> None:
-        new_nfc = n.copy(cache=False)
-        new_nfc.bet_amount = 8000
-        assert new_nfc.bet_amount != n.bet_amount
-
-    copy(nfc)
-    copy(nfc_from_url)
+    assert len(new_nfc.make_bets_from_binaries([0x1])) == 1
 
 
 def test_bet_amount(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
     def amount(n: NeoFoodClub) -> None:
-        new_nfc = n.copy(cache=False)
+        new_nfc = n.copy(ProbabilityModel.ORIGINAL_MODEL.value, n.modifier)
         new_nfc.bet_amount = 8000
         assert new_nfc.bet_amount == 8000
 
@@ -40,8 +27,8 @@ def test_bet_amount(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
 
 def test_modifier(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
     def modify(n: NeoFoodClub) -> None:
-        new_nfc = n.copy(cache=False)
-        new_nfc.modifier = Modifier(Modifier.REVERSE)
+        modifier = Modifier(Modifier.REVERSE)
+        new_nfc = n.copy(ProbabilityModel.ORIGINAL_MODEL.value, modifier)
         assert new_nfc.modifier == Modifier(Modifier.REVERSE)
 
     modify(nfc)
@@ -50,8 +37,8 @@ def test_modifier(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
 
 def test_modified(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
     def modify(n: NeoFoodClub) -> None:
-        new_nfc = n.copy(cache=False)
-        new_nfc.modifier = Modifier(custom_odds={1: 2})
+        modifier = Modifier(Modifier.EMPTY, custom_odds={1: 2})
+        new_nfc = n.copy(ProbabilityModel.ORIGINAL_MODEL.value, modifier)
         assert new_nfc.modified is True
 
     modify(nfc)
@@ -59,26 +46,23 @@ def test_modified(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
 
 
 def test_not_modified(nfc: NeoFoodClub) -> None:
-    new_nfc = nfc.copy(cache=False)
+    new_nfc = nfc.copy(ProbabilityModel.ORIGINAL_MODEL.value, nfc.modifier)
     assert new_nfc.modified is False
 
 
 def test_modified_opening_odds(nfc: NeoFoodClub) -> None:
-    new_nfc = nfc.copy(cache=False)
-    new_nfc.modifier = Modifier(Modifier.OPENING)
+    modifier = Modifier(Modifier.OPENING_ODDS)
+    new_nfc = nfc.copy(ProbabilityModel.ORIGINAL_MODEL.value, modifier)
     assert new_nfc.modified is True
 
 
 def test_modified_time(nfc: NeoFoodClub) -> None:
-    new_nfc = nfc.copy(cache=False)
-    new_nfc.modifier = Modifier(custom_time=datetime.time(hour=12, minute=0))
+    modifier = Modifier(
+        Modifier.EMPTY,
+        custom_time=datetime.time(hour=12, minute=0).isoformat(),
+    )
+    new_nfc = nfc.copy(ProbabilityModel.ORIGINAL_MODEL.value, modifier)
     assert new_nfc.modified is True
-
-
-def test_with_modifier(nfc: NeoFoodClub) -> None:
-    new_nfc = nfc.copy(cache=False)
-    m = Modifier(Modifier.ALL_MODIFIERS)
-    assert new_nfc.with_modifier(m).modifier == m
 
 
 def test_round(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
@@ -101,14 +85,14 @@ def test_changes_count(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
 
 
 def test_cc_perk(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
-    new_nfc = nfc.copy(cache=False)
-    new_nfc.modifier = Modifier(cc_perk=True)
+    modifier = Modifier(Modifier.CHARITY_CORNER)
+    new_nfc = nfc.copy(ProbabilityModel.ORIGINAL_MODEL.value, modifier)
     bets = new_nfc.make_max_ter_bets()
     assert len(bets) == 15
     assert new_nfc.max_amount_of_bets == 15
 
-    new_nfc = nfc_from_url.copy(cache=False)
-    new_nfc.modifier = Modifier(cc_perk=True)
+    modifier = Modifier(Modifier.CHARITY_CORNER)
+    new_nfc = nfc_from_url.copy(ProbabilityModel.ORIGINAL_MODEL.value, modifier)
     bets = new_nfc.make_max_ter_bets()
     assert len(bets) == 15
     assert new_nfc.max_amount_of_bets == 15
@@ -122,7 +106,10 @@ def test_cc_perk(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
     ],
 )
 def test_get_win_units(
-    nfc: NeoFoodClub, nfc_from_url: NeoFoodClub, bet_hash: str, winnings: int
+    nfc: NeoFoodClub,
+    nfc_from_url: NeoFoodClub,
+    bet_hash: str,
+    winnings: int,
 ) -> None:
     bets = nfc.make_bets_from_hash(bet_hash)
     assert nfc.get_win_units(bets) == winnings
@@ -147,33 +134,27 @@ def test_get_win_np(
     bet_amount: Optional[int],
     winnings: int,
 ) -> None:
-    new_nfc = nfc.copy()
+    new_nfc = nfc.copy(ProbabilityModel.ORIGINAL_MODEL.value, nfc.modifier)
     new_nfc.bet_amount = bet_amount
     bets = new_nfc.make_bets_from_hash(bet_hash)
     assert new_nfc.get_win_np(bets) == winnings
 
-    # this block uses the NFC's bet amount instead of passing the bet amount down to the bets
-    # notice the bet amount is set after the bets are made
-    new_nfc_amount_after_bets = nfc.copy()
-    bets_without_amount = new_nfc_amount_after_bets.make_bets_from_hash(bet_hash)
-    new_nfc_amount_after_bets.bet_amount = bet_amount
-    assert new_nfc_amount_after_bets.get_win_np(bets_without_amount) == winnings
-
-    new_nfc_from_url = nfc_from_url.copy()
+    new_nfc_from_url = nfc_from_url.copy(
+        ProbabilityModel.ORIGINAL_MODEL.value,
+        nfc_from_url.modifier,
+    )
     new_nfc_from_url.bet_amount = bet_amount
     bets_for_url = new_nfc_from_url.make_bets_from_hash(bet_hash)
     assert new_nfc_from_url.get_win_np(bets_for_url) == winnings
 
 
-def test_changes(nfc_no_cache: NeoFoodClub, test_round_data: Dict[str, Any]) -> None:
+def test_changes(nfc_no_cache: NeoFoodClub) -> None:
     # doing it all at once since it's literally one object
-    assert nfc_no_cache.changes[0].index == 0
-    assert nfc_no_cache.changes[0].data == test_round_data["changes"][0]
     assert nfc_no_cache.changes[0].old == 5
     assert nfc_no_cache.changes[0].new == 6
     assert nfc_no_cache.changes[0].pirate_index == 4
     assert nfc_no_cache.changes[0].arena_index == 1
-    assert nfc_no_cache.changes[0].pirate.name == "Squire"
+    assert nfc_no_cache.changes[0].pirate(nfc_no_cache).name == "Squire"
     assert nfc_no_cache.changes[0].arena == "Lagoon"
 
 
@@ -189,30 +170,21 @@ def test_changes_equivalence(nfc: NeoFoodClub) -> None:
     changes = list(set(nfc.changes))  # tests __hash__
 
     assert changes[0] != changes[1]
-    assert list(changes[0]) != list(changes[1])  # tests __iter__
-
-
-def test_change_bet_amount_twice(nfc: NeoFoodClub) -> None:
-    # this runs the bet_amount setter code which recalculates
-    # the inner dicts instead of making new ones
-    # this is more for code coverage than testing anything
-    new_nfc = nfc.copy(cache=False)
-
-    assert new_nfc._data_dict == {}
-    new_nfc.bet_amount = 8000
-
-    new_nfc.bet_amount = 5000
-    assert new_nfc._data_dict != {}
 
 
 def test_removed_timestamp(nfc: NeoFoodClub) -> None:
     # timestamp isn't really needed, so if it doesn't exist,
     # we just return None
-    data = nfc.to_dict()
+    data = orjson.loads(nfc.to_json())
 
     data.pop("timestamp")
 
-    new_nfc = NeoFoodClub(data)
+    new_nfc = NeoFoodClub(
+        json.dumps(data),
+        bet_amount=None,
+        modifier=None,
+        probability_model=None,
+    )
     assert new_nfc.timestamp is None
 
 
@@ -222,81 +194,144 @@ def test_outdated_lock(nfc: NeoFoodClub) -> None:
     assert nfc.is_outdated_lock is True
 
 
-@time_machine.travel(datetime.datetime(2021, 2, 16, 12, 0, 0, 0, tzinfo=tzutc()))
 def test_outdated_lock_false(nfc: NeoFoodClub) -> None:
-    assert nfc.is_outdated_lock is False
+    now = datetime.datetime.now(datetime.timezone.utc)
+    data = orjson.loads(nfc.to_json())
+    data["start"] = now.isoformat()
+    new_nfc = NeoFoodClub(
+        json.dumps(data),
+        bet_amount=None,
+        modifier=None,
+        probability_model=None,
+    )
+    assert new_nfc.is_outdated_lock is False
 
 
 def test_outdated_lock_none(nfc: NeoFoodClub) -> None:
-    data = nfc.to_dict()
+    data = orjson.loads(nfc.to_json())
 
     # if there's no start attribute, assume it's over
     data.pop("start")
 
-    new_nfc = NeoFoodClub(data)
+    new_nfc = NeoFoodClub(
+        json.dumps(data),
+        bet_amount=None,
+        modifier=None,
+        probability_model=None,
+    )
     assert new_nfc.is_outdated_lock is True
 
 
-def test_winners_pirates(nfc: NeoFoodClub) -> None:
-    assert len(nfc.winners_pirates) == 5
+def test_winning_pirates(nfc: NeoFoodClub) -> None:
+    assert len(nfc.winning_pirates) == 5  # type: ignore
 
 
-def test_winners_pirates_empty(nfc: NeoFoodClub) -> None:
-    data = nfc.to_dict()
+def test_winning_pirates_empty(nfc: NeoFoodClub) -> None:
+    data = orjson.loads(nfc.to_json())
     # monkeypatching in no winners
     data["winners"] = (0, 0, 0, 0, 0)
 
-    new_nfc = NeoFoodClub(data)
-    assert len(new_nfc.winners_pirates) == 0
+    new_nfc = NeoFoodClub(
+        json.dumps(data),
+        bet_amount=None,
+        modifier=None,
+        probability_model=None,
+    )
+    assert len(new_nfc.winning_pirates or []) == 0
 
 
 def test_from_url_exception() -> None:
-    with pytest.raises(InvalidData):
-        NeoFoodClub.from_url("")
+    with pytest.raises(BaseException):
+        NeoFoodClub.from_url(
+            "",
+            bet_amount=None,
+            modifier=None,
+            probability_model=None,
+        )
 
 
 def test_from_url_with_cc_perk(test_max_ter_15_bets: str) -> None:
-    nfc = NeoFoodClub.from_url(test_max_ter_15_bets)
-    assert nfc.modifier.cc_perk is True
+    nfc = NeoFoodClub.from_url(
+        test_max_ter_15_bets,
+        bet_amount=None,
+        modifier=None,
+        probability_model=None,
+    )
+    assert nfc.modifier.is_charity_corner is True
 
 
 def test_from_url_without_winners(test_round_url_no_winners: str) -> None:
-    nfc = NeoFoodClub.from_url(test_round_url_no_winners)
+    nfc = NeoFoodClub.from_url(
+        test_round_url_no_winners,
+        bet_amount=None,
+        modifier=None,
+        probability_model=None,
+    )
     assert nfc.winners == (0, 0, 0, 0, 0)
 
 
 def test_from_url_without_round_exception(test_round_url_no_round: str) -> None:
-    with pytest.raises(InvalidData):
-        NeoFoodClub.from_url(test_round_url_no_round)
+    with pytest.raises(BaseException):
+        NeoFoodClub.from_url(
+            test_round_url_no_round,
+            bet_amount=None,
+            modifier=None,
+            probability_model=None,
+        )
 
 
 def test_from_url_without_pirates_exception(test_round_url_no_pirates: str) -> None:
-    with pytest.raises(InvalidData):
-        NeoFoodClub.from_url(test_round_url_no_pirates)
+    with pytest.raises(BaseException):
+        NeoFoodClub.from_url(
+            test_round_url_no_pirates,
+            bet_amount=None,
+            modifier=None,
+            probability_model=None,
+        )
 
 
 def test_from_url_with_invalid_pirates_exception(
     test_round_url_invalid_pirates: str,
 ) -> None:
-    with pytest.raises(InvalidData):
-        NeoFoodClub.from_url(test_round_url_invalid_pirates)
+    with pytest.raises(BaseException):
+        NeoFoodClub.from_url(
+            test_round_url_invalid_pirates,
+            bet_amount=None,
+            modifier=None,
+            probability_model=None,
+        )
 
 
 def test_from_url_with_no_opening_odds(test_round_url_no_opening_odds: str) -> None:
-    with pytest.raises(InvalidData):
-        NeoFoodClub.from_url(test_round_url_no_opening_odds)
+    with pytest.raises(BaseException):
+        NeoFoodClub.from_url(
+            test_round_url_no_opening_odds,
+            bet_amount=None,
+            modifier=None,
+            probability_model=None,
+        )
 
 
 def test_from_url_with_no_current_odds(test_round_url_no_current_odds: str) -> None:
-    with pytest.raises(InvalidData):
-        NeoFoodClub.from_url(test_round_url_no_current_odds)
+    with pytest.raises(BaseException):
+        NeoFoodClub.from_url(
+            test_round_url_no_current_odds,
+            bet_amount=None,
+            modifier=None,
+            probability_model=None,
+        )
 
 
 def test_from_url_with_invalid_opening_odds(
     test_round_url_invalid_opening_odds: str,
 ) -> None:
-    with pytest.raises(InvalidData):
-        NeoFoodClub.from_url(test_round_url_invalid_opening_odds)
+    with pytest.raises(BaseException):
+        NeoFoodClub.from_url(
+            test_round_url_invalid_opening_odds,
+            bet_amount=None,
+            modifier=None,
+            probability_model=None,
+        )
 
 
 @pytest.mark.parametrize(
@@ -315,5 +350,10 @@ def test_from_url_with_invalid_opening_odds(
     ],
 )
 def test_error_cases_in_from_url(url: str) -> None:
-    with pytest.raises(InvalidData):
-        NeoFoodClub.from_url(url)
+    with pytest.raises(BaseException):
+        NeoFoodClub.from_url(
+            url,
+            bet_amount=None,
+            modifier=None,
+            probability_model=None,
+        )

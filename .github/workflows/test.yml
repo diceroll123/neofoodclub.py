@@ -17,30 +17,32 @@ jobs:
 
     name: pytest ${{ matrix.python-version }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          submodules: recursive
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Set up CPython ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
         run: |
-          python -m venv venv
-          source ./venv/bin/activate
-          pip install --upgrade pip setuptools wheel pytest setuptools-rust
-          pip install -U -r requirements_dev.txt
+          pip install uv
+          uv venv
+          source ./.venv/bin/activate
+          uv pip install --upgrade setuptools wheel pytest setuptools-rust
+          uv pip install -U -r requirements_dev.txt
       - name: Installing distribution (dev mode)
         # this adds the .so to the inner lib files so we can test
         run: |
-          source ./venv/bin/activate
+          source ./.venv/bin/activate
           python ./setup.py develop
       - name: Run tests
         shell: bash
         run: |
-          source ./venv/bin/activate
+          source ./.venv/bin/activate
           PYTHONPATH="$(pwd)" pytest
 
   coverage:
@@ -51,27 +53,31 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Set up CPython 3.12
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Install dependencies
         run: |
-          python -m venv venv
-          source ./venv/bin/activate
-          pip install --upgrade pip setuptools wheel pytest setuptools-rust
-          pip install -U -r requirements_dev.txt
+          pip install uv
+          uv venv
+          source ./.venv/bin/activate
+          uv pip install --upgrade setuptools wheel pytest setuptools-rust
+          uv pip install -U -r requirements_dev.txt
       - name: Installing distribution (dev mode)
         # this adds the .so to the inner lib files so we can test
         run: |
-          source ./venv/bin/activate
+          source ./.venv/bin/activate
           python ./setup.py develop
       - name: Run tests
         shell: bash
         run: |
-          source ./venv/bin/activate
+          source ./.venv/bin/activate
           PYTHONPATH="$(pwd)" coverage run -m pytest
 
       - name: Coverage comment

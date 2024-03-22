@@ -1,10 +1,8 @@
 [build-system]
-requires = ["setuptools", "wheel", "setuptools-rust"]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
 
 [tool.coverage.run]
-omit = [
-    "neofoodclub/types/*",
-]
 relative_files = true
 
 [tool.coverage.report]
@@ -19,8 +17,6 @@ exclude_lines = [
 [tool.pyright]
 include = [
     "neofoodclub",
-    "neofoodclub/types",
-    "neofoodclub/models",
 ]
 exclude = [
     "**/__pycache__",
