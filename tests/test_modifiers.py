@@ -71,7 +71,8 @@ def test_modifier_custom_odds_error(pirate_id: int, pirate_odds: int) -> None:
 
 def test_modifier_time_with_nfc(nfc: NeoFoodClub) -> None:
     modifier = Modifier(
-        Modifier.EMPTY, custom_time=datetime.time(hour=12, minute=0).isoformat()
+        Modifier.EMPTY,
+        custom_time=datetime.time(hour=12, minute=0).isoformat(),
     )
     new_nfc = nfc.copy(None, modifier)
 
@@ -83,7 +84,8 @@ def test_modifier_time_and_reset_no_start(nfc: NeoFoodClub) -> None:
     # remove the start time of the round so we can have an indeterminate start time
     new_data.pop("start")
     modifier = Modifier(
-        Modifier.EMPTY, custom_time=datetime.time(hour=12, minute=0).isoformat()
+        Modifier.EMPTY,
+        custom_time=datetime.time(hour=12, minute=0).isoformat(),
     )
     new_nfc = NeoFoodClub(json.dumps(new_data), None, None, None).copy(None, modifier)
 
@@ -92,7 +94,8 @@ def test_modifier_time_and_reset_no_start(nfc: NeoFoodClub) -> None:
 
 def test_modifier_time_and_reset(nfc: NeoFoodClub) -> None:
     modifier = Modifier(
-        Modifier.EMPTY, custom_time=datetime.time(hour=12, minute=0).isoformat()
+        Modifier.EMPTY,
+        custom_time=datetime.time(hour=12, minute=0).isoformat(),
     )
 
     new_nfc = nfc.copy(None, modifier)
