@@ -609,27 +609,30 @@ class NeoFoodClub:
     def __init__(
         self,
         json_string: str,
-        bet_amount: int | None,
-        probability_model: int | None,
-        modifier: Modifier | None,
+        *,
+        bet_amount: int | None = None,
+        probability_model: int | None = None,
+        modifier: Modifier | None = None,
     ) -> None: ...
 
     @classmethod
     def from_json(
         cls,
         json_string: str,
-        bet_amount: int | None,
-        probability_model: int | None,
-        modifier: Modifier | None,
+        *,
+        bet_amount: int | None = None,
+        probability_model: int | None = None,
+        modifier: Modifier | None = None,
     ): ...
 
     @classmethod
     def from_url(
         cls,
         url: str,
-        bet_amount: int | None,
-        probability_model: int | None,
-        modifier: Modifier | None,
+        *,
+        bet_amount: int | None = None,
+        probability_model: int | None = None,
+        modifier: Modifier | None = None,
     ): ...
 
     # fmt: on
@@ -637,8 +640,9 @@ class NeoFoodClub:
     @classmethod
     def copy(
         cls,
-        probability_model: int | None,
-        modifier: Modifier | None,
+        *,
+        probability_model: int | None = None,
+        modifier: Modifier | None = None,
     ) -> NeoFoodClub:
         """Returns a copy of the NeoFoodClub object with an optional modifier.
 
@@ -795,7 +799,7 @@ class NeoFoodClub:
         self,
         *,
         bets: Bets | None = None,
-        include_domain: bool = False,
+        include_domain: bool = True,
         all_data: bool = False,
     ) -> str:
         """Returns a URL to the round.

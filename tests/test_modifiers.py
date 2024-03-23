@@ -74,7 +74,7 @@ def test_modifier_time_with_nfc(nfc: NeoFoodClub) -> None:
         Modifier.EMPTY,
         custom_time=datetime.time(hour=12, minute=0).isoformat(),
     )
-    new_nfc = nfc.copy(None, modifier)
+    new_nfc = nfc.copy(modifier=modifier)
 
     assert new_nfc.modifier.custom_time == datetime.time(hour=12, minute=0).isoformat()
 
@@ -87,7 +87,7 @@ def test_modifier_time_and_reset_no_start(nfc: NeoFoodClub) -> None:
         Modifier.EMPTY,
         custom_time=datetime.time(hour=12, minute=0).isoformat(),
     )
-    new_nfc = NeoFoodClub(json.dumps(new_data), None, None, None).copy(None, modifier)
+    new_nfc = NeoFoodClub(json.dumps(new_data)).copy(modifier=modifier)
 
     assert new_nfc.modifier.custom_time == datetime.time(hour=12, minute=0).isoformat()
 
@@ -98,7 +98,7 @@ def test_modifier_time_and_reset(nfc: NeoFoodClub) -> None:
         custom_time=datetime.time(hour=12, minute=0).isoformat(),
     )
 
-    new_nfc = nfc.copy(None, modifier)
+    new_nfc = nfc.copy(modifier=modifier)
     assert new_nfc.modifier.custom_time == datetime.time(hour=12, minute=0).isoformat()
 
 
@@ -107,7 +107,7 @@ def test_modifier_time_rollback_changes(nfc: NeoFoodClub) -> None:
         Modifier.EMPTY,
         custom_time=datetime.time(hour=15, minute=47, second=42).isoformat(),
     )
-    new_nfc = nfc.copy(None, modifier)
+    new_nfc = nfc.copy(modifier=modifier)
 
     assert new_nfc.current_odds == new_nfc.opening_odds
 
@@ -117,13 +117,13 @@ def test_modifier_time_rollforward_changes(nfc: NeoFoodClub) -> None:
         Modifier.EMPTY,
         custom_time=datetime.time(hour=15, minute=47, second=19).isoformat(),
     )
-    new_nfc = nfc.copy(None, modifier)
+    new_nfc = nfc.copy(modifier=modifier)
 
     assert nfc.current_odds == new_nfc.current_odds
 
 
 def test_modifier_custom_odds_reset(nfc: NeoFoodClub) -> None:
     modifier = Modifier(Modifier.EMPTY, custom_odds={1: 2, 2: 2, 3: 2})
-    new_nfc = nfc.copy(None, modifier)
+    new_nfc = nfc.copy(modifier=modifier)
 
     assert new_nfc.current_odds != new_nfc.opening_odds
