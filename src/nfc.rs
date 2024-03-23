@@ -288,8 +288,10 @@ impl NeoFoodClub {
         )
     }
 
-    fn make_url(&self, bets: &Bets, include_domain: bool, all_data: bool) -> String {
-        self.inner.make_url(&bets.inner, include_domain, all_data)
+    #[pyo3(signature = (*, bets=None, include_domain=false, all_data=false))]
+    fn make_url(&self, bets: Option<&Bets>, include_domain: bool, all_data: bool) -> String {
+        self.inner
+            .make_url(bets.map(|b| &b.inner), include_domain, all_data)
     }
 
     #[getter]

@@ -452,6 +452,7 @@ class Bets:
     def make_url(
         self,
         nfc: NeoFoodClub,
+        *,
         include_domain: bool = False,
         all_data: bool = False,
     ) -> str:
@@ -793,16 +794,20 @@ class NeoFoodClub:
 
     def make_url(
         self,
-        bets: Bets,
+        *,
+        bets: Bets | None = None,
         include_domain: bool = False,
         all_data: bool = False,
     ) -> str:
-        """Returns a URL to the bets provided.
+        """Returns a URL to the round.
+
+        If bets is provided, it will include the bets in the URL. If bet amounts
+        are provided, it will include the bet amounts in the URL.
 
         Parameters
         ----------
-        bets: :class:`Bets`
-            The bets to make a URL for.
+        bets: Optional[:class:`Bets`]
+            The bets to make a URL for, if any.
         include_domain: :class:`bool`
             Whether or not to include the domain in the URL.
         all_data: :class:`bool`

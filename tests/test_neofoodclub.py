@@ -357,3 +357,10 @@ def test_error_cases_in_from_url(url: str) -> None:
             modifier=None,
             probability_model=None,
         )
+
+
+def test_make_url_kwargs(nfc: NeoFoodClub) -> None:
+    assert nfc.make_url() == f"/#round={nfc.round}"
+    assert (
+        nfc.make_url(include_domain=True) == f"https://neofood.club/#round={nfc.round}"
+    )
