@@ -84,7 +84,7 @@ class Math:
         """
 
     @staticmethod
-    def binary_to_indices(bet_binary: int) -> tuple[int]:
+    def binary_to_indices(bet_binary: int) -> tuple[int, ...]:
         """Tuple[int, ...]: Returns the bet indices of a bet-binary value.
 
         Parameters
@@ -299,9 +299,6 @@ class Pirate:
     def image(self) -> str:
         """:class:`str`: The pirate's image URL."""
     @property
-    def arena(self) -> int:
-        """:class:`int`: The index of the arena this pirate is in."""
-    @property
     def index(self) -> int:
         """:class:`int`: The pirate's index in the arena the pirate is in. One-based."""
     @property
@@ -457,7 +454,7 @@ class Bets:
         self,
         nfc: NeoFoodClub,
         *,
-        include_domain: bool = False,
+        include_domain: bool = True,
         all_data: bool = False,
     ) -> str:
         """Returns a URL for the bets.
