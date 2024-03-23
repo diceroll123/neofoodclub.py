@@ -1,11 +1,10 @@
 name: Tests
 
 on:
+  pull_request:
   push:
     branches:
       - "main"
-  pull_request:
-    types: [opened, synchronize]
 
 jobs:
   pytest:
@@ -82,7 +81,6 @@ jobs:
 
       - name: Coverage comment
         id: coverage_comment
-        if: github.event.workflow_run.event == 'pull_request'
         uses: py-cov-action/python-coverage-comment-action@v3
         with:
           GITHUB_TOKEN: ${{ github.token }}
