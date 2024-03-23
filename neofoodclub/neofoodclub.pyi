@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import datetime
 from dataclasses import dataclass
 from typing import Sequence
 
@@ -711,8 +710,8 @@ class NeoFoodClub:
         """Tuple[:class:`int`, ...]: Returns the opening odds of the pirates."""
 
     @property
-    def timestamp(self) -> datetime.datetime | None:
-        """Optional[datetime.datetime]: The most recent timestamp, if applicable."""
+    def timestamp(self) -> str | None:
+        """Optional[:class:`str`]: The timestamp of the round, if applicable."""
 
     @property
     def foods(self) -> tuple[tuple[int, ...], ...] | None:
