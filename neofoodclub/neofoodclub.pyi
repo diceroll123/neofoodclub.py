@@ -6,7 +6,7 @@ from typing import Sequence
 
 @dataclass
 class OddsChange:
-    t: str
+    timestamp: str
     old: int
     new: int
 
