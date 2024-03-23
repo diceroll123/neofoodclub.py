@@ -82,3 +82,10 @@ def test_bets_hash_to_bets_count(bets_hash: str, expected: int) -> None:
 
 def test_amount_hash_to_bet_amounts_below_50() -> None:
     assert Math.amounts_hash_to_bet_amounts("AaX") == (None,)
+
+
+def test_expand_ib_object():
+    assert (Math.expand_ib_object([Math.binary_to_indices(0x80000)], [1])) == {
+        524287: 0,
+        589823: 1,
+    }

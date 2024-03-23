@@ -181,6 +181,11 @@ class Math:
         bet_odds: Sequence[int],
         probabilities: Sequence[Sequence[float]],
     ) -> list[Chance]: ...
+    @staticmethod
+    def expand_ib_object(
+        bets: Sequence[Sequence[int]],
+        bet_odds: Sequence[int],
+    ) -> dict[int, int]: ...
 
 class Modifier:
     EMPTY: int

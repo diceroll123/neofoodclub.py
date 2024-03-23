@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use pyo3::{prelude::*, types::PyTuple};
 
 use crate::chance::Chance;
@@ -91,5 +93,10 @@ impl Math {
                 .collect();
 
         Ok(PyTuple::new(py, py_structs))
+    }
+
+    #[staticmethod]
+    fn expand_ib_object(bets: Vec<[u8; 5]>, bet_odds: Vec<u32>) -> HashMap<u32, u32> {
+        neofoodclub::math::expand_ib_object(&bets, &bet_odds)
     }
 }
