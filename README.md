@@ -1,7 +1,6 @@
 # neofoodclub.py
 
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![Coverage badge](https://raw.githubusercontent.com/diceroll123/neofoodclub.py/python-coverage-comment-action-data/badge.svg)](https://htmlpreview.github.io/?https://github.com/diceroll123/neofoodclub.py/blob/python-coverage-comment-action-data/htmlcov/index.html)
 
 A mostly-Python implementation of functionality used in https://neofood.club
 
