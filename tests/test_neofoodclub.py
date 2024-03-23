@@ -168,14 +168,14 @@ def test_get_win_np(
     assert new_nfc_from_url.get_win_np(bets_for_url) == winnings
 
 
-def test_changes(nfc_no_cache: NeoFoodClub) -> None:
+def test_changes(nfc: NeoFoodClub) -> None:
     # doing it all at once since it's literally one object
-    assert nfc_no_cache.changes[0].old == 5
-    assert nfc_no_cache.changes[0].new == 6
-    assert nfc_no_cache.changes[0].pirate_index == 4
-    assert nfc_no_cache.changes[0].arena_index == 1
-    assert nfc_no_cache.changes[0].pirate(nfc_no_cache).name == "Squire"
-    assert nfc_no_cache.changes[0].arena == "Lagoon"
+    assert nfc.changes[0].old == 5
+    assert nfc.changes[0].new == 6
+    assert nfc.changes[0].pirate_index == 4
+    assert nfc.changes[0].arena_index == 1
+    assert nfc.changes[0].pirate(nfc).name == "Squire"
+    assert nfc.changes[0].arena == "Lagoon"
 
 
 def test_get_arena(nfc: NeoFoodClub) -> None:
@@ -199,12 +199,7 @@ def test_removed_timestamp(nfc: NeoFoodClub) -> None:
 
     data.pop("timestamp")
 
-    new_nfc = NeoFoodClub(
-        json.dumps(data),
-        bet_amount=None,
-        modifier=None,
-        probability_model=None,
-    )
+    new_nfc = NeoFoodClub(json.dumps(data))
     assert new_nfc.timestamp is None
 
 
@@ -218,12 +213,7 @@ def test_outdated_lock_false(nfc: NeoFoodClub) -> None:
     now = datetime.datetime.now(datetime.timezone.utc)
     data = orjson.loads(nfc.to_json())
     data["start"] = now.isoformat()
-    new_nfc = NeoFoodClub(
-        json.dumps(data),
-        bet_amount=None,
-        modifier=None,
-        probability_model=None,
-    )
+    new_nfc = NeoFoodClub(json.dumps(data))
     assert new_nfc.is_outdated_lock is False
 
 
@@ -233,12 +223,7 @@ def test_outdated_lock_none(nfc: NeoFoodClub) -> None:
     # if there's no start attribute, assume it's over
     data.pop("start")
 
-    new_nfc = NeoFoodClub(
-        json.dumps(data),
-        bet_amount=None,
-        modifier=None,
-        probability_model=None,
-    )
+    new_nfc = NeoFoodClub(json.dumps(data))
     assert new_nfc.is_outdated_lock is True
 
 
@@ -251,107 +236,57 @@ def test_winning_pirates_empty(nfc: NeoFoodClub) -> None:
     # monkeypatching in no winners
     data["winners"] = (0, 0, 0, 0, 0)
 
-    new_nfc = NeoFoodClub(
-        json.dumps(data),
-        bet_amount=None,
-        modifier=None,
-        probability_model=None,
-    )
+    new_nfc = NeoFoodClub(json.dumps(data))
     assert len(new_nfc.winning_pirates or []) == 0
 
 
 def test_from_url_exception() -> None:
     with pytest.raises(BaseException):
-        NeoFoodClub.from_url(
-            "",
-            bet_amount=None,
-            modifier=None,
-            probability_model=None,
-        )
+        NeoFoodClub.from_url("")
 
 
 def test_from_url_with_cc_perk(test_max_ter_15_bets: str) -> None:
-    nfc = NeoFoodClub.from_url(
-        test_max_ter_15_bets,
-        bet_amount=None,
-        modifier=None,
-        probability_model=None,
-    )
+    nfc = NeoFoodClub.from_url(test_max_ter_15_bets)
     assert nfc.modifier.is_charity_corner is True
 
 
 def test_from_url_without_winners(test_round_url_no_winners: str) -> None:
-    nfc = NeoFoodClub.from_url(
-        test_round_url_no_winners,
-        bet_amount=None,
-        modifier=None,
-        probability_model=None,
-    )
+    nfc = NeoFoodClub.from_url(test_round_url_no_winners)
     assert nfc.winners == (0, 0, 0, 0, 0)
 
 
 def test_from_url_without_round_exception(test_round_url_no_round: str) -> None:
     with pytest.raises(BaseException):
-        NeoFoodClub.from_url(
-            test_round_url_no_round,
-            bet_amount=None,
-            modifier=None,
-            probability_model=None,
-        )
+        NeoFoodClub.from_url(test_round_url_no_round)
 
 
 def test_from_url_without_pirates_exception(test_round_url_no_pirates: str) -> None:
     with pytest.raises(BaseException):
-        NeoFoodClub.from_url(
-            test_round_url_no_pirates,
-            bet_amount=None,
-            modifier=None,
-            probability_model=None,
-        )
+        NeoFoodClub.from_url(test_round_url_no_pirates)
 
 
 def test_from_url_with_invalid_pirates_exception(
     test_round_url_invalid_pirates: str,
 ) -> None:
     with pytest.raises(BaseException):
-        NeoFoodClub.from_url(
-            test_round_url_invalid_pirates,
-            bet_amount=None,
-            modifier=None,
-            probability_model=None,
-        )
+        NeoFoodClub.from_url(test_round_url_invalid_pirates)
 
 
 def test_from_url_with_no_opening_odds(test_round_url_no_opening_odds: str) -> None:
     with pytest.raises(BaseException):
-        NeoFoodClub.from_url(
-            test_round_url_no_opening_odds,
-            bet_amount=None,
-            modifier=None,
-            probability_model=None,
-        )
+        NeoFoodClub.from_url(test_round_url_no_opening_odds)
 
 
 def test_from_url_with_no_current_odds(test_round_url_no_current_odds: str) -> None:
     with pytest.raises(BaseException):
-        NeoFoodClub.from_url(
-            test_round_url_no_current_odds,
-            bet_amount=None,
-            modifier=None,
-            probability_model=None,
-        )
+        NeoFoodClub.from_url(test_round_url_no_current_odds)
 
 
 def test_from_url_with_invalid_opening_odds(
     test_round_url_invalid_opening_odds: str,
 ) -> None:
     with pytest.raises(BaseException):
-        NeoFoodClub.from_url(
-            test_round_url_invalid_opening_odds,
-            bet_amount=None,
-            modifier=None,
-            probability_model=None,
-        )
+        NeoFoodClub.from_url(test_round_url_invalid_opening_odds)
 
 
 @pytest.mark.parametrize(
@@ -371,12 +306,7 @@ def test_from_url_with_invalid_opening_odds(
 )
 def test_error_cases_in_from_url(url: str) -> None:
     with pytest.raises(BaseException):
-        NeoFoodClub.from_url(
-            url,
-            bet_amount=None,
-            modifier=None,
-            probability_model=None,
-        )
+        NeoFoodClub.from_url(url)
 
 
 def test_make_url_kwargs(nfc: NeoFoodClub) -> None:
