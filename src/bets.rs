@@ -88,6 +88,11 @@ impl Bets {
         self.inner.is_gambit()
     }
 
+    #[getter]
+    fn is_tenbet(&self) -> bool {
+        self.inner.is_tenbet()
+    }
+
     fn is_guaranteed_win(&self, nfc: &NeoFoodClub) -> bool {
         self.inner.is_guaranteed_win(&nfc.inner)
     }
@@ -127,6 +132,7 @@ impl Bets {
         self.inner.get_indices() == other.inner.get_indices()
     }
 
+    #[pyo3(signature = (nfc, *, include_domain=false, all_data=false))]
     pub fn make_url(&self, nfc: &NeoFoodClub, include_domain: bool, all_data: bool) -> String {
         self.inner.make_url(&nfc.inner, include_domain, all_data)
     }

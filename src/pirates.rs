@@ -165,4 +165,8 @@ impl Pirate {
             && self.inner.arena_id == other.inner.arena_id
             && self.inner.index == other.inner.index
     }
+
+    fn __int__(&self) -> u32 {
+        self.inner.binary()
+    }
 }

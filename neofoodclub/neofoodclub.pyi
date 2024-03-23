@@ -6,7 +6,7 @@ from typing import Sequence
 
 @dataclass
 class OddsChange:
-    t: str
+    timestamp: str
     old: int
     new: int
 
@@ -331,6 +331,9 @@ class Pirate:
     def negative_foods(self, nfc: NeoFoodClub) -> tuple[int, ...] | None:
         """Tuple[:class:`int`, ...]: The IDs of the negative foods for this pirate."""
 
+    def __int__(self) -> int:
+        """Returns the pirate's binary representation."""
+
     def __eq__(self, other: object) -> bool: ...
 
 class Odds:
@@ -421,6 +424,10 @@ class Bets:
     def is_gambit(self) -> bool:
         """:class:`bool`: Whether or not the bets are gambit."""
 
+    @property
+    def is_tenbet(self) -> bool:
+        """:class:`bool`: Whether or not the bets are a tenbet."""
+
     def is_guaranteed_win(self, nfc: NeoFoodClub) -> bool:
         """:class:`bool`: Whether or not the bets are guaranteed to win."""
 
@@ -445,6 +452,7 @@ class Bets:
     def make_url(
         self,
         nfc: NeoFoodClub,
+        *,
         include_domain: bool = False,
         all_data: bool = False,
     ) -> str:
@@ -671,8 +679,8 @@ class NeoFoodClub:
         """:class:`int`: The round's number."""
 
     @property
-    def start(self) -> datetime.datetime | None:
-        """Optional[datetime.datetime]: When the round started in UTC, if applicable."""
+    def start(self) -> str | None:
+        """Optional[:class:`str`]: When the round started in UTC, if applicable."""
 
     @property
     def start_nst(self) -> str | None:
@@ -786,16 +794,20 @@ class NeoFoodClub:
 
     def make_url(
         self,
-        bets: Bets,
+        *,
+        bets: Bets | None = None,
         include_domain: bool = False,
         all_data: bool = False,
     ) -> str:
-        """Returns a URL to the bets provided.
+        """Returns a URL to the round.
+
+        If bets is provided, it will include the bets in the URL. If bet amounts
+        are provided, it will include the bet amounts in the URL.
 
         Parameters
         ----------
-        bets: :class:`Bets`
-            The bets to make a URL for.
+        bets: Optional[:class:`Bets`]
+            The bets to make a URL for, if any.
         include_domain: :class:`bool`
             Whether or not to include the domain in the URL.
         all_data: :class:`bool`

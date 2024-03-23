@@ -50,7 +50,7 @@ def test_make_url(nfc_with_bet_amount: NeoFoodClub) -> None:
     )
 
     assert (
-        nfc_with_bet_amount.make_url(bets, include_domain=True, all_data=False)
+        nfc_with_bet_amount.make_url(bets=bets, include_domain=True, all_data=False)
         == "https://neofood.club/#round=7956&b=eukucjuoycaulucepkyrtukyw&a=CXSCXSCXSCXSCXSCXSCXSCXSCXSCXS"
     )
 
