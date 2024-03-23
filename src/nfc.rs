@@ -31,6 +31,7 @@ fn convert_probability_model_int_to_enum(
 #[pymethods]
 impl NeoFoodClub {
     #[new]
+    #[pyo3(signature = (json, bet_amount=None, probability_model=None, modifier=None))]
     fn new(
         json: &str,
         bet_amount: Option<u32>,
@@ -48,6 +49,7 @@ impl NeoFoodClub {
     }
 
     #[classmethod]
+    #[pyo3(signature = (json, bet_amount=None, probability_model=None, modifier=None))]
     fn from_json(
         _cls: &PyType,
         json: &str,
@@ -66,6 +68,7 @@ impl NeoFoodClub {
     }
 
     #[classmethod]
+    #[pyo3(signature = (url, bet_amount=None, probability_model=None, modifier=None))]
     fn from_url(
         _cls: &PyType,
         url: &str,
@@ -88,6 +91,7 @@ impl NeoFoodClub {
         Modifier::from(self.inner.modifier.clone())
     }
 
+    #[pyo3(signature = (*, probability_model=None, modifier=None))]
     fn copy(&self, probability_model: Option<u8>, modifier: Option<Modifier>) -> Self {
         NeoFoodClub {
             inner: self.inner.copy(
@@ -288,7 +292,7 @@ impl NeoFoodClub {
         )
     }
 
-    #[pyo3(signature = (*, bets=None, include_domain=false, all_data=false))]
+    #[pyo3(signature = (*, bets=None, include_domain=true, all_data=false))]
     fn make_url(&self, bets: Option<&Bets>, include_domain: bool, all_data: bool) -> String {
         self.inner
             .make_url(bets.map(|b| &b.inner), include_domain, all_data)

@@ -36,6 +36,7 @@ impl Modifier {
     const ALL_MODIFIERS: i32 = ModifierFlags::all().bits();
 
     #[new]
+    #[pyo3(signature = (value=0, custom_odds=None, custom_time=None))]
     pub fn new(
         value: i32,
         custom_odds: Option<HashMap<u8, u8>>,
