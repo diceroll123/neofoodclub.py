@@ -193,37 +193,31 @@ def gambit_test_binaries() -> Tuple[int, ...]:
 
 @pytest.fixture()
 def nfc(test_round_data_json: str) -> NeoFoodClub:
-    return NeoFoodClub(test_round_data_json, None, None, None)
-
-
-@pytest.fixture()
-def nfc_no_cache(test_round_data_json: str) -> NeoFoodClub:
-    return NeoFoodClub(test_round_data_json, None, None, None)
+    return NeoFoodClub(test_round_data_json)
 
 
 @pytest.fixture()
 def nfc_with_bet_amount(test_round_data_json: str) -> NeoFoodClub:
-    return NeoFoodClub(test_round_data_json, 8000, None, None)
+    return NeoFoodClub(test_round_data_json, bet_amount=8000)
 
 
 @pytest.fixture()
 def nfc_with_bet_amount_logit_model(test_round_data_json: str) -> NeoFoodClub:
     return NeoFoodClub(
         test_round_data_json,
-        8000,
-        ProbabilityModel.MULTINOMIAL_LOGIT_MODEL.value,
-        None,
+        bet_amount=8000,
+        probability_model=ProbabilityModel.MULTINOMIAL_LOGIT_MODEL.value,
     )
 
 
 @pytest.fixture()
 def nfc_from_url(test_round_url) -> NeoFoodClub:
-    return NeoFoodClub.from_url(test_round_url, None, None, None)
+    return NeoFoodClub.from_url(test_round_url)
 
 
 @pytest.fixture()
 def nfc_no_foods(test_round_url_no_food: str) -> NeoFoodClub:
-    return NeoFoodClub.from_url(test_round_url_no_food, None, None, None)
+    return NeoFoodClub.from_url(test_round_url_no_food)
 
 
 @pytest.fixture()
