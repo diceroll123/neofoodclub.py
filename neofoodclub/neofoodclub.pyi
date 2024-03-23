@@ -2,22 +2,7 @@ from __future__ import annotations
 
 import datetime
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Sequence
-
-if TYPE_CHECKING:
-    import numpy as np
-    import numpy.typing as npt
-
-# fmt: off
-@staticmethod
-def make_probabilities(opening_odds: Sequence[Sequence[int]]) -> list[list[float]]: ...
-
-@staticmethod
-def make_round_dicts(stds: Sequence[Sequence[float]], odds: tuple[tuple[int, ...], ...]) -> tuple[
-    npt.NDArray[np.int_], npt.NDArray[np.float64], npt.NDArray[np.int_], npt.NDArray[np.float64], npt.NDArray[np.int_],
-]: ...
-
-# fmt: on
+from typing import Sequence
 
 @dataclass
 class OddsChange:
