@@ -331,6 +331,9 @@ class Pirate:
     def negative_foods(self, nfc: NeoFoodClub) -> tuple[int, ...] | None:
         """Tuple[:class:`int`, ...]: The IDs of the negative foods for this pirate."""
 
+    def __int__(self) -> int:
+        """Returns the pirate's binary representation."""
+
     def __eq__(self, other: object) -> bool: ...
 
 class Odds:

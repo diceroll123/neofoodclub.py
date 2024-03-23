@@ -74,3 +74,8 @@ def test_pirate_equality(nfc: NeoFoodClub) -> None:
     puffo = shipwreck.pirates[1]
 
     assert sproggie != puffo
+
+
+def test_binary_int(nfc: NeoFoodClub) -> None:
+    pirate = nfc.arenas[0].pirates[0]
+    assert int(pirate) == pirate.binary
