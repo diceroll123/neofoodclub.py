@@ -424,6 +424,10 @@ class Bets:
     def is_gambit(self) -> bool:
         """:class:`bool`: Whether or not the bets are gambit."""
 
+    @property
+    def is_tenbet(self) -> bool:
+        """:class:`bool`: Whether or not the bets are a tenbet."""
+
     def is_guaranteed_win(self, nfc: NeoFoodClub) -> bool:
         """:class:`bool`: Whether or not the bets are guaranteed to win."""
 

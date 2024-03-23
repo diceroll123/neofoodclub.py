@@ -88,6 +88,11 @@ impl Bets {
         self.inner.is_gambit()
     }
 
+    #[getter]
+    fn is_tenbet(&self) -> bool {
+        self.inner.is_tenbet()
+    }
+
     fn is_guaranteed_win(&self, nfc: &NeoFoodClub) -> bool {
         self.inner.is_guaranteed_win(&nfc.inner)
     }
