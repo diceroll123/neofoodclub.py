@@ -671,8 +671,8 @@ class NeoFoodClub:
         """:class:`int`: The round's number."""
 
     @property
-    def start(self) -> datetime.datetime | None:
-        """Optional[datetime.datetime]: When the round started in UTC, if applicable."""
+    def start(self) -> str | None:
+        """Optional[:class:`str`]: When the round started in UTC, if applicable."""
 
     @property
     def start_nst(self) -> str | None:
