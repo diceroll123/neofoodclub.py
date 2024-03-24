@@ -188,7 +188,7 @@ impl Arenas {
         self.inner
             .positives()
             .iter()
-            .map(|a| Arena::from(a.clone()))
+            .map(|&a| Arena::from(a.clone()))
             .collect()
     }
 

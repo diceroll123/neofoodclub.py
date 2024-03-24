@@ -103,12 +103,17 @@ impl NeoFoodClub {
 
     #[getter]
     fn arenas(&self) -> Arenas {
-        let elements = self.inner.arenas.clone();
+        let elements = self.inner.get_arenas().clone();
         Arenas::from(elements)
     }
 
     fn get_arena(&self, index: usize) -> Arena {
-        let arena = self.inner.arenas.get_arena(index).expect("Invalid index");
+        let arena = self
+            .inner
+            .get_arenas()
+            .get_arena(index)
+            .expect("Invalid index")
+            .clone();
         Arena::from(arena)
     }
 
@@ -145,7 +150,7 @@ impl NeoFoodClub {
 
     #[getter]
     fn start(&self) -> Option<String> {
-        self.inner.start()
+        self.inner.start().to_owned()
     }
 
     #[getter]
@@ -156,6 +161,12 @@ impl NeoFoodClub {
     #[getter]
     fn current_odds<'a>(&self, py: Python<'a>) -> PyResult<&'a PyTuple> {
         let elements = self.inner.current_odds();
+        Ok(PyTuple::new(py, elements))
+    }
+
+    #[getter]
+    fn custom_odds<'a>(&self, py: Python<'a>) -> PyResult<&'a PyTuple> {
+        let elements = self.inner.custom_odds();
         Ok(PyTuple::new(py, elements))
     }
 
@@ -173,17 +184,21 @@ impl NeoFoodClub {
 
     #[getter]
     fn timestamp(&self) -> Option<String> {
-        self.inner.timestamp()
+        self.inner.timestamp().to_owned()
     }
 
     #[getter]
     fn last_change(&self) -> Option<String> {
-        self.inner.last_change()
+        self.inner.last_change().to_owned()
     }
 
     #[getter]
     fn modified(&self) -> bool {
         self.inner.modified()
+    }
+
+    fn with_modifier(&mut self, modifier: Modifier) {
+        self.inner.with_modifier(modifier.inner.clone());
     }
 
     #[getter]

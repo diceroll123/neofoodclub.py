@@ -105,7 +105,17 @@ def test_modifier_time_rollback_changes(nfc: NeoFoodClub) -> None:
     )
     new_nfc = nfc.copy(modifier=modifier)
 
-    assert new_nfc.current_odds == new_nfc.opening_odds
+    assert new_nfc.custom_odds == new_nfc.opening_odds
+
+
+def test_modifier_time_rollback_changes_with_modifier(nfc: NeoFoodClub) -> None:
+    modifier = Modifier(
+        custom_time=datetime.time(hour=15, minute=47, second=42).isoformat(),
+    )
+    new_nfc = nfc.copy()
+    new_nfc.with_modifier(modifier=modifier)
+
+    assert new_nfc.custom_odds == new_nfc.opening_odds
 
 
 def test_modifier_time_rollforward_changes(nfc: NeoFoodClub) -> None:
@@ -114,7 +124,7 @@ def test_modifier_time_rollforward_changes(nfc: NeoFoodClub) -> None:
     )
     new_nfc = nfc.copy(modifier=modifier)
 
-    assert nfc.current_odds == new_nfc.current_odds
+    assert nfc.current_odds == new_nfc.custom_odds
 
 
 def test_modifier_custom_odds_reset(nfc: NeoFoodClub) -> None:
