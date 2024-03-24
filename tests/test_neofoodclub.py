@@ -5,13 +5,11 @@ from typing import Optional
 import orjson
 import pytest
 
-from neofoodclub import Modifier, NeoFoodClub, ProbabilityModel
+from neofoodclub import Modifier, NeoFoodClub
 
 
 def test_nfc_reset(nfc: NeoFoodClub) -> None:
-    new_nfc = nfc.copy(
-        probability_model=ProbabilityModel.ORIGINAL_MODEL.value, modifier=nfc.modifier
-    )
+    new_nfc = nfc.copy(modifier=nfc.modifier)
 
     # making a bet will run the wrapper's reset
     assert len(new_nfc.make_bets_from_binaries([0x1])) == 1
@@ -19,9 +17,7 @@ def test_nfc_reset(nfc: NeoFoodClub) -> None:
 
 def test_bet_amount(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
     def amount(n: NeoFoodClub) -> None:
-        new_nfc = n.copy(
-            probability_model=ProbabilityModel.ORIGINAL_MODEL.value, modifier=n.modifier
-        )
+        new_nfc = n.copy(modifier=n.modifier)
         new_nfc.bet_amount = 8000
         assert new_nfc.bet_amount == 8000
 
@@ -32,9 +28,7 @@ def test_bet_amount(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
 def test_modifier(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
     def modify(n: NeoFoodClub) -> None:
         modifier = Modifier(Modifier.REVERSE)
-        new_nfc = n.copy(
-            probability_model=ProbabilityModel.ORIGINAL_MODEL.value, modifier=modifier
-        )
+        new_nfc = n.copy(modifier=modifier)
         assert new_nfc.modifier == Modifier(Modifier.REVERSE)
 
     modify(nfc)
@@ -43,10 +37,8 @@ def test_modifier(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
 
 def test_modified(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
     def modify(n: NeoFoodClub) -> None:
-        modifier = Modifier(Modifier.EMPTY, custom_odds={1: 2})
-        new_nfc = n.copy(
-            probability_model=ProbabilityModel.ORIGINAL_MODEL.value, modifier=modifier
-        )
+        modifier = Modifier(custom_odds={1: 2})
+        new_nfc = n.copy(modifier=modifier)
         assert new_nfc.modified is True
 
     modify(nfc)
@@ -54,28 +46,19 @@ def test_modified(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
 
 
 def test_not_modified(nfc: NeoFoodClub) -> None:
-    new_nfc = nfc.copy(
-        probability_model=ProbabilityModel.ORIGINAL_MODEL.value, modifier=nfc.modifier
-    )
+    new_nfc = nfc.copy(modifier=nfc.modifier)
     assert new_nfc.modified is False
 
 
 def test_modified_opening_odds(nfc: NeoFoodClub) -> None:
     modifier = Modifier(Modifier.OPENING_ODDS)
-    new_nfc = nfc.copy(
-        probability_model=ProbabilityModel.ORIGINAL_MODEL.value, modifier=modifier
-    )
+    new_nfc = nfc.copy(modifier=modifier)
     assert new_nfc.modified is True
 
 
 def test_modified_time(nfc: NeoFoodClub) -> None:
-    modifier = Modifier(
-        Modifier.EMPTY,
-        custom_time=datetime.time(hour=12, minute=0).isoformat(),
-    )
-    new_nfc = nfc.copy(
-        probability_model=ProbabilityModel.ORIGINAL_MODEL.value, modifier=modifier
-    )
+    modifier = Modifier(custom_time=datetime.time(hour=12, minute=0).isoformat())
+    new_nfc = nfc.copy(modifier=modifier)
     assert new_nfc.modified is True
 
 
@@ -100,17 +83,13 @@ def test_changes_count(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
 
 def test_cc_perk(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
     modifier = Modifier(Modifier.CHARITY_CORNER)
-    new_nfc = nfc.copy(
-        probability_model=ProbabilityModel.ORIGINAL_MODEL.value, modifier=modifier
-    )
+    new_nfc = nfc.copy(modifier=modifier)
     bets = new_nfc.make_max_ter_bets()
     assert len(bets) == 15
     assert new_nfc.max_amount_of_bets == 15
 
     modifier = Modifier(Modifier.CHARITY_CORNER)
-    new_nfc = nfc_from_url.copy(
-        probability_model=ProbabilityModel.ORIGINAL_MODEL.value, modifier=modifier
-    )
+    new_nfc = nfc_from_url.copy(modifier=modifier)
     bets = new_nfc.make_max_ter_bets()
     assert len(bets) == 15
     assert new_nfc.max_amount_of_bets == 15
@@ -152,15 +131,12 @@ def test_get_win_np(
     bet_amount: Optional[int],
     winnings: int,
 ) -> None:
-    new_nfc = nfc.copy(
-        probability_model=ProbabilityModel.ORIGINAL_MODEL.value, modifier=nfc.modifier
-    )
+    new_nfc = nfc.copy(modifier=nfc.modifier)
     new_nfc.bet_amount = bet_amount
     bets = new_nfc.make_bets_from_hash(bet_hash)
     assert new_nfc.get_win_np(bets) == winnings
 
     new_nfc_from_url = nfc_from_url.copy(
-        probability_model=ProbabilityModel.ORIGINAL_MODEL.value,
         modifier=nfc_from_url.modifier,
     )
     new_nfc_from_url.bet_amount = bet_amount
