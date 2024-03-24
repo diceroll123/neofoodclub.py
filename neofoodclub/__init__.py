@@ -2,7 +2,7 @@ __title__ = "neofoodclub"
 __author__ = "diceroll123"
 __license__ = "MIT"
 __copyright__ = "Copyright 2021-present diceroll123"
-__version__ = "1.0.6"
+__version__ = "1.0.7"
 
 from .neofoodclub import *  # noqa
 from .probability_model import *  # noqa
