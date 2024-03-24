@@ -41,7 +41,7 @@ def test_full_modifier() -> None:
 
 
 def test_modifier_custom_odds() -> None:
-    m = Modifier(Modifier.EMPTY, custom_odds={1: 2})
+    m = Modifier(custom_odds={1: 2})
     assert m.custom_odds == {1: 2}
 
 
@@ -66,12 +66,11 @@ def test_modifier_copy_equality() -> None:
 )
 def test_modifier_custom_odds_error(pirate_id: int, pirate_odds: int) -> None:
     with pytest.raises(BaseException):
-        Modifier(Modifier.EMPTY, custom_odds={pirate_id: pirate_odds})
+        Modifier(custom_odds={pirate_id: pirate_odds})
 
 
 def test_modifier_time_with_nfc(nfc: NeoFoodClub) -> None:
     modifier = Modifier(
-        Modifier.EMPTY,
         custom_time=datetime.time(hour=12, minute=0).isoformat(),
     )
     new_nfc = nfc.copy(modifier=modifier)
@@ -84,7 +83,6 @@ def test_modifier_time_and_reset_no_start(nfc: NeoFoodClub) -> None:
     # remove the start time of the round so we can have an indeterminate start time
     new_data.pop("start")
     modifier = Modifier(
-        Modifier.EMPTY,
         custom_time=datetime.time(hour=12, minute=0).isoformat(),
     )
     new_nfc = NeoFoodClub(json.dumps(new_data)).copy(modifier=modifier)
@@ -94,7 +92,6 @@ def test_modifier_time_and_reset_no_start(nfc: NeoFoodClub) -> None:
 
 def test_modifier_time_and_reset(nfc: NeoFoodClub) -> None:
     modifier = Modifier(
-        Modifier.EMPTY,
         custom_time=datetime.time(hour=12, minute=0).isoformat(),
     )
 
@@ -104,7 +101,6 @@ def test_modifier_time_and_reset(nfc: NeoFoodClub) -> None:
 
 def test_modifier_time_rollback_changes(nfc: NeoFoodClub) -> None:
     modifier = Modifier(
-        Modifier.EMPTY,
         custom_time=datetime.time(hour=15, minute=47, second=42).isoformat(),
     )
     new_nfc = nfc.copy(modifier=modifier)
@@ -114,7 +110,6 @@ def test_modifier_time_rollback_changes(nfc: NeoFoodClub) -> None:
 
 def test_modifier_time_rollforward_changes(nfc: NeoFoodClub) -> None:
     modifier = Modifier(
-        Modifier.EMPTY,
         custom_time=datetime.time(hour=15, minute=47, second=19).isoformat(),
     )
     new_nfc = nfc.copy(modifier=modifier)
@@ -123,7 +118,7 @@ def test_modifier_time_rollforward_changes(nfc: NeoFoodClub) -> None:
 
 
 def test_modifier_custom_odds_reset(nfc: NeoFoodClub) -> None:
-    modifier = Modifier(Modifier.EMPTY, custom_odds={1: 2, 2: 2, 3: 2})
+    modifier = Modifier(custom_odds={1: 2, 2: 2, 3: 2})
     new_nfc = nfc.copy(modifier=modifier)
 
     assert new_nfc.current_odds != new_nfc.opening_odds
