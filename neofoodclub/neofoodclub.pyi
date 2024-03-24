@@ -625,7 +625,7 @@ class NeoFoodClub:
         bet_amount: int | None = None,
         probability_model: int | None = None,
         modifier: Modifier | None = None,
-    ): ...
+    ) -> NeoFoodClub: ...
 
     @classmethod
     def from_url(
@@ -635,7 +635,7 @@ class NeoFoodClub:
         bet_amount: int | None = None,
         probability_model: int | None = None,
         modifier: Modifier | None = None,
-    ): ...
+    ) -> NeoFoodClub: ...
 
     # fmt: on
 
@@ -842,3 +842,13 @@ class NeoFoodClub:
 
     def to_json(self) -> str:
         """:class:`str`: Returns the JSON representation of the NeoFoodClub object."""
+
+    def with_modifier(self, modifier: Modifier) -> None:
+        """Returns a copy of the NeoFoodClub object with the provided modifier.
+
+        Parameters
+        ----------
+        modifier: :class:`Modifier`
+            The modifier to use.
+
+        """

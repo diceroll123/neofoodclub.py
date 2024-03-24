@@ -89,11 +89,6 @@ impl Modifier {
             .map(|t| t.format("%H:%M:%S").to_string())
     }
 
-    #[getter]
-    pub fn modified(&self) -> bool {
-        self.inner.modified()
-    }
-
     pub fn __eq__(&self, other: &Modifier) -> bool {
         self.inner == other.inner
     }
@@ -102,5 +97,12 @@ impl Modifier {
         Modifier {
             inner: self.inner.copy(),
         }
+    }
+
+    pub fn __repr__(&self) -> String {
+        format!(
+            "<Modifier value={:b} custom_odds={:?} custom_time={:?}>",
+            self.inner.value, self.inner.custom_odds, self.inner.custom_time
+        )
     }
 }

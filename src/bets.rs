@@ -60,7 +60,7 @@ impl Bets {
 
     #[getter]
     fn binaries<'a>(&self, py: Python<'a>) -> PyResult<&'a PyTuple> {
-        Ok(PyTuple::new(py, &self.inner.get_binaries()))
+        Ok(PyTuple::new(py, self.inner.get_binaries()))
     }
 
     #[getter]

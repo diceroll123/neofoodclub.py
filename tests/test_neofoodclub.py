@@ -9,7 +9,7 @@ from neofoodclub import Modifier, NeoFoodClub
 
 
 def test_nfc_reset(nfc: NeoFoodClub) -> None:
-    new_nfc = nfc.copy(modifier=nfc.modifier)
+    new_nfc = nfc.copy()
 
     # making a bet will run the wrapper's reset
     assert len(new_nfc.make_bets_from_binaries([0x1])) == 1
@@ -37,7 +37,7 @@ def test_modifier(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
 
 def test_modified(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
     def modify(n: NeoFoodClub) -> None:
-        modifier = Modifier(custom_odds={1: 2})
+        modifier = Modifier(custom_odds={1: 13})
         new_nfc = n.copy(modifier=modifier)
         assert new_nfc.modified is True
 
@@ -46,7 +46,8 @@ def test_modified(nfc: NeoFoodClub, nfc_from_url: NeoFoodClub) -> None:
 
 
 def test_not_modified(nfc: NeoFoodClub) -> None:
-    new_nfc = nfc.copy(modifier=nfc.modifier)
+    new_nfc = nfc.copy()
+
     assert new_nfc.modified is False
 
 
@@ -131,7 +132,7 @@ def test_get_win_np(
     bet_amount: Optional[int],
     winnings: int,
 ) -> None:
-    new_nfc = nfc.copy(modifier=nfc.modifier)
+    new_nfc = nfc.copy()
     new_nfc.bet_amount = bet_amount
     bets = new_nfc.make_bets_from_hash(bet_hash)
     assert new_nfc.get_win_np(bets) == winnings
