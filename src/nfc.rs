@@ -198,7 +198,7 @@ impl NeoFoodClub {
     }
 
     fn with_modifier(&mut self, modifier: Modifier) {
-        self.inner.with_modifier(modifier.inner.clone());
+        self.inner.with_modifier(modifier.inner);
     }
 
     #[getter]

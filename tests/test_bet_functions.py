@@ -3,7 +3,7 @@ from typing import Sequence, Tuple
 
 import pytest
 
-from neofoodclub import Bets, Math, NeoFoodClub
+from neofoodclub import Bets, Math, Modifier, NeoFoodClub
 
 
 def test_odds_iter(nfc_with_bet_amount: NeoFoodClub) -> None:
@@ -351,3 +351,17 @@ def test_bet_with_trailing_none_in_amounts(
 
     assert len(nine_bets) == 9
     assert len(nine_bets.bet_amounts or []) == 9
+
+
+def test_mer_gmer_not_equal(nfc_round_9088: NeoFoodClub) -> None:
+    # make sure gmer and mer are not equal when explicitly setting a modifier
+    # this checks that the logic understands something changed
+    nfc_round_9088.bet_amount = 8000
+
+    mer = nfc_round_9088.make_max_ter_bets()
+
+    nfc_round_9088.with_modifier(modifier=Modifier(Modifier.GENERAL))
+
+    gmer = nfc_round_9088.make_max_ter_bets()
+
+    assert mer.binaries != gmer.binaries

@@ -844,7 +844,7 @@ class NeoFoodClub:
         """:class:`str`: Returns the JSON representation of the NeoFoodClub object."""
 
     def with_modifier(self, modifier: Modifier) -> None:
-        """Returns a copy of the NeoFoodClub object with the provided modifier.
+        """Modifies the NeoFoodClub object in-place with the provided modifier.
 
         Parameters
         ----------
