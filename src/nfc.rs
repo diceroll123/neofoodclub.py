@@ -201,6 +201,10 @@ impl NeoFoodClub {
         self.inner.with_modifier(modifier.inner);
     }
 
+    fn max_ters(&self) -> Vec<f64> {
+        self.inner.max_ters().clone()
+    }
+
     #[getter]
     fn foods<'a>(&self, py: Python<'a>) -> PyResult<Option<&'a PyTuple>> {
         let elements = self.inner.foods();
@@ -289,6 +293,10 @@ impl NeoFoodClub {
 
     fn make_bets_from_indices(&self, indices: Vec<[u8; 5]>) -> Bets {
         Bets::from(self.inner.make_bets_from_indices(indices))
+    }
+
+    fn make_bets_from_array_indices(&self, indices: Vec<usize>) -> Bets {
+        Bets::from(self.inner.make_bets_from_array_indices(indices))
     }
 
     fn get_win_units(&self, bets: &Bets) -> u32 {
