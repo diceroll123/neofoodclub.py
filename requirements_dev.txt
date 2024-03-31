@@ -1,4 +1,5 @@
 coverage
+numpy
 orjson
 pytest
 python-dateutil
