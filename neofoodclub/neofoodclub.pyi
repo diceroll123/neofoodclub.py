@@ -727,6 +727,9 @@ class NeoFoodClub:
     def max_amount_of_bets(self) -> int:
         """:class:`int`: The maximum amount of bets you can make. Generally, this is `10`."""
 
+    def max_ters(self) -> tuple[int, ...]:
+        """Tuple[:class:`int`, ...]: Returns the max ter values with the given modifiers applied beforehand."""
+
     @property
     def winning_pirates(self) -> tuple[Pirate, Pirate, Pirate, Pirate, Pirate] | None:
         """Optional[Tuple[:class:`Pirate`, :class:`Pirate`, :class:`Pirate`, :class:`Pirate`, :class:`Pirate`]]: The winning pirates, if applicable."""
@@ -772,6 +775,9 @@ class NeoFoodClub:
 
     def make_bets_from_indices(self, bets_indices: Sequence[Sequence[int]]) -> Bets:
         """:class:`Bets`: Returns a bet object from a sequence of bet indices."""
+
+    def make_bets_from_array_indices(self, bets_indices: Sequence[int]) -> Bets:
+        """:class:`Bets`: Returns a bet object from a sequence of RoundData array indices."""
 
     def get_win_units(self, bets: Bets) -> int:
         """:class:`int`: Returns the amount of units won from the provided bets."""
