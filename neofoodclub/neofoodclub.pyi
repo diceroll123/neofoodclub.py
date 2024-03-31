@@ -776,7 +776,7 @@ class NeoFoodClub:
     def make_bets_from_indices(self, bets_indices: Sequence[Sequence[int]]) -> Bets:
         """:class:`Bets`: Returns a bet object from a sequence of bet indices."""
 
-    def make_bets_from_array_indices(self, bets_indices: Sequence[int]) -> Bets:
+    def make_bets_from_array_indices(self, array_indices: Sequence[int]) -> Bets:
         """:class:`Bets`: Returns a bet object from a sequence of RoundData array indices."""
 
     def get_win_units(self, bets: Bets) -> int:
