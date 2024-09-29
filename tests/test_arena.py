@@ -1,5 +1,4 @@
 import math
-from typing import List, Tuple
 
 from neofoodclub import NeoFoodClub
 
@@ -10,7 +9,7 @@ def test_first_arena_name_and_id(nfc: NeoFoodClub) -> None:
 
 
 def test_first_arena_best(nfc: NeoFoodClub) -> None:
-    best_in_first_arena: List[Tuple[str, int, int]] = [  # name, odds, binary
+    best_in_first_arena: list[tuple[str, int, int]] = [  # name, odds, binary
         ("Sproggie", 2, 0x80000),
         ("Fairfax", 3, 0x20000),
         ("Crossblades", 5, 0x10000),

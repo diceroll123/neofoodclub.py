@@ -25,3 +25,27 @@ reportUnnecessaryTypeIgnoreComment = "warning"
 reportUnusedImport = "error"
 pythonVersion = "3.10"
 typeCheckingMode = "basic"
+
+[tool.ruff]
+show-fixes = true
+target-version = "py310"
+
+[tool.ruff.lint]
+extend-select = [
+    "C4",
+    "SIM",
+    "TCH",
+    "UP",
+    "ANN201",
+    "ANN202",
+    "ANN204",
+    "ANN205",
+    "ANN206",
+]
+ignore = ["E501", "F403"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
