@@ -1,4 +1,3 @@
-numpy<2.0.0
 orjson
 python-dateutil
 setuptools-rust
