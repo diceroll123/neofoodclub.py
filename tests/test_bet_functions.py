@@ -1,5 +1,5 @@
 import math
-from typing import Sequence, Tuple
+from collections.abc import Sequence
 
 import pytest
 
@@ -83,8 +83,8 @@ def test_bets_set_bet_amount_none(nfc: NeoFoodClub) -> None:
 def test_bet_equivalence(
     nfc: NeoFoodClub,
     crazy_test_hash: str,
-    crazy_test_indices: Tuple[Tuple[int, ...], ...],
-    crazy_test_binaries: Tuple[int, ...],
+    crazy_test_indices: tuple[tuple[int, ...], ...],
+    crazy_test_binaries: tuple[int, ...],
 ) -> None:
     crazy_from_hash = nfc.make_bets_from_hash(crazy_test_hash)
     crazy_from_indices = nfc.make_bets_from_indices(crazy_test_indices)
@@ -157,14 +157,14 @@ def test_bet_hash_encoding(nfc: NeoFoodClub, crazy_test_hash: str) -> None:
 
 def test_bet_indices_encoding(
     nfc: NeoFoodClub,
-    crazy_test_indices: Tuple[Tuple[int, ...], ...],
+    crazy_test_indices: tuple[tuple[int, ...], ...],
 ) -> None:
     assert nfc.make_bets_from_indices(crazy_test_indices).indices == crazy_test_indices
 
 
 def test_bet_indices_with_amount(
     nfc: NeoFoodClub,
-    crazy_test_indices: Tuple[Tuple[int, ...], ...],
+    crazy_test_indices: tuple[tuple[int, ...], ...],
 ) -> None:
     bets = nfc.make_bets_from_indices(crazy_test_indices)
 
@@ -175,7 +175,7 @@ def test_bet_indices_with_amount(
 
 def test_bet_binaries_encoding(
     nfc: NeoFoodClub,
-    crazy_test_binaries: Tuple[int, ...],
+    crazy_test_binaries: tuple[int, ...],
 ) -> None:
     assert (
         nfc.make_bets_from_binaries(crazy_test_binaries).binaries == crazy_test_binaries
@@ -184,7 +184,7 @@ def test_bet_binaries_encoding(
 
 def test_bet_binaries_with_amount(
     nfc: NeoFoodClub,
-    crazy_test_binaries: Tuple[int, ...],
+    crazy_test_binaries: tuple[int, ...],
 ) -> None:
     bets = nfc.make_bets_from_binaries(crazy_test_binaries)
 

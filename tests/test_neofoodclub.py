@@ -1,6 +1,5 @@
 import datetime
 import json
-from typing import Optional
 
 import orjson
 import pytest
@@ -130,7 +129,7 @@ def test_get_win_np(
     nfc: NeoFoodClub,
     nfc_from_url: NeoFoodClub,
     bet_hash: str,
-    bet_amount: Optional[int],
+    bet_amount: int | None,
     winnings: int,
 ) -> None:
     new_nfc = nfc.copy()
