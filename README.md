@@ -1,6 +1,10 @@
 # neofoodclub.py
 
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![image](https://img.shields.io/pypi/v/neofoodclub.svg)](https://pypi.python.org/pypi/neofoodclub.py)
+[![image](https://img.shields.io/pypi/l/neofoodclub.svg)](https://github.com/diceroll123/neofoodclub.py/blob/master/LICENSE)
+[![Actions status](https://github.com/diceroll123/neofoodclub.py/workflows/CI/badge.svg)](https://github.com/diceroll123/neofoodclub.py/actions)
+[![image](https://img.shields.io/pypi/pyversions/neofoodclub.svg)](https://pypi.python.org/pypi/neofoodclub)
 
 A mostly-Python implementation of functionality used in https://neofood.club
 
