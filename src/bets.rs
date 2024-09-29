@@ -21,11 +21,11 @@ impl Bets {
     }
 
     #[getter(bet_amounts)]
-    fn get_amounts<'a>(&self, py: Python<'a>) -> PyResult<Option<&'a PyTuple>> {
+    fn get_amounts<'a>(&self, py: Python<'a>) -> PyResult<Option<Bound<'a, PyTuple>>> {
         let elements = &self.inner.bet_amounts;
 
         match elements {
-            Some(amounts) => Ok(Some(PyTuple::new(py, amounts))),
+            Some(amounts) => Ok(Some(PyTuple::new_bound(py, amounts))),
             None => Ok(None),
         }
     }
@@ -59,8 +59,8 @@ impl Bets {
     }
 
     #[getter]
-    fn binaries<'a>(&self, py: Python<'a>) -> PyResult<&'a PyTuple> {
-        Ok(PyTuple::new(py, self.inner.get_binaries()))
+    fn binaries<'a>(&self, py: Python<'a>) -> PyResult<Bound<'a, PyTuple>> {
+        Ok(PyTuple::new_bound(py, self.inner.get_binaries()))
     }
 
     #[getter]
@@ -102,14 +102,14 @@ impl Bets {
     }
 
     #[getter]
-    fn indices<'a>(&self, py: Python<'a>) -> PyResult<&'a PyTuple> {
+    fn indices<'a>(&self, py: Python<'a>) -> PyResult<Bound<'a, PyTuple>> {
         let indicies = self.inner.get_indices();
-        let py_indicies: Vec<&'a PyTuple> = indicies
+        let py_indicies: Vec<Bound<'a, PyTuple>> = indicies
             .iter()
-            .map(|index| PyTuple::new(py, index))
+            .map(|index| PyTuple::new_bound(py, index))
             .collect();
 
-        Ok(PyTuple::new(py, py_indicies))
+        Ok(PyTuple::new_bound(py, py_indicies))
     }
 
     fn net_expected(&self, nfc: &NeoFoodClub) -> f64 {

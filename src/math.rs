@@ -29,15 +29,18 @@ impl Math {
     }
 
     #[staticmethod]
-    fn binary_to_indices(py: Python, binary: u32) -> PyResult<&PyTuple> {
+    fn binary_to_indices<'a>(py: Python<'a>, binary: u32) -> PyResult<Bound<'a, PyTuple>> {
         let elements = neofoodclub::math::binary_to_indices(binary);
-        Ok(PyTuple::new(py, elements))
+        Ok(PyTuple::new_bound(py, elements))
     }
 
     #[staticmethod]
-    fn bets_hash_to_bet_indices<'a>(py: Python<'a>, bets_hash: &'a str) -> PyResult<&'a PyTuple> {
+    fn bets_hash_to_bet_indices<'a>(
+        py: Python<'a>,
+        bets_hash: &'a str,
+    ) -> PyResult<Bound<'a, PyTuple>> {
         let elements = neofoodclub::math::bets_hash_to_bet_indices(bets_hash);
-        Ok(PyTuple::new(py, elements))
+        Ok(PyTuple::new_bound(py, elements))
     }
 
     #[staticmethod]
@@ -54,15 +57,18 @@ impl Math {
     fn amounts_hash_to_bet_amounts<'a>(
         py: Python<'a>,
         amounts_hash: &'a str,
-    ) -> PyResult<&'a PyTuple> {
+    ) -> PyResult<Bound<'a, PyTuple>> {
         let elements = neofoodclub::math::amounts_hash_to_bet_amounts(amounts_hash);
-        Ok(PyTuple::new(py, elements))
+        Ok(PyTuple::new_bound(py, elements))
     }
 
     #[staticmethod]
-    fn bets_hash_to_bet_binaries<'a>(py: Python<'a>, bets_hash: &'a str) -> PyResult<&'a PyTuple> {
+    fn bets_hash_to_bet_binaries<'a>(
+        py: Python<'a>,
+        bets_hash: &'a str,
+    ) -> PyResult<Bound<'a, PyTuple>> {
         let elements = neofoodclub::math::bets_hash_to_bet_binaries(bets_hash);
-        Ok(PyTuple::new(py, elements))
+        Ok(PyTuple::new_bound(py, elements))
     }
 
     #[staticmethod]
@@ -71,28 +77,28 @@ impl Math {
     }
 
     #[staticmethod]
-    fn bets_indices_to_bet_binaries(
-        py: Python<'_>,
+    fn bets_indices_to_bet_binaries<'a>(
+        py: Python<'a>,
         bets_indices: Vec<[u8; 5]>,
-    ) -> PyResult<&PyTuple> {
+    ) -> PyResult<Bound<'a, PyTuple>> {
         let elements = neofoodclub::math::bets_indices_to_bet_binaries(bets_indices);
-        Ok(PyTuple::new(py, elements))
+        Ok(PyTuple::new_bound(py, elements))
     }
 
     #[staticmethod]
-    fn build_chance_objects(
-        py: Python<'_>,
+    fn build_chance_objects<'a>(
+        py: Python<'a>,
         bets: Vec<[u8; 5]>,
         bet_odds: Vec<u32>,
         probabilities: [[f64; 5]; 5],
-    ) -> PyResult<&PyTuple> {
+    ) -> PyResult<Bound<'a, PyTuple>> {
         let py_structs: Vec<PyObject> =
             neofoodclub::math::build_chance_objects(&bets, &bet_odds, probabilities)
                 .into_iter()
                 .map(|chance| Chance::from(chance).into_py(py))
                 .collect();
 
-        Ok(PyTuple::new(py, py_structs))
+        Ok(PyTuple::new_bound(py, py_structs))
     }
 
     #[staticmethod]
