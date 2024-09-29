@@ -6,7 +6,6 @@ __version__ = "1.0.11"
 
 from .neofoodclub import *  # noqa
 from .probability_model import *  # noqa
-from .utils import *  # noqa
 
 __all__ = (  # noqa
     "Math",
@@ -20,5 +19,4 @@ __all__ = (  # noqa
     "Pirate",
     "PartialPirate",
     "ProbabilityModel",
-    "utils",
 )

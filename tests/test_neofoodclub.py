@@ -5,7 +5,6 @@ import orjson
 import pytest
 
 from neofoodclub import Modifier, NeoFoodClub
-from neofoodclub.utils import make_max_ter_bets_numpy
 
 
 def test_nfc_reset(nfc: NeoFoodClub) -> None:
@@ -289,21 +288,3 @@ def test_error_cases_in_from_url(url: str) -> None:
 def test_make_url_kwargs(nfc: NeoFoodClub) -> None:
     assert nfc.make_url(include_domain=False) == f"/#round={nfc.round}"
     assert nfc.make_url() == f"https://neofood.club/#round={nfc.round}"
-
-
-def test_make_bets_with_numpy(test_round_data_round_7315: str) -> None:
-    nfc = NeoFoodClub.from_json(test_round_data_round_7315, bet_amount=8000)
-    bets = make_max_ter_bets_numpy(nfc)
-
-    assert bets.bets_hash == "cauueepukadauujbauuacpauy"
-
-
-def test_make_bets_with_numpy_reverse(test_round_data_round_7315: str) -> None:
-    nfc = NeoFoodClub.from_json(
-        test_round_data_round_7315,
-        bet_amount=8000,
-        modifier=Modifier(Modifier.REVERSE),
-    )
-    bets = make_max_ter_bets_numpy(nfc)
-
-    assert bets.bets_hash == "kwrekuwnemuwieluwsenuwdek"
