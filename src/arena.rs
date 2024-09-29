@@ -24,11 +24,11 @@ impl Arena {
     }
 
     #[getter]
-    fn foods<'a>(&self, py: Python<'a>) -> PyResult<Option<&'a PyTuple>> {
+    fn foods<'a>(&self, py: Python<'a>) -> PyResult<Option<Bound<'a, PyTuple>>> {
         let elements = &self.inner.foods;
 
         match elements {
-            Some(foods) => Ok(Some(PyTuple::new(py, foods))),
+            Some(foods) => Ok(Some(PyTuple::new_bound(py, foods))),
             None => Ok(None),
         }
     }
@@ -53,9 +53,9 @@ impl Arena {
     }
 
     #[getter]
-    fn pirate_ids<'a>(&self, py: Python<'a>) -> PyResult<&'a PyTuple> {
+    fn pirate_ids<'a>(&self, py: Python<'a>) -> PyResult<Bound<'a, PyTuple>> {
         let elements = &self.inner.ids();
-        Ok(PyTuple::new(py, elements))
+        Ok(PyTuple::new_bound(py, elements))
     }
 
     #[getter]
@@ -174,13 +174,13 @@ impl Arenas {
     }
 
     #[getter]
-    fn pirate_ids<'a>(&self, py: Python<'a>) -> PyResult<&'a PyTuple> {
-        let elements: Vec<&PyTuple> = self
+    fn pirate_ids<'a>(&self, py: Python<'a>) -> PyResult<Bound<'a, PyTuple>> {
+        let elements: Vec<Bound<'a, PyTuple>> = self
             .arenas()
             .iter()
             .map(|a| a.pirate_ids(py).expect("failed to get pirate ids"))
             .collect();
-        Ok(PyTuple::new(py, elements))
+        Ok(PyTuple::new_bound(py, elements))
     }
 
     #[getter]

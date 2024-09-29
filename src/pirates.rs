@@ -138,11 +138,11 @@ impl Pirate {
         &self,
         nfc: &NeoFoodClub,
         py: Python<'a>,
-    ) -> PyResult<Option<&'a PyTuple>> {
+    ) -> PyResult<Option<Bound<'a, PyTuple>>> {
         let elements = self.inner.positive_foods(&nfc.inner);
 
         match elements {
-            Some(foods) => Ok(Some(PyTuple::new(py, foods))),
+            Some(foods) => Ok(Some(PyTuple::new_bound(py, foods))),
             None => Ok(None),
         }
     }
@@ -151,11 +151,11 @@ impl Pirate {
         &self,
         nfc: &NeoFoodClub,
         py: Python<'a>,
-    ) -> PyResult<Option<&'a PyTuple>> {
+    ) -> PyResult<Option<Bound<'a, PyTuple>>> {
         let elements = self.inner.negative_foods(&nfc.inner);
 
         match elements {
-            Some(foods) => Ok(Some(PyTuple::new(py, foods))),
+            Some(foods) => Ok(Some(PyTuple::new_bound(py, foods))),
             None => Ok(None),
         }
     }

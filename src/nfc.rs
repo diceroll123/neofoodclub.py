@@ -51,7 +51,7 @@ impl NeoFoodClub {
     #[classmethod]
     #[pyo3(signature = (json, bet_amount=None, probability_model=None, modifier=None))]
     fn from_json(
-        _cls: &PyType,
+        _cls: &Bound<'_, PyType>,
         json: &str,
         bet_amount: Option<u32>,
         probability_model: Option<u8>,
@@ -70,7 +70,7 @@ impl NeoFoodClub {
     #[classmethod]
     #[pyo3(signature = (url, bet_amount=None, probability_model=None, modifier=None))]
     fn from_url(
-        _cls: &PyType,
+        _cls: &Bound<'_, PyType>,
         url: &str,
         bet_amount: Option<u32>,
         probability_model: Option<u8>,
@@ -128,9 +128,9 @@ impl NeoFoodClub {
     }
 
     #[getter]
-    fn winners<'a>(&self, py: Python<'a>) -> PyResult<&'a PyTuple> {
+    fn winners<'a>(&self, py: Python<'a>) -> PyResult<Bound<'a, PyTuple>> {
         let elements = self.inner.winners();
-        Ok(PyTuple::new(py, elements))
+        Ok(PyTuple::new_bound(py, elements))
     }
 
     #[getter]
@@ -159,27 +159,27 @@ impl NeoFoodClub {
     }
 
     #[getter]
-    fn current_odds<'a>(&self, py: Python<'a>) -> PyResult<&'a PyTuple> {
+    fn current_odds<'a>(&self, py: Python<'a>) -> PyResult<Bound<'a, PyTuple>> {
         let elements = self.inner.current_odds();
-        Ok(PyTuple::new(py, elements))
+        Ok(PyTuple::new_bound(py, elements))
     }
 
     #[getter]
-    fn custom_odds<'a>(&self, py: Python<'a>) -> PyResult<&'a PyTuple> {
+    fn custom_odds<'a>(&self, py: Python<'a>) -> PyResult<Bound<'a, PyTuple>> {
         let elements = self.inner.custom_odds();
-        Ok(PyTuple::new(py, elements))
+        Ok(PyTuple::new_bound(py, elements))
     }
 
     #[getter]
-    fn opening_odds<'a>(&self, py: Python<'a>) -> PyResult<&'a PyTuple> {
+    fn opening_odds<'a>(&self, py: Python<'a>) -> PyResult<Bound<'a, PyTuple>> {
         let elements = self.inner.opening_odds();
-        Ok(PyTuple::new(py, elements))
+        Ok(PyTuple::new_bound(py, elements))
     }
 
     #[getter]
-    fn pirates<'a>(&self, py: Python<'a>) -> PyResult<&'a PyTuple> {
+    fn pirates<'a>(&self, py: Python<'a>) -> PyResult<Bound<'a, PyTuple>> {
         let elements = self.inner.pirates();
-        Ok(PyTuple::new(py, elements))
+        Ok(PyTuple::new_bound(py, elements))
     }
 
     #[getter]
@@ -206,11 +206,11 @@ impl NeoFoodClub {
     }
 
     #[getter]
-    fn foods<'a>(&self, py: Python<'a>) -> PyResult<Option<&'a PyTuple>> {
+    fn foods<'a>(&self, py: Python<'a>) -> PyResult<Option<Bound<'a, PyTuple>>> {
         let elements = self.inner.foods();
 
         match elements {
-            Some(e) => Ok(Some(PyTuple::new(py, e))),
+            Some(e) => Ok(Some(PyTuple::new_bound(py, e))),
             None => Ok(None),
         }
     }

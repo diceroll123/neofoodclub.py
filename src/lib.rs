@@ -12,7 +12,7 @@ use pyo3::prelude::*;
 
 #[pymodule]
 #[pyo3(name = "neofoodclub")]
-fn neofoodclub_rs(_py: Python, m: &PyModule) -> PyResult<()> {
+fn neofoodclub_rs(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<math::Math>()?;
     m.add_class::<modifier::Modifier>()?;
     m.add_class::<nfc::NeoFoodClub>()?;
