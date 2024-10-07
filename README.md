@@ -14,7 +14,7 @@ Notes:
 
 ## Installing
 
-**Python 3.10 or higher is required**
+**Python 3.9 or higher is suggested**
 
 ```sh
 pip install neofoodclub
