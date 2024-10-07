@@ -23,12 +23,12 @@ exclude = [
 ]
 reportUnnecessaryTypeIgnoreComment = "warning"
 reportUnusedImport = "error"
-pythonVersion = "3.10"
+pythonVersion = "3.9"
 typeCheckingMode = "basic"
 
 [tool.ruff]
 show-fixes = true
-target-version = "py310"
+target-version = "py39"
 
 [tool.ruff.lint]
 extend-select = [

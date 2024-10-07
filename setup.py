@@ -63,9 +63,10 @@ setup(
     packages=packages,
     package_data=package_data,
     rust_extensions=[RustExtension("neofoodclub.neofoodclub", binding=Binding.PyO3)],
-    python_requires=">=3.10.0",
+    python_requires=">=3.9.0",
     classifiers=[
         "Programming Language :: Rust",
+        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
