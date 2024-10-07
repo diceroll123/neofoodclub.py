@@ -101,7 +101,7 @@ impl Modifier {
 
     pub fn __repr__(&self) -> String {
         format!(
-            "<Modifier value={:b} custom_odds={:?} custom_time={:?}>",
+            "<Modifier value=0b{:b} custom_odds={:?} custom_time={:?}>",
             self.inner.value, self.inner.custom_odds, self.inner.custom_time
         )
     }
