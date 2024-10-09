@@ -48,6 +48,7 @@ impl From<neofoodclub::pirates::Pirate> for Pirate {
 impl Pirate {
     #[new]
     #[allow(clippy::too_many_arguments)]
+    #[pyo3(signature = (id, arena_id, index, current_odds, opening_odds, is_winner, pfa=None, nfa=None, fa=None))]
     fn new(
         id: u8,
         arena_id: u8,
