@@ -181,6 +181,12 @@ def test_removed_timestamp(nfc: NeoFoodClub) -> None:
     assert new_nfc.timestamp is None
 
 
+def test_timestamp(nfc: NeoFoodClub) -> None:
+    assert nfc.timestamp == datetime.datetime(
+        2021, 2, 16, 23, 47, 37, tzinfo=datetime.timezone.utc
+    )
+
+
 def test_outdated_lock(nfc: NeoFoodClub) -> None:
     # we're not even in the same year anymore
     # so this should be True

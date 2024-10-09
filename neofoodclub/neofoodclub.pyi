@@ -1,9 +1,12 @@
-from dataclasses import dataclass
 from collections.abc import Sequence
+from dataclasses import dataclass
+from datetime import datetime
 
 @dataclass
 class OddsChange:
     timestamp: str
+    timestamp_utc: datetime
+    timestamp_nst: datetime
     old: int
     new: int
 
@@ -714,8 +717,8 @@ class NeoFoodClub:
         """Tuple[:class:`int`, ...]: Returns the opening odds of the pirates."""
 
     @property
-    def timestamp(self) -> str | None:
-        """Optional[:class:`str`]: The timestamp of the round, if applicable."""
+    def timestamp(self) -> datetime | None:
+        """Optional[:class:`datetime.datetime`]: The timestamp of the round, if applicable."""
 
     @property
     def foods(self) -> tuple[tuple[int, ...], ...] | None:

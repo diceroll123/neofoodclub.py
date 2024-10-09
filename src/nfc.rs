@@ -1,3 +1,5 @@
+use chrono::DateTime;
+use chrono_tz::Tz;
 use pyo3::{
     exceptions::PyValueError,
     prelude::*,
@@ -154,8 +156,8 @@ impl NeoFoodClub {
     }
 
     #[getter]
-    fn start_nst(&self) -> Option<String> {
-        self.inner.start_nst().map(|t| t.to_rfc3339())
+    fn start_nst(&self) -> Option<DateTime<Tz>> {
+        self.inner.start_nst()
     }
 
     #[getter]
@@ -183,13 +185,13 @@ impl NeoFoodClub {
     }
 
     #[getter]
-    fn timestamp(&self) -> Option<String> {
-        self.inner.timestamp().to_owned()
+    fn timestamp(&self) -> Option<DateTime<Tz>> {
+        self.inner.timestamp_nst()
     }
 
     #[getter]
-    fn last_change(&self) -> Option<String> {
-        self.inner.last_change().to_owned()
+    fn last_change(&self) -> Option<DateTime<Tz>> {
+        self.inner.last_change_nst()
     }
 
     #[getter]

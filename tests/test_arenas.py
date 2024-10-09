@@ -2,7 +2,7 @@ from neofoodclub import NeoFoodClub
 
 
 def test_arenas_get_pirate_by_id(nfc: NeoFoodClub) -> None:
-    assert nfc.arenas.get_pirate_by_id(2).name == "Sproggie"
+    assert nfc.arenas.get_pirate_by_id(2).name == "Sproggie"  # type: ignore
 
 
 def test_arenas_get_pirates_by_id(nfc: NeoFoodClub) -> None:

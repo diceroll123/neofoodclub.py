@@ -1,3 +1,5 @@
+use chrono::{DateTime, Utc};
+use chrono_tz::Tz;
 use pyo3::prelude::*;
 
 use crate::nfc::NeoFoodClub;
@@ -46,19 +48,30 @@ impl OddsChange {
         self.inner.t.to_string()
     }
 
+    #[getter]
+    fn timestamp_utc(&self) -> DateTime<Utc> {
+        self.inner.timestamp_utc()
+    }
+
+    #[getter]
+    fn timestamp_nst(&self) -> DateTime<Tz> {
+        self.inner.timestamp_nst()
+    }
+
     fn pirate(&self, nfc: &NeoFoodClub) -> crate::pirates::PartialPirate {
         crate::pirates::PartialPirate::new(self.inner.pirate_id(&nfc.inner))
     }
 
     fn __repr__(&self) -> String {
         format!(
-            "<OddsChange old={}, new={}, pirate_index={}, arena_index={}, timestamp={:?} timestamp_nst={:?}>",
+            "<OddsChange old={}, new={}, pirate_index={}, arena_index={}, timestamp={:?} timestamp_utc={:?} timestamp_nst={:?}>",
             self.old(),
             self.new(),
             self.pirate_index(),
             self.arena_index(),
             self.timestamp(),
-            self.inner.timestamp_nst().to_rfc3339(),
+            self.timestamp_utc(),
+            self.timestamp_nst(),
         )
     }
 }
