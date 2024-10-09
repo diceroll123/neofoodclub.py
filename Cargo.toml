@@ -8,9 +8,10 @@ name = "neofoodclub"
 crate-type = ["cdylib"]
 
 [dependencies]
-pyo3 = { version = "0.22.3", features = ["extension-module", "abi3-py39"] }
+pyo3 = { version = "0.22.3", features = ["extension-module", "abi3-py39", "chrono", "chrono-tz"] }
 neofoodclub = { path = "./neofoodclub_rs" }
 chrono = "0.4.38"
+chrono-tz = "0.10.0"
 
 [profile.release]
 lto = "fat"
