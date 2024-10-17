@@ -16,28 +16,24 @@ jobs:
           submodules: recursive
           token: ${{ github.token }}
 
-      - name: Set up CPython 3.12
-        uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
         with:
-          python-version: "3.12"
+          version: "0.4.22"
 
-      - name: Install dependencies
-        run: |
-          pip install uv
-          uv venv
-          source ./.venv/bin/activate
-          uv pip install --upgrade setuptools wheel pytest setuptools-rust
-          uv pip install -U -r requirements_dev.txt
+      - name: Set up Python
+        run: uv python install 3.13
+
       - name: Installing distribution (dev mode)
         # this adds the .so to the inner lib files so we can test
         run: |
-          source ./.venv/bin/activate
-          python ./setup.py develop
+          uv run --no-project ./setup.py develop
       - name: Run tests
         shell: bash
         run: |
-          source ./.venv/bin/activate
-          PYTHONPATH="$(pwd)" coverage run -m pytest
+          uv venv
+          uv pip install pytest coverage
+          uv run --no-project coverage run -m pytest
 
       - name: Coverage comment
         id: coverage_comment
