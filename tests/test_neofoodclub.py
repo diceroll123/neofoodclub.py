@@ -3,7 +3,6 @@ from __future__ import annotations
 import datetime
 import json
 
-import orjson
 import pytest
 
 from neofoodclub import Modifier, NeoFoodClub
@@ -173,7 +172,7 @@ def test_changes_equivalence(nfc: NeoFoodClub) -> None:
 def test_removed_timestamp(nfc: NeoFoodClub) -> None:
     # timestamp isn't really needed, so if it doesn't exist,
     # we just return None
-    data = orjson.loads(nfc.to_json())
+    data = json.loads(nfc.to_json())
 
     data.pop("timestamp")
 
@@ -195,14 +194,14 @@ def test_outdated_lock(nfc: NeoFoodClub) -> None:
 
 def test_outdated_lock_false(nfc: NeoFoodClub) -> None:
     now = datetime.datetime.now(datetime.timezone.utc)
-    data = orjson.loads(nfc.to_json())
+    data = json.loads(nfc.to_json())
     data["start"] = now.isoformat()
     new_nfc = NeoFoodClub(json.dumps(data))
     assert new_nfc.is_outdated_lock is False
 
 
 def test_outdated_lock_none(nfc: NeoFoodClub) -> None:
-    data = orjson.loads(nfc.to_json())
+    data = json.loads(nfc.to_json())
 
     # if there's no start attribute, assume it's over
     data.pop("start")
@@ -216,7 +215,7 @@ def test_winning_pirates(nfc: NeoFoodClub) -> None:
 
 
 def test_winning_pirates_empty(nfc: NeoFoodClub) -> None:
-    data = orjson.loads(nfc.to_json())
+    data = json.loads(nfc.to_json())
     # monkeypatching in no winners
     data["winners"] = (0, 0, 0, 0, 0)
 

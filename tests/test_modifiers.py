@@ -1,7 +1,6 @@
 import datetime
 import json
 
-import orjson
 import pytest
 
 from neofoodclub import Modifier, NeoFoodClub
@@ -79,7 +78,7 @@ def test_modifier_time_with_nfc(nfc: NeoFoodClub) -> None:
 
 
 def test_modifier_time_and_reset_no_start(nfc: NeoFoodClub) -> None:
-    new_data = orjson.loads(nfc.to_json())
+    new_data = json.loads(nfc.to_json())
     # remove the start time of the round so we can have an indeterminate start time
     new_data.pop("start")
     modifier = Modifier(
