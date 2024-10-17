@@ -1,20 +1,21 @@
+# /// script
+# requires-python = ">=3.9"
+# dependencies = [
+#     "setuptools-rust",
+# ]
+# ///
 import contextlib
 import re
+from pathlib import Path
 
 from setuptools import setup
 from setuptools_rust import Binding, RustExtension
 
-requirements = []
-with open("requirements.txt") as f:
-    requirements = f.read().splitlines()
-
-version = ""
-with open("neofoodclub/__init__.py") as f:
-    version = re.search(
-        r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
-        f.read(),
-        re.MULTILINE,
-    )
+version = re.search(
+    r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
+    Path("neofoodclub/__init__.py").read_text(),
+    re.MULTILINE,
+)
 
 if not version:
     raise RuntimeError("version is not set")
@@ -70,6 +71,7 @@ setup(
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
         "Typing :: Typed",
     ],
     zip_safe=False,
