@@ -1,7 +1,5 @@
 import json
 
-import orjson
-
 from neofoodclub import Bets, Modifier, NeoFoodClub
 
 
@@ -59,7 +57,7 @@ def test_bustproof_equivalence(nfc_with_bet_amount: NeoFoodClub) -> None:
 
 def test_bustproof_generator_no_positives(nfc: NeoFoodClub) -> None:
     # modify our round object to have no positives (just need to change the last arena for this one)
-    round_data = orjson.loads(nfc.to_json())
+    round_data = json.loads(nfc.to_json())
     # will give the arena a -50% ratio
     round_data["currentOdds"][-1] = [1, 2, 2, 2, 2]
     no_positive_nfc = NeoFoodClub(json.dumps(round_data))

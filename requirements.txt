@@ -1,4 +1,3 @@
-orjson
 python-dateutil
 setuptools-rust
 typing_extensions
