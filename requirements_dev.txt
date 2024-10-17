@@ -1,4 +1,2 @@
 coverage
 pytest
-python-dateutil
-typing_extensions
