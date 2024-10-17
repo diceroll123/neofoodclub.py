@@ -12,7 +12,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.x"]
+        python-version:
+          - "3.9"
+          - "3.10"
+          - "3.11"
+          - "3.12"
+          - "3.13"
 
     name: pytest ${{ matrix.python-version }}
     steps:
@@ -21,25 +26,21 @@ jobs:
           submodules: recursive
           token: ${{ github.token }}
 
-      - name: Set up CPython ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
         with:
-          python-version: ${{ matrix.python-version }}
+          version: "0.4.22"
 
-      - name: Install dependencies
-        run: |
-          pip install uv
-          uv venv
-          source ./.venv/bin/activate
-          uv pip install --upgrade setuptools wheel pytest setuptools-rust
-          uv pip install -U -r requirements_dev.txt
+      - name: Set up Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+
       - name: Installing distribution (dev mode)
         # this adds the .so to the inner lib files so we can test
         run: |
-          source ./.venv/bin/activate
-          python ./setup.py develop
+          uv run --no-project ./setup.py develop
       - name: Run tests
         shell: bash
         run: |
-          source ./.venv/bin/activate
-          PYTHONPATH="$(pwd)" pytest
+          uv venv
+          uv pip install pytest
+          uv run --no-project pytest
