@@ -24,16 +24,11 @@ jobs:
       - name: Set up Python
         run: uv python install 3.13
 
-      - name: Installing distribution (dev mode)
-        # this adds the .so to the inner lib files so we can test
-        run: |
-          uv run --no-project ./setup.py develop
       - name: Run tests
         shell: bash
         run: |
-          uv venv
-          uv pip install pytest coverage
-          uv run --no-project coverage run -m pytest
+          uv sync
+          uv run coverage run -m pytest
 
       - name: Coverage comment
         id: coverage_comment

@@ -1,3 +1,11 @@
+[project]
+name = "neofoodclub.py"
+version = "1.0.12"
+description = "A Python implementation of functionality used in https://neofood.club"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = []
+
 [build-system]
 requires = ["maturin>=1.0,<2.0"]
 build-backend = "maturin"
@@ -49,3 +57,10 @@ quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
+
+[tool.uv]
+dev-dependencies = [
+    "coverage>=7.6.3",
+    "pytest>=8.3.3",
+    "setuptools-rust>=1.10.2",
+]
