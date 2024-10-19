@@ -1,9 +1,3 @@
-# /// script
-# requires-python = ">=3.9"
-# dependencies = [
-#     "setuptools-rust",
-# ]
-# ///
 import re
 from pathlib import Path
 

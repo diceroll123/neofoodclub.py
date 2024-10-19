@@ -34,13 +34,8 @@ jobs:
       - name: Set up Python ${{ matrix.python-version }}
         run: uv python install ${{ matrix.python-version }}
 
-      - name: Installing distribution (dev mode)
-        # this adds the .so to the inner lib files so we can test
-        run: |
-          uv run --no-project ./setup.py develop
       - name: Run tests
         shell: bash
         run: |
-          uv venv
-          uv pip install pytest
-          uv run --no-project pytest
+          uv sync
+          uv run pytest
