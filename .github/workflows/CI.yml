@@ -17,39 +17,53 @@ jobs:
     runs-on: macos-latest
     strategy:
       fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
           token: ${{ github.token }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
       - name: "Build wheels - x86_64"
         uses: PyO3/maturin-action@v1
         with:
           target: x86_64
-          args: --release --find-interpreter --out dist
+          args: --release -i python${{ matrix.python-version }} --out dist
       - name: Upload wheels
-        uses: actions/upload-artifact@v3
+        id: upload-macos-x86_64
+        uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-macos-x86_64-${{ matrix.python-version }}
           path: dist
 
   macos-universal:
     runs-on: macos-latest
     strategy:
       fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
           token: ${{ github.token }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
       - name: "Build wheels - universal"
         uses: PyO3/maturin-action@v1
         with:
-          args: --release --find-interpreter --target universal2-apple-darwin --out dist
+          args: --release -i python${{ matrix.python-version }} --target universal2-apple-darwin --out dist
       - name: Upload wheels
-        uses: actions/upload-artifact@v3
+        id: upload-macos-universal
+        uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-macos-universal-${{ matrix.python-version }}
           path: dist
 
   windows:
@@ -57,23 +71,30 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        python-version: ["3.11", "3.12", "3.13"]
         platform:
           - target: x86_64-pc-windows-msvc
-          - target: i686-pc-windows-msvc
+            arch: x64
           - target: aarch64-pc-windows-msvc
+            arch: x64
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
           token: ${{ github.token }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: ${{ matrix.platform.arch }}
       - name: "Build wheels - windows"
         uses: PyO3/maturin-action@v1
         with:
-          args: --release --find-interpreter --out dist --target ${{ matrix.platform.target }}
+          args: --release -i python${{ matrix.python-version }} --out dist
       - name: Upload wheels
-        uses: actions/upload-artifact@v3
+        id: upload-windows
+        uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-windows-${{ matrix.python-version }}-${{ matrix.platform.target }}
           path: dist
 
   linux:
@@ -81,6 +102,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        python-version: ["3.11", "3.12", "3.13"]
         target:
           - x86_64-unknown-linux-gnu
           - i686-unknown-linux-gnu
@@ -89,17 +111,22 @@ jobs:
         with:
           submodules: recursive
           token: ${{ github.token }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
       - name: "Build wheels - linux"
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
           manylinux: auto
           command: build
-          args: --release --find-interpreter -o dist
+          args: --release -i python${{ matrix.python-version }} -o dist
       - name: Upload wheels
-        uses: actions/upload-artifact@v3
+        id: upload-linux
+        uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-linux-${{ matrix.python-version }}-${{ matrix.target }}
           path: dist
 
   linux-cross:
@@ -107,6 +134,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        python-version: ["3.11", "3.12", "3.13"]
         platform:
           - target: aarch64-unknown-linux-gnu
             arch: aarch64
@@ -124,17 +152,22 @@ jobs:
         with:
           submodules: recursive
           token: ${{ github.token }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
       - name: "Build wheels - linux-cross"
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
           manylinux: auto
           docker-options: ${{ matrix.platform.maturin_docker_options }}
-          args: --release --find-interpreter -o dist
+          args: --release -i python${{ matrix.python-version }} -o dist
       - name: Upload wheels
-        uses: actions/upload-artifact@v3
+        id: upload-linux-cross
+        uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-linux-cross-${{ matrix.python-version }}-${{ matrix.platform.target }}
           path: dist
 
   musllinux:
@@ -142,6 +175,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        python-version: ["3.11", "3.12", "3.13"]
         target:
           - x86_64-unknown-linux-musl
           - i686-unknown-linux-musl
@@ -150,16 +184,21 @@ jobs:
         with:
           submodules: recursive
           token: ${{ github.token }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
       - name: "Build wheels - musllinux"
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
           manylinux: musllinux_1_2
-          args: --release --find-interpreter -o dist
+          args: --release -i python${{ matrix.python-version }} -o dist
       - name: Upload wheels
-        uses: actions/upload-artifact@v3
+        id: upload-musllinux
+        uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-musllinux-${{ matrix.python-version }}-${{ matrix.target }}
           path: dist
 
   musllinux-cross:
@@ -167,6 +206,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        python-version: ["3.11", "3.12", "3.13"]
         platform:
           - target: aarch64-unknown-linux-musl
             arch: aarch64
@@ -178,22 +218,28 @@ jobs:
         with:
           submodules: recursive
           token: ${{ github.token }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
       - name: "Build wheels - musllinux-cross"
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
           manylinux: musllinux_1_2
-          args: --release --find-interpreter -o dist
+          args: --release -i python${{ matrix.python-version }} -o dist
           docker-options: ${{ matrix.platform.maturin_docker_options }}
       - name: Upload wheels
-        uses: actions/upload-artifact@v3
+        id: upload-musllinux-cross
+        uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-musllinux-cross-${{ matrix.python-version }}-${{ matrix.platform.target }}
           path: dist
 
   release:
     name: Release
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
     needs:
       - linux
       - linux-cross
@@ -204,13 +250,16 @@ jobs:
       - windows
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     steps:
-      - uses: actions/download-artifact@v3
+      - name: "Install uv"
+        uses: astral-sh/setup-uv@v3
         with:
-          name: wheels
-      - name: Publish to PyPI
-        uses: PyO3/maturin-action@v1
+          version: "0.5.1"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: wheels-*
+          path: wheels
+          merge-multiple: true
+      - name: Publish to PyPi
         env:
-          MATURIN_PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
-        with:
-          command: upload
-          args: --skip-existing *
+          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+        run: uv publish -v wheels/*

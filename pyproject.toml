@@ -3,12 +3,10 @@ name = "neofoodclub.py"
 version = "1.0.12"
 description = "A Python implementation of functionality used in https://neofood.club"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 dependencies = []
 classifiers=[
     "Programming Language :: Rust",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -40,12 +38,12 @@ exclude = [
 ]
 reportUnnecessaryTypeIgnoreComment = "warning"
 reportUnusedImport = "error"
-pythonVersion = "3.9"
+pythonVersion = "3.11"
 typeCheckingMode = "basic"
 
 [tool.ruff]
 show-fixes = true
-target-version = "py39"
+target-version = "py311"
 
 [tool.ruff.lint]
 extend-select = [
