@@ -19,6 +19,8 @@ pub struct NeoFoodClub {
     pub inner: neofoodclub::nfc::NeoFoodClub,
 }
 
+unsafe impl Sync for NeoFoodClub {}
+
 fn convert_probability_model_int_to_enum(
     probability_model: Option<u8>,
 ) -> Option<neofoodclub::nfc::ProbabilityModel> {
@@ -132,7 +134,7 @@ impl NeoFoodClub {
     #[getter]
     fn winners<'a>(&self, py: Python<'a>) -> PyResult<Bound<'a, PyTuple>> {
         let elements = self.inner.winners();
-        Ok(PyTuple::new_bound(py, elements))
+        PyTuple::new(py, elements)
     }
 
     #[getter]
@@ -163,25 +165,25 @@ impl NeoFoodClub {
     #[getter]
     fn current_odds<'a>(&self, py: Python<'a>) -> PyResult<Bound<'a, PyTuple>> {
         let elements = self.inner.current_odds();
-        Ok(PyTuple::new_bound(py, elements))
+        PyTuple::new(py, elements)
     }
 
     #[getter]
     fn custom_odds<'a>(&self, py: Python<'a>) -> PyResult<Bound<'a, PyTuple>> {
         let elements = self.inner.custom_odds();
-        Ok(PyTuple::new_bound(py, elements))
+        PyTuple::new(py, elements)
     }
 
     #[getter]
     fn opening_odds<'a>(&self, py: Python<'a>) -> PyResult<Bound<'a, PyTuple>> {
         let elements = self.inner.opening_odds();
-        Ok(PyTuple::new_bound(py, elements))
+        PyTuple::new(py, elements)
     }
 
     #[getter]
     fn pirates<'a>(&self, py: Python<'a>) -> PyResult<Bound<'a, PyTuple>> {
         let elements = self.inner.pirates();
-        Ok(PyTuple::new_bound(py, elements))
+        PyTuple::new(py, elements)
     }
 
     #[getter]
@@ -212,7 +214,7 @@ impl NeoFoodClub {
         let elements = self.inner.foods();
 
         match elements {
-            Some(e) => Ok(Some(PyTuple::new_bound(py, e))),
+            Some(e) => Ok(Some(PyTuple::new(py, e)?)),
             None => Ok(None),
         }
     }

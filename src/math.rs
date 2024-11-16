@@ -31,7 +31,7 @@ impl Math {
     #[staticmethod]
     fn binary_to_indices(py: Python<'_>, binary: u32) -> PyResult<Bound<'_, PyTuple>> {
         let elements = neofoodclub::math::binary_to_indices(binary);
-        Ok(PyTuple::new_bound(py, elements))
+        PyTuple::new(py, elements)
     }
 
     #[staticmethod]
@@ -40,7 +40,7 @@ impl Math {
         bets_hash: &'a str,
     ) -> PyResult<Bound<'a, PyTuple>> {
         let elements = neofoodclub::math::bets_hash_to_bet_indices(bets_hash);
-        Ok(PyTuple::new_bound(py, elements))
+        PyTuple::new(py, elements)
     }
 
     #[staticmethod]
@@ -59,7 +59,7 @@ impl Math {
         amounts_hash: &'a str,
     ) -> PyResult<Bound<'a, PyTuple>> {
         let elements = neofoodclub::math::amounts_hash_to_bet_amounts(amounts_hash);
-        Ok(PyTuple::new_bound(py, elements))
+        PyTuple::new(py, elements)
     }
 
     #[staticmethod]
@@ -68,7 +68,7 @@ impl Math {
         bets_hash: &'a str,
     ) -> PyResult<Bound<'a, PyTuple>> {
         let elements = neofoodclub::math::bets_hash_to_bet_binaries(bets_hash);
-        Ok(PyTuple::new_bound(py, elements))
+        PyTuple::new(py, elements)
     }
 
     #[staticmethod]
@@ -82,7 +82,7 @@ impl Math {
         bets_indices: Vec<[u8; 5]>,
     ) -> PyResult<Bound<'_, PyTuple>> {
         let elements = neofoodclub::math::bets_indices_to_bet_binaries(bets_indices);
-        Ok(PyTuple::new_bound(py, elements))
+        PyTuple::new(py, elements)
     }
 
     #[staticmethod]
@@ -92,13 +92,12 @@ impl Math {
         bet_odds: Vec<u32>,
         probabilities: [[f64; 5]; 5],
     ) -> PyResult<Bound<'_, PyTuple>> {
-        let py_structs: Vec<PyObject> =
-            neofoodclub::math::build_chance_objects(&bets, &bet_odds, probabilities)
-                .into_iter()
-                .map(|chance| Chance::from(chance).into_py(py))
-                .collect();
+        let py_structs = neofoodclub::math::build_chance_objects(&bets, &bet_odds, probabilities)
+            .into_iter()
+            .map(|chance| Chance::from(chance).into_pyobject(py))
+            .collect::<Result<Vec<_>, _>>()?;
 
-        Ok(PyTuple::new_bound(py, py_structs))
+        PyTuple::new(py, py_structs)
     }
 
     #[staticmethod]
