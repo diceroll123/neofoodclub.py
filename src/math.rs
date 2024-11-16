@@ -92,11 +92,10 @@ impl Math {
         bet_odds: Vec<u32>,
         probabilities: [[f64; 5]; 5],
     ) -> PyResult<Bound<'_, PyTuple>> {
-        let py_structs: Vec<PyObject> =
-            neofoodclub::math::build_chance_objects(&bets, &bet_odds, probabilities)
-                .into_iter()
-                .map(|chance| Chance::from(chance).into_py(py))
-                .collect();
+        let py_structs = neofoodclub::math::build_chance_objects(&bets, &bet_odds, probabilities)
+            .into_iter()
+            .map(|chance| Chance::from(chance).into_pyobject(py))
+            .collect::<Result<Vec<_>, _>>()?;
 
         PyTuple::new(py, py_structs)
     }
