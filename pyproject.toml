@@ -40,6 +40,8 @@ reportUnnecessaryTypeIgnoreComment = "warning"
 reportUnusedImport = "error"
 pythonVersion = "3.11"
 typeCheckingMode = "basic"
+venvPath = "."
+venv = ".venv"
 
 [tool.ruff]
 show-fixes = true
@@ -49,7 +51,7 @@ target-version = "py311"
 extend-select = [
     "C4",
     "SIM",
-    "TCH",
+    "TC",
     "UP",
     "ANN201",
     "ANN202",
