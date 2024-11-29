@@ -182,7 +182,7 @@ def test_removed_timestamp(nfc: NeoFoodClub) -> None:
 
 def test_timestamp(nfc: NeoFoodClub) -> None:
     assert nfc.timestamp == datetime.datetime(
-        2021, 2, 16, 23, 47, 37, tzinfo=datetime.timezone.utc
+        2021, 2, 16, 23, 47, 37, tzinfo=datetime.UTC
     )
 
 
@@ -193,7 +193,7 @@ def test_outdated_lock(nfc: NeoFoodClub) -> None:
 
 
 def test_outdated_lock_false(nfc: NeoFoodClub) -> None:
-    now = datetime.datetime.now(datetime.timezone.utc)
+    now = datetime.datetime.now(datetime.UTC)
     data = json.loads(nfc.to_json())
     data["start"] = now.isoformat()
     new_nfc = NeoFoodClub(json.dumps(data))
