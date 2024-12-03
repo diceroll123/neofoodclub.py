@@ -8,9 +8,11 @@ repos:
       - id: check-yaml
       - id: check-ast
       - id: debug-statements
+      - id: name-tests-test
+        args: [--pytest-test-first]
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: v0.8.0
+    rev: v0.8.1
     hooks:
       - id: ruff
         args: [--fix]
