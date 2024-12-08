@@ -689,8 +689,8 @@ class NeoFoodClub:
         """Optional[:class:`str`]: When the round started in UTC, if applicable."""
 
     @property
-    def start_nst(self) -> str | None:
-        """Optional[:class:`str`]: When the round started in NST, if applicable."""
+    def start_nst(self) -> datetime | None:
+        """Optional[:class:`datetime.datetime`]: When the round started in NST, as an aware datetime object if applicable."""
 
     @property
     def current_odds(
