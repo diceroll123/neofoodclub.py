@@ -39,3 +39,7 @@ def test_arenas_iter(nfc: NeoFoodClub) -> None:
 def test_arenas_get_pirate_by_id_wrong(nfc: NeoFoodClub) -> None:
     pirate = nfc.arenas.get_pirate_by_id(21)
     assert pirate is None
+
+
+def test_arenas_length(nfc: NeoFoodClub) -> None:
+    assert len(nfc.arenas) == 5
