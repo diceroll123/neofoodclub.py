@@ -1,6 +1,6 @@
 [project]
 name = "neofoodclub"
-version = "1.0.14"
+version = "1.0.15"
 description = "A Python implementation of functionality used in https://neofood.club"
 readme = "README.md"
 requires-python = ">=3.11"
