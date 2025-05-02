@@ -203,4 +203,8 @@ impl Arenas {
     fn __repr__(&self) -> String {
         format!("<Arenas {:?}>", self.inner.arenas)
     }
+
+    fn __len__(&self) -> usize {
+        5
+    }
 }

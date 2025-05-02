@@ -599,6 +599,12 @@ class Arenas:
 
         """
 
+    def __iter__(self) -> tuple[Arena, Arena, Arena, Arena, Arena]:
+        """Tuple[:class:`Arena`, ...]: Returns an iterator of the arenas."""
+
+    def __len__(self) -> int:
+        """:class:`int`: Returns the amount of arenas. Should be 5."""
+
     @property
     def arenas(self) -> tuple[Arena, Arena, Arena, Arena, Arena]:
         """Tuple[:class:`Arena`, ...]: Returns the arenas."""
