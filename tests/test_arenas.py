@@ -43,3 +43,12 @@ def test_arenas_get_pirate_by_id_wrong(nfc: NeoFoodClub) -> None:
 
 def test_arenas_length(nfc: NeoFoodClub) -> None:
     assert len(nfc.arenas) == 5
+
+
+def test_arenas_iterator(nfc: NeoFoodClub) -> None:
+    for arena in nfc.arenas:
+        assert len(arena.pirates) == 4
+
+    # testing using an iterator twice
+    for arena in nfc.arenas:
+        assert arena.winner_pirate is not None

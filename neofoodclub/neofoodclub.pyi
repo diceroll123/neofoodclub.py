@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -599,8 +599,11 @@ class Arenas:
 
         """
 
-    def __iter__(self) -> tuple[Arena, Arena, Arena, Arena, Arena]:
-        """Tuple[:class:`Arena`, ...]: Returns an iterator of the arenas."""
+    def __iter__(self) -> Iterator[Arena]:
+        """Iterator[:class:`Arena`]: Returns an iterator of the arenas."""
+
+    def __next__(self) -> Arena:
+        """Returns the next arena in the iterator."""
 
     def __len__(self) -> int:
         """:class:`int`: Returns the amount of arenas. Should be 5."""

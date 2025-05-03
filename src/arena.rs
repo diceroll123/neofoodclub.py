@@ -1,6 +1,7 @@
 use pyo3::{prelude::*, types::PyTuple};
 
 #[pyclass]
+#[derive(Clone)]
 pub struct Arena {
     pub inner: neofoodclub::arena::Arena,
 }
@@ -19,8 +20,16 @@ impl Arena {
     }
 
     #[getter]
-    fn winner(&self) -> u8 {
+    fn winner_index(&self) -> u8 {
         self.inner.winner
+    }
+
+    #[getter]
+    fn winner_pirate(&self) -> Option<crate::pirates::Pirate> {
+        self.inner
+            .pirates
+            .get(self.inner.winner as usize - 1)
+            .map(|p| crate::pirates::Pirate::from(*p))
     }
 
     #[getter]
@@ -120,6 +129,13 @@ impl Arenas {
             .collect()
     }
 
+    fn __iter__(slf: PyRef<'_, Self>) -> PyResult<Py<ArenaIterator>> {
+        let iter = ArenaIterator {
+            arenas: slf.arenas().into_iter(),
+        };
+        Py::new(slf.py(), iter)
+    }
+
     fn get_pirate_by_id(&self, id: u8) -> Option<crate::pirates::Pirate> {
         self.inner
             .get_pirate_by_id(id)
@@ -206,5 +222,20 @@ impl Arenas {
 
     fn __len__(&self) -> usize {
         5
+    }
+}
+#[pyclass]
+struct ArenaIterator {
+    arenas: std::vec::IntoIter<Arena>,
+}
+
+#[pymethods]
+impl ArenaIterator {
+    fn __iter__(slf: PyRef<'_, Self>) -> PyRef<'_, Self> {
+        slf
+    }
+
+    fn __next__(mut slf: PyRefMut<'_, Self>) -> Option<Arena> {
+        slf.arenas.next()
     }
 }
