@@ -129,11 +129,11 @@ impl Arenas {
             .collect()
     }
 
-    fn __iter__(self: PyRef<'_, Self>) -> PyResult<Py<ArenaIterator>> {
+    fn __iter__(slf: PyRef<'_, Self>) -> PyResult<Py<ArenaIterator>> {
         let iter = ArenaIterator {
-            arenas: self.arenas().into_iter(),
+            arenas: slf.arenas().into_iter(),
         };
-        Py::new(self.py(), iter)
+        Py::new(slf.py(), iter)
     }
 
     fn get_pirate_by_id(&self, id: u8) -> Option<crate::pirates::Pirate> {
@@ -231,11 +231,11 @@ struct ArenaIterator {
 
 #[pymethods]
 impl ArenaIterator {
-    fn __iter__(self: PyRef<'_, Self>) -> PyRef<'_, Self> {
-        self
+    fn __iter__(slf: PyRef<'_, Self>) -> PyRef<'_, Self> {
+        slf
     }
 
-    fn __next__(mut self: PyRefMut<'_, Self>) -> Option<Arena> {
-        self.arenas.next()
+    fn __next__(mut slf: PyRefMut<'_, Self>) -> Option<Arena> {
+        slf.arenas.next()
     }
 }
