@@ -161,7 +161,7 @@ impl NeoFoodClub {
     fn current_odds(&self) -> Vec<Vec<u8>> {
         self.inner
             .current_odds()
-            .into_iter()
+            .iter()
             .map(|o| o.to_vec())
             .collect()
     }
