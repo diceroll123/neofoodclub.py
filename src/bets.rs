@@ -98,7 +98,9 @@ impl Bets {
 
     #[getter]
     fn indices<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, pyo3::types::PyTuple>> {
-        let tuples: PyResult<Vec<_>> = self.inner.get_indices()
+        let tuples: PyResult<Vec<_>> = self
+            .inner
+            .get_indices()
             .into_iter()
             .map(|arr| pyo3::types::PyTuple::new(py, arr))
             .collect();
