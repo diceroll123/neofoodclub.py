@@ -17,28 +17,28 @@ impl From<neofoodclub::odds::Odds> for Odds {
 impl Odds {
     #[getter]
     fn best(&self) -> Chance {
-        Chance::from(self.inner.best.clone())
+        Chance::from(self.inner.best())
     }
 
     #[getter]
     fn bust(&self) -> Option<Chance> {
-        self.inner.bust.clone().map(Chance::from)
+        self.inner.bust().map(|c| Chance::from(c))
     }
 
     #[getter]
     fn most_likely_winner(&self) -> Chance {
-        Chance::from(self.inner.most_likely_winner.clone())
+        Chance::from(self.inner.most_likely_winner())
     }
 
     #[getter]
     fn partial_rate(&self) -> f64 {
-        self.inner.partial_rate
+        self.inner.partial_rate()
     }
 
     #[getter]
     fn chances(&self) -> Vec<Chance> {
         self.inner
-            .chances
+            .chances()
             .iter()
             .map(|c| Chance::from(c.clone()))
             .collect()

@@ -28,14 +28,14 @@ impl Arena {
     fn winner_pirate(&self) -> Option<crate::pirates::Pirate> {
         self.inner
             .pirates
-            .get(self.inner.winner as usize - 1)
+            .get(self.inner.winner as usize)
             .map(|p| crate::pirates::Pirate::from(*p))
     }
 
     #[getter]
     fn foods<'a>(&self, py: Python<'a>) -> PyResult<Option<Bound<'a, PyTuple>>> {
         match self.inner.foods {
-            Some(foods) => Ok(Some(PyTuple::new(py, foods)?)),
+            Some(ref foods) => Ok(Some(PyTuple::new(py, foods)?)),
             None => Ok(None),
         }
     }
@@ -54,15 +54,14 @@ impl Arena {
     fn best(&self) -> Vec<crate::pirates::Pirate> {
         self.inner
             .best()
-            .iter()
-            .map(|p| crate::pirates::Pirate::from(*p))
+            .into_iter()
+            .map(crate::pirates::Pirate::from)
             .collect()
     }
 
-    #[getter]
     fn pirate_ids<'a>(&self, py: Python<'a>) -> PyResult<Bound<'a, PyTuple>> {
-        let elements = &self.inner.ids();
-        PyTuple::new(py, elements)
+        let elements = self.inner.ids();
+        PyTuple::new(py, &elements)
     }
 
     #[getter]
@@ -139,14 +138,14 @@ impl Arenas {
     fn get_pirate_by_id(&self, id: u8) -> Option<crate::pirates::Pirate> {
         self.inner
             .get_pirate_by_id(id)
-            .map(|p| crate::pirates::Pirate::from(*p))
+            .map(|p| crate::pirates::Pirate::from(p))
     }
 
     fn get_pirates_by_id(&self, ids: Vec<u8>) -> Vec<crate::pirates::Pirate> {
         self.inner
             .get_pirates_by_id(&ids)
-            .iter()
-            .map(|p| crate::pirates::Pirate::from(**p))
+            .into_iter()
+            .map(|p| crate::pirates::Pirate::from(p))
             .collect()
     }
 
