@@ -1,5 +1,5 @@
 use neofoodclub::bets::BetAmounts;
-use pyo3::{prelude::*, types::PyTuple};
+use pyo3::prelude::*;
 
 use crate::{nfc::NeoFoodClub, odds::Odds};
 
@@ -21,13 +21,8 @@ impl Bets {
     }
 
     #[getter(bet_amounts)]
-    fn get_amounts<'a>(&self, py: Python<'a>) -> PyResult<Option<Bound<'a, PyTuple>>> {
-        let elements = &self.inner.bet_amounts;
-
-        match elements {
-            Some(amounts) => Ok(Some(PyTuple::new(py, amounts)?)),
-            None => Ok(None),
-        }
+    fn get_amounts(&self) -> Option<Vec<Option<u32>>> {
+        self.inner.bet_amounts.clone()
     }
 
     fn remove_amounts(&mut self) {
@@ -59,8 +54,8 @@ impl Bets {
     }
 
     #[getter]
-    fn binaries<'a>(&self, py: Python<'a>) -> PyResult<Bound<'a, PyTuple>> {
-        PyTuple::new(py, self.inner.get_binaries())
+    fn binaries<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, pyo3::types::PyTuple>> {
+        pyo3::types::PyTuple::new(py, self.inner.get_binaries())
     }
 
     #[getter]
@@ -102,14 +97,12 @@ impl Bets {
     }
 
     #[getter]
-    fn indices<'a>(&self, py: Python<'a>) -> PyResult<Bound<'a, PyTuple>> {
-        let indicies = self.inner.get_indices();
-        let py_indicies: Result<Vec<Bound<'a, PyTuple>>, PyErr> = indicies
-            .iter()
-            .map(|index| PyTuple::new(py, index))
+    fn indices<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, pyo3::types::PyTuple>> {
+        let tuples: PyResult<Vec<_>> = self.inner.get_indices()
+            .into_iter()
+            .map(|arr| pyo3::types::PyTuple::new(py, arr))
             .collect();
-
-        PyTuple::new(py, py_indicies?)
+        pyo3::types::PyTuple::new(py, tuples?)
     }
 
     fn net_expected(&self, nfc: &NeoFoodClub) -> f64 {

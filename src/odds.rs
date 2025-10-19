@@ -22,7 +22,7 @@ impl Odds {
 
     #[getter]
     fn bust(&self) -> Option<Chance> {
-        self.inner.bust().map(|c| Chance::from(c))
+        self.inner.bust().map(Chance::from)
     }
 
     #[getter]
