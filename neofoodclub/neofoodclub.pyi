@@ -85,8 +85,8 @@ class Math:
         """
 
     @staticmethod
-    def binary_to_indices(bet_binary: int) -> tuple[int, ...]:
-        """Tuple[int, ...]: Returns the bet indices of a bet-binary value.
+    def binary_to_indices(bet_binary: int) -> tuple[int, int, int, int, int]:
+        """Tuple[int, int, int, int, int]: Returns the bet indices of a bet-binary value.
 
         Parameters
         ----------
