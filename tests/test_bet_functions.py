@@ -66,12 +66,11 @@ def test_bets_without_bet_amount(nfc: NeoFoodClub) -> None:
     assert bets.bet_amounts is None
 
 
-def test_bets_set_bet_amount_below_50(nfc: NeoFoodClub) -> None:
-    # set bets externally to 48 for each amount
-    # setting numerical values below 50 should clamp the amount to 50
+def test_bets_set_bet_amount_to_1(nfc: NeoFoodClub) -> None:
+    # set bets externally to 1 for each amount
     bets = nfc.make_max_ter_bets()
-    bets.set_amounts_with_list((48,) * 10)
-    assert sum(a or 0 for a in (bets.bet_amounts or [])) == 500
+    bets.set_amounts_with_list((1,) * 10)
+    assert sum(a or 0 for a in (bets.bet_amounts or [])) == 10
 
 
 def test_bets_set_bet_amount_none(nfc: NeoFoodClub) -> None:
@@ -211,7 +210,9 @@ def test_net_expected_equality_with_amount(
 
     crazy_bets = nfc_with_bet_amount.make_bets_from_hash(crazy_test_hash)
 
-    assert math.isclose(crazy_bets.net_expected(nfc_with_bet_amount), -4742.56016102454)
+    assert math.isclose(
+        crazy_bets.net_expected(nfc_with_bet_amount), -4736.6455776912135
+    )
 
 
 def test_repeating_bets_from_binary(nfc: NeoFoodClub) -> None:

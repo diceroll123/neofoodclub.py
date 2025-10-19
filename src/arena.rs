@@ -1,4 +1,4 @@
-use pyo3::{prelude::*, types::PyTuple};
+use pyo3::prelude::*;
 
 #[pyclass]
 #[derive(Clone)]
@@ -33,9 +33,9 @@ impl Arena {
     }
 
     #[getter]
-    fn foods<'a>(&self, py: Python<'a>) -> PyResult<Option<Bound<'a, PyTuple>>> {
+    fn foods<'py>(&self, py: Python<'py>) -> PyResult<Option<Bound<'py, pyo3::types::PyTuple>>> {
         match self.inner.foods {
-            Some(foods) => Ok(Some(PyTuple::new(py, foods)?)),
+            Some(f) => Ok(Some(pyo3::types::PyTuple::new(py, f)?)),
             None => Ok(None),
         }
     }
@@ -54,15 +54,14 @@ impl Arena {
     fn best(&self) -> Vec<crate::pirates::Pirate> {
         self.inner
             .best()
-            .iter()
-            .map(|p| crate::pirates::Pirate::from(*p))
+            .into_iter()
+            .map(crate::pirates::Pirate::from)
             .collect()
     }
 
     #[getter]
-    fn pirate_ids<'a>(&self, py: Python<'a>) -> PyResult<Bound<'a, PyTuple>> {
-        let elements = &self.inner.ids();
-        PyTuple::new(py, elements)
+    fn pirate_ids<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, pyo3::types::PyTuple>> {
+        pyo3::types::PyTuple::new(py, self.inner.ids())
     }
 
     #[getter]
@@ -139,14 +138,14 @@ impl Arenas {
     fn get_pirate_by_id(&self, id: u8) -> Option<crate::pirates::Pirate> {
         self.inner
             .get_pirate_by_id(id)
-            .map(|p| crate::pirates::Pirate::from(*p))
+            .map(crate::pirates::Pirate::from)
     }
 
     fn get_pirates_by_id(&self, ids: Vec<u8>) -> Vec<crate::pirates::Pirate> {
         self.inner
             .get_pirates_by_id(&ids)
-            .iter()
-            .map(|p| crate::pirates::Pirate::from(**p))
+            .into_iter()
+            .map(crate::pirates::Pirate::from)
             .collect()
     }
 
@@ -161,20 +160,16 @@ impl Arenas {
     fn get_pirates_from_binary(&self, binary: u32) -> Vec<crate::pirates::Pirate> {
         self.inner
             .get_pirates_from_binary(binary)
-            .iter()
-            .map(|p| crate::pirates::Pirate::from(**p))
+            .into_iter()
+            .map(crate::pirates::Pirate::from)
             .collect()
     }
 
     fn get_all_pirates(&self) -> Vec<Vec<crate::pirates::Pirate>> {
         self.inner
             .get_all_pirates()
-            .iter()
-            .map(|p| {
-                p.iter()
-                    .map(|pirate| crate::pirates::Pirate::from(*pirate))
-                    .collect()
-            })
+            .into_iter()
+            .map(|p| p.into_iter().map(crate::pirates::Pirate::from).collect())
             .collect()
     }
 
@@ -188,13 +183,12 @@ impl Arenas {
     }
 
     #[getter]
-    fn pirate_ids<'a>(&self, py: Python<'a>) -> PyResult<Bound<'a, PyTuple>> {
-        let elements: Vec<Bound<'a, PyTuple>> = self
-            .arenas()
+    fn pirate_ids<'py>(&self, py: Python<'py>) -> PyResult<Vec<Bound<'py, pyo3::types::PyTuple>>> {
+        self.inner
+            .arenas
             .iter()
-            .map(|a| a.pirate_ids(py).expect("failed to get pirate ids"))
-            .collect();
-        PyTuple::new(py, elements)
+            .map(|a| pyo3::types::PyTuple::new(py, a.ids()))
+            .collect()
     }
 
     #[getter]

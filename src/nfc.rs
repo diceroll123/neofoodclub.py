@@ -1,10 +1,6 @@
 use chrono::DateTime;
 use chrono_tz::Tz;
-use pyo3::{
-    exceptions::PyValueError,
-    prelude::*,
-    types::{PyTuple, PyType},
-};
+use pyo3::{exceptions::PyValueError, prelude::*, types::PyType};
 
 use crate::{
     arena::{Arena, Arenas},
@@ -132,9 +128,8 @@ impl NeoFoodClub {
     }
 
     #[getter]
-    fn winners<'a>(&self, py: Python<'a>) -> PyResult<Bound<'a, PyTuple>> {
-        let elements = self.inner.winners();
-        PyTuple::new(py, elements)
+    fn winners<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, pyo3::types::PyTuple>> {
+        pyo3::types::PyTuple::new(py, self.inner.winners())
     }
 
     #[getter]
@@ -163,27 +158,39 @@ impl NeoFoodClub {
     }
 
     #[getter]
-    fn current_odds<'a>(&self, py: Python<'a>) -> PyResult<Bound<'a, PyTuple>> {
-        let elements = self.inner.current_odds();
-        PyTuple::new(py, elements)
+    fn current_odds(&self) -> Vec<Vec<u8>> {
+        self.inner
+            .current_odds()
+            .iter()
+            .map(|o| o.to_vec())
+            .collect()
     }
 
     #[getter]
-    fn custom_odds<'a>(&self, py: Python<'a>) -> PyResult<Bound<'a, PyTuple>> {
-        let elements = self.inner.custom_odds();
-        PyTuple::new(py, elements)
+    fn custom_odds(&self) -> Vec<Vec<u8>> {
+        self.inner
+            .custom_odds()
+            .into_iter()
+            .map(|o| o.to_vec())
+            .collect()
     }
 
     #[getter]
-    fn opening_odds<'a>(&self, py: Python<'a>) -> PyResult<Bound<'a, PyTuple>> {
-        let elements = self.inner.opening_odds();
-        PyTuple::new(py, elements)
+    fn opening_odds(&self) -> Vec<Vec<u8>> {
+        self.inner
+            .opening_odds()
+            .into_iter()
+            .map(|o| o.to_vec())
+            .collect()
     }
 
     #[getter]
-    fn pirates<'a>(&self, py: Python<'a>) -> PyResult<Bound<'a, PyTuple>> {
-        let elements = self.inner.pirates();
-        PyTuple::new(py, elements)
+    fn pirates(&self) -> Vec<Vec<u8>> {
+        self.inner
+            .pirates()
+            .into_iter()
+            .map(|o| o.to_vec())
+            .collect()
     }
 
     #[getter]
@@ -210,13 +217,10 @@ impl NeoFoodClub {
     }
 
     #[getter]
-    fn foods<'a>(&self, py: Python<'a>) -> PyResult<Option<Bound<'a, PyTuple>>> {
-        let elements = self.inner.foods();
-
-        match elements {
-            Some(e) => Ok(Some(PyTuple::new(py, e)?)),
-            None => Ok(None),
-        }
+    fn foods(&self) -> Option<Vec<Vec<u8>>> {
+        self.inner
+            .foods()
+            .map(|f| f.into_iter().map(|f| f.to_vec()).collect())
     }
 
     #[getter]
@@ -239,7 +243,7 @@ impl NeoFoodClub {
     fn get_winning_pirates(&self) -> Option<Vec<Pirate>> {
         self.inner
             .winning_pirates()
-            .map(|pirates| pirates.iter().map(|p| Pirate::from(**p)).collect())
+            .map(|pirates| pirates.into_iter().map(Pirate::from).collect::<Vec<_>>())
     }
 
     fn make_random_bets(&self) -> Bets {

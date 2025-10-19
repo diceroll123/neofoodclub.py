@@ -1,5 +1,5 @@
 use neofoodclub::pirates::PartialPirateThings;
-use pyo3::{prelude::*, types::PyTuple};
+use pyo3::prelude::*;
 
 use crate::nfc::NeoFoodClub;
 
@@ -135,28 +135,24 @@ impl Pirate {
         self.inner.is_winner
     }
 
-    fn positive_foods<'a>(
+    fn positive_foods<'py>(
         &self,
+        py: Python<'py>,
         nfc: &NeoFoodClub,
-        py: Python<'a>,
-    ) -> PyResult<Option<Bound<'a, PyTuple>>> {
-        let elements = self.inner.positive_foods(&nfc.inner);
-
-        match elements {
-            Some(foods) => Ok(Some(PyTuple::new(py, foods)?)),
+    ) -> PyResult<Option<Bound<'py, pyo3::types::PyTuple>>> {
+        match self.inner.positive_foods(&nfc.inner) {
+            Some(foods) => Ok(Some(pyo3::types::PyTuple::new(py, foods)?)),
             None => Ok(None),
         }
     }
 
-    fn negative_foods<'a>(
+    fn negative_foods<'py>(
         &self,
+        py: Python<'py>,
         nfc: &NeoFoodClub,
-        py: Python<'a>,
-    ) -> PyResult<Option<Bound<'a, PyTuple>>> {
-        let elements = self.inner.negative_foods(&nfc.inner);
-
-        match elements {
-            Some(foods) => Ok(Some(PyTuple::new(py, foods)?)),
+    ) -> PyResult<Option<Bound<'py, pyo3::types::PyTuple>>> {
+        match self.inner.negative_foods(&nfc.inner) {
+            Some(foods) => Ok(Some(pyo3::types::PyTuple::new(py, foods)?)),
             None => Ok(None),
         }
     }
