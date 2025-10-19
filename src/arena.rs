@@ -28,7 +28,7 @@ impl Arena {
     fn winner_pirate(&self) -> Option<crate::pirates::Pirate> {
         self.inner
             .pirates
-            .get(self.inner.winner as usize)
+            .get(self.inner.winner as usize - 1)
             .map(|p| crate::pirates::Pirate::from(*p))
     }
 
