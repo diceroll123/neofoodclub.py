@@ -12,24 +12,20 @@ env:
   CARGO_TERM_COLOR: always
   RUSTUP_MAX_RETRIES: 10
 
-x-python-versions: &python-versions ["3.11", "3.12", "3.13", "3.14"]
-
-x-checkout-step: &checkout-step
-  uses: actions/checkout@v4
-  with:
-    submodules: recursive
-    token: ${{ github.token }}
-
 jobs:
   macos:
     runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix:
-        python-version: *python-versions
+        python-version: &python-versions ["3.11", "3.12", "3.13", "3.14"]
         target: [x86_64, universal2-apple-darwin]
     steps:
-      - *checkout-step
+      - &checkout-step
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ github.token }}
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
