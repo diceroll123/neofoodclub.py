@@ -4,17 +4,18 @@ default:
 
 # Clean all build artifacts
 clean:
-    rm -rf target/
+    cargo clean || true
+    cd neofoodclub_rs && cargo clean || true
     rm -rf dist/
     rm -rf build/
     rm -rf neofoodclub.egg-info/
-    rm -rf .uv run pytest_cache/
+    rm -rf .pytest_cache/
     rm -rf .coverage
     find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
-    find . -type f -name "*.pyc" -delete
-    find . -type f -name "*.pyo" -delete
-    find . -type f -name "*.so" -delete
-    find . -type f -name "*.pyd" -delete
+    find . -type f -name "*.pyc" -delete 2>/dev/null || true
+    find . -type f -name "*.pyo" -delete 2>/dev/null || true
+    find . -type f -name "*.so" -delete 2>/dev/null || true
+    find . -type f -name "*.pyd" -delete 2>/dev/null || true
 
 # Build the Rust extension in debug mode
 build:
