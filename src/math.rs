@@ -35,8 +35,9 @@ impl Math {
     }
 
     #[staticmethod]
-    fn bets_hash_to_bet_indices(bets_hash: &str) -> Vec<[u8; 5]> {
+    fn bets_hash_to_bet_indices(bets_hash: &str) -> PyResult<Vec<[u8; 5]>> {
         neofoodclub::math::bets_hash_to_bet_indices(bets_hash)
+            .map_err(pyo3::exceptions::PyValueError::new_err)
     }
 
     #[staticmethod]
@@ -54,18 +55,21 @@ impl Math {
         py: Python<'py>,
         amounts_hash: &str,
     ) -> PyResult<Bound<'py, pyo3::types::PyTuple>> {
-        let amounts = neofoodclub::math::amounts_hash_to_bet_amounts(amounts_hash);
+        let amounts = neofoodclub::math::amounts_hash_to_bet_amounts(amounts_hash)
+            .map_err(pyo3::exceptions::PyValueError::new_err)?;
         pyo3::types::PyTuple::new(py, amounts)
     }
 
     #[staticmethod]
-    fn bets_hash_to_bet_binaries(bets_hash: &str) -> Vec<u32> {
+    fn bets_hash_to_bet_binaries(bets_hash: &str) -> PyResult<Vec<u32>> {
         neofoodclub::math::bets_hash_to_bet_binaries(bets_hash)
+            .map_err(pyo3::exceptions::PyValueError::new_err)
     }
 
     #[staticmethod]
-    fn bets_hash_to_bets_count(bets_hash: &str) -> usize {
+    fn bets_hash_to_bets_count(bets_hash: &str) -> PyResult<usize> {
         neofoodclub::math::bets_hash_to_bets_count(bets_hash)
+            .map_err(pyo3::exceptions::PyValueError::new_err)
     }
 
     #[staticmethod]

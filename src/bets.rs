@@ -29,19 +29,22 @@ impl Bets {
         self.inner.bet_amounts = None;
     }
 
-    fn set_amounts_with_hash(&mut self, hash: String) {
+    fn set_amounts_with_hash(&mut self, hash: String) -> PyResult<()> {
         self.inner
-            .set_bet_amounts(&Some(BetAmounts::AmountHash(hash)));
+            .set_bet_amounts(&Some(BetAmounts::AmountHash(hash)))
+            .map_err(pyo3::exceptions::PyValueError::new_err)
     }
 
-    fn set_amounts_with_int(&mut self, amount: u32) {
+    fn set_amounts_with_int(&mut self, amount: u32) -> PyResult<()> {
         self.inner
-            .set_bet_amounts(&Some(BetAmounts::from_amount(amount, self.inner.len())));
+            .set_bet_amounts(&Some(BetAmounts::from_amount(amount)))
+            .map_err(pyo3::exceptions::PyValueError::new_err)
     }
 
-    fn set_amounts_with_list(&mut self, amounts: Vec<Option<u32>>) {
+    fn set_amounts_with_list(&mut self, amounts: Vec<Option<u32>>) -> PyResult<()> {
         self.inner
-            .set_bet_amounts(&Some(BetAmounts::Amounts(amounts)));
+            .set_bet_amounts(&Some(BetAmounts::Amounts(amounts)))
+            .map_err(pyo3::exceptions::PyValueError::new_err)
     }
 
     #[getter]

@@ -64,7 +64,7 @@ def test_modifier_copy_equality() -> None:
     ],
 )
 def test_modifier_custom_odds_error(pirate_id: int, pirate_odds: int) -> None:
-    with pytest.raises(BaseException):
+    with pytest.raises(ValueError, match="Invalid"):
         Modifier(custom_odds={pirate_id: pirate_odds})
 
 

@@ -88,12 +88,11 @@ impl Arena {
         self.inner.odds
     }
 
-    fn __getitem__(&self, index: u8) -> crate::pirates::Pirate {
-        let pirate = self
-            .inner
-            .get_pirate_by_index(index)
-            .expect("list index out of range");
-        crate::pirates::Pirate::from(*pirate)
+    fn __getitem__(&self, index: u8) -> PyResult<crate::pirates::Pirate> {
+        let pirate = self.inner.get_pirate_by_index(index).ok_or_else(|| {
+            pyo3::exceptions::PyIndexError::new_err(format!("list index out of range: {}", index))
+        })?;
+        Ok(crate::pirates::Pirate::from(*pirate))
     }
 
     fn __repr__(&self) -> String {
@@ -200,14 +199,18 @@ impl Arenas {
             .collect()
     }
 
-    fn get_arena(&self, id: usize) -> Arena {
-        let arena = self.inner.get_arena(id).expect("list index out of range");
-        Arena::from(arena.clone())
+    fn get_arena(&self, id: usize) -> PyResult<Arena> {
+        let arena = self.inner.get_arena(id).ok_or_else(|| {
+            pyo3::exceptions::PyIndexError::new_err(format!("list index out of range: {}", id))
+        })?;
+        Ok(Arena::from(arena.clone()))
     }
 
-    fn __getitem__(&self, id: usize) -> Arena {
-        let arena = self.inner.get_arena(id).expect("list index out of range");
-        Arena::from(arena.clone())
+    fn __getitem__(&self, id: usize) -> PyResult<Arena> {
+        let arena = self.inner.get_arena(id).ok_or_else(|| {
+            pyo3::exceptions::PyIndexError::new_err(format!("list index out of range: {}", id))
+        })?;
+        Ok(Arena::from(arena.clone()))
     }
 
     fn __repr__(&self) -> String {

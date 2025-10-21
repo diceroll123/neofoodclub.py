@@ -4,17 +4,18 @@ default:
 
 # Clean all build artifacts
 clean:
-    rm -rf target/
+    cargo clean || true
+    cd neofoodclub_rs && cargo clean || true
     rm -rf dist/
     rm -rf build/
     rm -rf neofoodclub.egg-info/
-    rm -rf .uv run pytest_cache/
+    rm -rf .pytest_cache/
     rm -rf .coverage
     find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
-    find . -type f -name "*.pyc" -delete
-    find . -type f -name "*.pyo" -delete
-    find . -type f -name "*.so" -delete
-    find . -type f -name "*.pyd" -delete
+    find . -type f -name "*.pyc" -delete 2>/dev/null || true
+    find . -type f -name "*.pyo" -delete 2>/dev/null || true
+    find . -type f -name "*.so" -delete 2>/dev/null || true
+    find . -type f -name "*.pyd" -delete 2>/dev/null || true
 
 # Build the Rust extension in debug mode
 build:
@@ -48,6 +49,34 @@ test-rust:
 # Run Rust tests in the neofoodclub_rs subproject
 test-rust-lib:
     cd neofoodclub_rs && cargo test
+
+# Run Rust coverage (requires cargo-llvm-cov: cargo install cargo-llvm-cov)
+coverage-rust:
+    cargo llvm-cov --all-features --workspace
+
+# Run Rust coverage with HTML report
+coverage-rust-html:
+    cargo llvm-cov --all-features --workspace --html
+    @echo "Coverage report generated at target/llvm-cov/html/index.html"
+
+# Run Rust coverage for neofoodclub_rs subproject
+coverage-rust-lib:
+    cd neofoodclub_rs && cargo llvm-cov --all-features --workspace
+
+# Run Rust coverage for neofoodclub_rs with HTML report
+coverage-rust-lib-html:
+    cd neofoodclub_rs && cargo llvm-cov --all-features --workspace --html
+    @echo "Coverage report generated at neofoodclub_rs/target/llvm-cov/html/index.html"
+
+# Run Rust coverage and output lcov file
+coverage-rust-lcov:
+    cargo llvm-cov --all-features --workspace --lcov --output-path lcov.info
+    @echo "LCOV report generated at lcov.info"
+
+# Run Rust coverage and output JSON file (best for AI analysis)
+coverage-rust-json:
+    cargo llvm-cov --all-features --workspace --json --output-path coverage.json
+    @echo "JSON coverage report generated at coverage.json"
 
 # Run all tests (Python and Rust)
 test-all: rebuild test test-rust test-rust-lib

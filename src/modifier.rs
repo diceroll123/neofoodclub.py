@@ -41,14 +41,22 @@ impl Modifier {
         value: i32,
         custom_odds: Option<HashMap<u8, u8>>,
         custom_time: Option<String>,
-    ) -> Self {
-        Modifier {
-            inner: neofoodclub::modifier::Modifier::new(
-                value,
-                custom_odds,
-                custom_time.map(|s| NaiveTime::parse_from_str(&s, "%H:%M:%S").unwrap()),
-            ),
-        }
+    ) -> PyResult<Self> {
+        let parsed_time = if let Some(s) = custom_time {
+            Some(NaiveTime::parse_from_str(&s, "%H:%M:%S").map_err(|e| {
+                pyo3::exceptions::PyValueError::new_err(format!(
+                    "Invalid time format '{}'. Expected format: HH:MM:SS. Error: {}",
+                    s, e
+                ))
+            })?)
+        } else {
+            None
+        };
+
+        Ok(Modifier {
+            inner: neofoodclub::modifier::Modifier::new(value, custom_odds, parsed_time)
+                .map_err(pyo3::exceptions::PyValueError::new_err)?,
+        })
     }
 
     #[getter]
