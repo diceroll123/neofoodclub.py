@@ -43,32 +43,50 @@ jobs:
           name: wheels-macos-${{ matrix.target }}-${{ matrix.python-version }}
           path: dist
 
-  windows:
+  windows-x64:
     runs-on: windows-latest
     strategy:
       fail-fast: false
       matrix:
         python-version: *python-versions
-        platform:
-          - target: x86_64-pc-windows-msvc
-            arch: x64
-          - target: aarch64-pc-windows-msvc
-            arch: x64
     steps:
       - *checkout-step
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          architecture: ${{ matrix.platform.arch }}
-      - name: "Build wheels - Windows"
+          architecture: x64
+      - name: "Build wheels - Windows x64"
         uses: PyO3/maturin-action@v1
         with:
-          target: ${{ matrix.platform.target }}
+          target: x86_64-pc-windows-msvc
           args: --release -i python${{ matrix.python-version }} --out dist
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels-windows-${{ matrix.python-version }}-${{ matrix.platform.target }}
+          name: wheels-windows-${{ matrix.python-version }}-x86_64-pc-windows-msvc
+          path: dist
+
+  windows-arm64:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: *python-versions
+    steps:
+      - *checkout-step
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+      - name: "Build wheels - Windows ARM64"
+        uses: PyO3/maturin-action@v1
+        with:
+          target: aarch64-pc-windows-msvc
+          args: --release -i python${{ matrix.python-version }} --out dist --features windows-cross
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-windows-${{ matrix.python-version }}-aarch64-pc-windows-msvc
           path: dist
 
   linux:
@@ -143,7 +161,8 @@ jobs:
       id-token: write
     needs:
       - macos
-      - windows
+      - windows-x64
+      - windows-arm64
       - linux
       - musllinux
     if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) || github.event_name == 'release'
