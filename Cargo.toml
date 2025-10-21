@@ -13,6 +13,10 @@ neofoodclub = { path = "./neofoodclub_rs" }
 chrono = "0.4.38"
 chrono-tz = "0.10.0"
 
+[features]
+# Feature for Windows ARM64 cross-compilation
+windows-cross = ["pyo3/generate-import-lib"]
+
 [profile.release]
 lto = "fat"
 codegen-units = 1
