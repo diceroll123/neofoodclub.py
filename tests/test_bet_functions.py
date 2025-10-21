@@ -216,9 +216,9 @@ def test_net_expected_equality_with_amount(
 
 
 def test_repeating_bets_from_binary(nfc: NeoFoodClub) -> None:
-    # duplicates are removed in from_binary, we're making sure of this
+    # duplicates are preserved in from_binary, we're making sure of this
     repeating = nfc.make_bets_from_binaries([0x1, 0x1, 0x2])
-    assert len(repeating) == 2
+    assert len(repeating) == 3
 
 
 def test_random_bets(nfc: NeoFoodClub) -> None:
@@ -228,43 +228,56 @@ def test_random_bets(nfc: NeoFoodClub) -> None:
 
 def test_too_many_bet_amounts_from_binaries(nfc: NeoFoodClub) -> None:
     bets = nfc.make_bets_from_binaries([0x1])
-    with pytest.raises(BaseException):
+    with pytest.raises(ValueError, match="Bet amounts must be the same length"):
         bets.set_amounts_with_list([50, 50])
 
 
 def test_invalid_bet_amounts_from_binaries(nfc: NeoFoodClub) -> None:
     bets = nfc.make_bets_from_binaries([0x1])
-    with pytest.raises(BaseException):
+    with pytest.raises(ValueError, match="Invalid amounts hash"):
         bets.set_amounts_with_hash("???")
 
 
 def test_too_many_bet_amounts_from_indices(nfc: NeoFoodClub) -> None:
     bets = nfc.make_bets_from_indices([(1, 0, 0, 0, 0)])
-    with pytest.raises(BaseException):
+    with pytest.raises(ValueError, match="Bet amounts must be the same length"):
         bets.set_amounts_with_list([50, 50])
 
 
 def test_invalid_bet_amounts_from_indices(nfc: NeoFoodClub) -> None:
     bets = nfc.make_bets_from_indices([(1, 0, 0, 0, 0)])
-    with pytest.raises(BaseException):
+    with pytest.raises(ValueError, match="Invalid amounts hash"):
         bets.set_amounts_with_hash("???")
 
 
 def test_too_many_bet_amounts_from_hash(nfc: NeoFoodClub) -> None:
     bets = nfc.make_bets_from_hash("faa")
-    with pytest.raises(BaseException):
+    with pytest.raises(ValueError, match="Bet amounts must be the same length"):
         bets.set_amounts_with_list([50, 50])
 
 
 def test_invalid_bet_hash(nfc: NeoFoodClub) -> None:
-    with pytest.raises(BaseException):
+    with pytest.raises(ValueError, match="Invalid bet hash"):
         nfc.make_bets_from_hash("faz")
 
 
 def test_invalid_amounts_hash(nfc: NeoFoodClub) -> None:
     bets = nfc.make_bets_from_hash("faa")
-    with pytest.raises(BaseException):
+    with pytest.raises(ValueError, match="Invalid amounts hash"):
         bets.set_amounts_with_hash("???")
+
+
+def test_set_amounts_with_int_never_fails(nfc: NeoFoodClub) -> None:
+    """Test that set_amounts_with_int (using AllSame) never raises errors."""
+    bets = nfc.make_bets_from_binaries([0x1])
+    # This should work fine, even though we're setting an amount on a single-bet set
+    bets.set_amounts_with_int(5000)
+    assert bets.bet_amounts == [5000]
+
+    # Should work on any number of bets
+    bets_10 = nfc.make_max_ter_bets()
+    bets_10.set_amounts_with_int(8000)
+    assert bets_10.bet_amounts == [8000] * 10
 
 
 def test_bet_get_win_units(nfc: NeoFoodClub) -> None:

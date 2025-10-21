@@ -19,12 +19,17 @@ unsafe impl Sync for NeoFoodClub {}
 
 fn convert_probability_model_int_to_enum(
     probability_model: Option<u8>,
-) -> Option<neofoodclub::nfc::ProbabilityModel> {
+) -> PyResult<Option<neofoodclub::nfc::ProbabilityModel>> {
     match probability_model {
-        Some(0) => Some(neofoodclub::nfc::ProbabilityModel::OriginalModel),
-        Some(1) => Some(neofoodclub::nfc::ProbabilityModel::MultinomialLogitModel),
-        None => None,
-        _ => panic!("Invalid probability model"),
+        Some(0) => Ok(Some(neofoodclub::nfc::ProbabilityModel::OriginalModel)),
+        Some(1) => Ok(Some(
+            neofoodclub::nfc::ProbabilityModel::MultinomialLogitModel,
+        )),
+        None => Ok(None),
+        Some(v) => Err(PyValueError::new_err(format!(
+            "Invalid probability model: {}. Must be 0 (OriginalModel), 1 (MultinomialLogitModel), or None.",
+            v
+        ))),
     }
 }
 
@@ -37,15 +42,15 @@ impl NeoFoodClub {
         bet_amount: Option<u32>,
         probability_model: Option<u8>,
         modifier: Option<Modifier>,
-    ) -> Self {
-        NeoFoodClub {
+    ) -> PyResult<Self> {
+        Ok(NeoFoodClub {
             inner: neofoodclub::nfc::NeoFoodClub::from_json(
                 json,
                 bet_amount,
-                convert_probability_model_int_to_enum(probability_model),
+                convert_probability_model_int_to_enum(probability_model)?,
                 modifier.map(|m| m.inner),
             ),
-        }
+        })
     }
 
     #[classmethod]
@@ -56,15 +61,15 @@ impl NeoFoodClub {
         bet_amount: Option<u32>,
         probability_model: Option<u8>,
         modifier: Option<Modifier>,
-    ) -> Self {
-        NeoFoodClub {
+    ) -> PyResult<Self> {
+        Ok(NeoFoodClub {
             inner: neofoodclub::nfc::NeoFoodClub::from_json(
                 json,
                 bet_amount,
-                convert_probability_model_int_to_enum(probability_model),
+                convert_probability_model_int_to_enum(probability_model)?,
                 modifier.map(|m| m.inner),
             ),
-        }
+        })
     }
 
     #[classmethod]
@@ -75,15 +80,15 @@ impl NeoFoodClub {
         bet_amount: Option<u32>,
         probability_model: Option<u8>,
         modifier: Option<Modifier>,
-    ) -> Self {
-        NeoFoodClub {
+    ) -> PyResult<Self> {
+        Ok(NeoFoodClub {
             inner: neofoodclub::nfc::NeoFoodClub::from_url(
                 url,
                 bet_amount,
-                convert_probability_model_int_to_enum(probability_model),
+                convert_probability_model_int_to_enum(probability_model)?,
                 modifier.map(|m| m.inner),
             ),
-        }
+        })
     }
 
     #[getter]
@@ -92,13 +97,13 @@ impl NeoFoodClub {
     }
 
     #[pyo3(signature = (*, probability_model=None, modifier=None))]
-    fn copy(&self, probability_model: Option<u8>, modifier: Option<Modifier>) -> Self {
-        NeoFoodClub {
+    fn copy(&self, probability_model: Option<u8>, modifier: Option<Modifier>) -> PyResult<Self> {
+        Ok(NeoFoodClub {
             inner: self.inner.copy(
-                convert_probability_model_int_to_enum(probability_model),
+                convert_probability_model_int_to_enum(probability_model)?,
                 modifier.map(|m| m.inner),
             ),
-        }
+        })
     }
 
     #[getter]
@@ -107,14 +112,14 @@ impl NeoFoodClub {
         Arenas::from(elements)
     }
 
-    fn get_arena(&self, index: usize) -> Arena {
+    fn get_arena(&self, index: usize) -> PyResult<Arena> {
         let arena = self
             .inner
             .get_arenas()
             .get_arena(index)
-            .expect("Invalid index")
+            .ok_or_else(|| PyValueError::new_err(format!("Invalid arena index: {}", index)))?
             .clone();
-        Arena::from(arena)
+        Ok(Arena::from(arena))
     }
 
     #[getter(bet_amount)]
@@ -251,12 +256,10 @@ impl NeoFoodClub {
     }
 
     fn make_tenbet_bets(&self, pirates_binary: u32) -> PyResult<Bets> {
-        let bets = self.inner.make_tenbet_bets(pirates_binary);
-
-        match bets {
-            Ok(bets) => Ok(Bets::from(bets)),
-            Err(s) => Err(PyValueError::new_err(s)),
-        }
+        self.inner
+            .make_tenbet_bets(pirates_binary)
+            .map(Bets::from)
+            .map_err(PyValueError::new_err)
     }
 
     fn make_max_ter_bets(&self) -> Bets {
@@ -291,8 +294,11 @@ impl NeoFoodClub {
         self.inner.make_bustproof_bets().map(Bets::from)
     }
 
-    fn make_bets_from_hash(&self, bets_hash: &str) -> Bets {
-        Bets::from(self.inner.make_bets_from_hash(bets_hash))
+    fn make_bets_from_hash(&self, bets_hash: &str) -> PyResult<Bets> {
+        self.inner
+            .make_bets_from_hash(bets_hash)
+            .map(Bets::from)
+            .map_err(PyValueError::new_err)
     }
 
     fn make_bets_from_binaries(&self, binaries: Vec<u32>) -> Bets {

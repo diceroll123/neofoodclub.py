@@ -49,6 +49,34 @@ test-rust:
 test-rust-lib:
     cd neofoodclub_rs && cargo test
 
+# Run Rust coverage (requires cargo-llvm-cov: cargo install cargo-llvm-cov)
+coverage-rust:
+    cargo llvm-cov --all-features --workspace
+
+# Run Rust coverage with HTML report
+coverage-rust-html:
+    cargo llvm-cov --all-features --workspace --html
+    @echo "Coverage report generated at target/llvm-cov/html/index.html"
+
+# Run Rust coverage for neofoodclub_rs subproject
+coverage-rust-lib:
+    cd neofoodclub_rs && cargo llvm-cov --all-features --workspace
+
+# Run Rust coverage for neofoodclub_rs with HTML report
+coverage-rust-lib-html:
+    cd neofoodclub_rs && cargo llvm-cov --all-features --workspace --html
+    @echo "Coverage report generated at neofoodclub_rs/target/llvm-cov/html/index.html"
+
+# Run Rust coverage and output lcov file
+coverage-rust-lcov:
+    cargo llvm-cov --all-features --workspace --lcov --output-path lcov.info
+    @echo "LCOV report generated at lcov.info"
+
+# Run Rust coverage and output JSON file (best for AI analysis)
+coverage-rust-json:
+    cargo llvm-cov --all-features --workspace --json --output-path coverage.json
+    @echo "JSON coverage report generated at coverage.json"
+
 # Run all tests (Python and Rust)
 test-all: rebuild test test-rust test-rust-lib
 
