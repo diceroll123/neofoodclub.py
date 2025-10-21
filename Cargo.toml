@@ -8,10 +8,14 @@ name = "neofoodclub"
 crate-type = ["cdylib"]
 
 [dependencies]
-pyo3 = { version = "0.27.0", features = ["extension-module", "abi3-py311", "chrono", "chrono-tz", "generate-import-lib"] }
+pyo3 = { version = "0.27.0", features = ["extension-module", "abi3-py311", "chrono", "chrono-tz"] }
 neofoodclub = { path = "./neofoodclub_rs" }
 chrono = "0.4.38"
 chrono-tz = "0.10.0"
+
+[features]
+# Feature for Windows ARM64 cross-compilation
+windows-cross = ["pyo3/generate-import-lib"]
 
 [profile.release]
 lto = "fat"
