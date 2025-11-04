@@ -78,6 +78,7 @@ line-ending = "auto"
 [dependency-groups]
 dev = [
     "coverage>=7.6.3",
+    "maturin>=1.0,<2.0",
     "pytest>=8.3.3",
     "setuptools-rust>=1.10.2",
 ]
