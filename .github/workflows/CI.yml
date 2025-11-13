@@ -28,10 +28,9 @@ jobs:
         with:
           submodules: recursive
           token: ${{ github.token }}
-      - uses: actions/setup-python@v5
+      - uses: astral-sh/setup-uv@v7
         with:
           python-version: ${{ matrix.python-version }}
-          architecture: x64
       - name: "Build wheels - macOS"
         uses: PyO3/maturin-action@v1
         with:
@@ -51,10 +50,9 @@ jobs:
         python-version: *python-versions
     steps:
       - *checkout-step
-      - uses: actions/setup-python@v5
+      - uses: astral-sh/setup-uv@v7
         with:
           python-version: ${{ matrix.python-version }}
-          architecture: x64
       - name: "Build wheels - Windows x64"
         uses: PyO3/maturin-action@v1
         with:
@@ -74,10 +72,9 @@ jobs:
         python-version: *python-versions
     steps:
       - *checkout-step
-      - uses: actions/setup-python@v5
+      - uses: astral-sh/setup-uv@v7
         with:
           python-version: ${{ matrix.python-version }}
-          architecture: x64
       - name: "Build wheels - Windows ARM64"
         uses: PyO3/maturin-action@v1
         with:
@@ -106,10 +103,9 @@ jobs:
           - target: powerpc64-unknown-linux-gnu
     steps:
       - *checkout-step
-      - uses: actions/setup-python@v5
+      - uses: astral-sh/setup-uv@v7
         with:
           python-version: ${{ matrix.python-version }}
-          architecture: x64
       - name: "Build wheels - Linux"
         uses: PyO3/maturin-action@v1
         with:
@@ -137,10 +133,9 @@ jobs:
           - target: armv7-unknown-linux-musleabihf
     steps:
       - *checkout-step
-      - uses: actions/setup-python@v5
+      - uses: astral-sh/setup-uv@v7
         with:
           python-version: ${{ matrix.python-version }}
-          architecture: x64
       - name: "Build wheels - musllinux"
         uses: PyO3/maturin-action@v1
         with:
