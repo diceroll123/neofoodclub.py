@@ -12,7 +12,7 @@ repos:
         args: [--pytest-test-first]
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: v0.14.5
+    rev: v0.14.10
     hooks:
       - id: ruff
         args: [--fix]
@@ -21,17 +21,11 @@ repos:
     rev: v1.1.407
     hooks:
       - id: pyright
-  - repo: https://gitlab.com/vojko.pribudic.foss/pre-commit-update
-    rev: v0.9.0
-    hooks:
-      - id: pre-commit-update
-        args: []
-
   - repo: local
     hooks:
       - id: cargo-clippy
         name: Run cargo clippy
-        entry: cargo clippy --fix --allow-staged
+        entry: cargo clippy --fix --allow-staged --allow-dirty
         language: system
         types: [rust]
         pass_filenames: false
