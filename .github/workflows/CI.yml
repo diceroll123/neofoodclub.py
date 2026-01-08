@@ -103,7 +103,6 @@ jobs:
           - target: armv7-unknown-linux-gnueabihf
           - target: s390x-unknown-linux-gnu
           - target: powerpc64le-unknown-linux-gnu
-          - target: powerpc64-unknown-linux-gnu
     steps:
       - *checkout-step
       - uses: astral-sh/setup-uv@v7
