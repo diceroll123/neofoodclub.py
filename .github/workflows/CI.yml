@@ -176,6 +176,4 @@ jobs:
           path: wheels
           merge-multiple: true
       - name: Publish to PyPi
-        env:
-          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
-        run: uv publish -v wheels/*
+        run: uv publish wheels/*
