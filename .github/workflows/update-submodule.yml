@@ -1,0 +1,56 @@
+name: Update neofoodclub_rs submodule
+
+on:
+  schedule:
+    # Run daily at 00:00 UTC
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-submodule:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update submodule
+        id: update
+        run: |
+          cd neofoodclub_rs
+          git fetch origin main
+          NEW_COMMIT=$(git rev-parse origin/main)
+          OLD_COMMIT=$(git rev-parse HEAD)
+          echo "old=$OLD_COMMIT" >> $GITHUB_OUTPUT
+          echo "new=$NEW_COMMIT" >> $GITHUB_OUTPUT
+          if [ "$NEW_COMMIT" != "$OLD_COMMIT" ]; then
+            git checkout "$NEW_COMMIT"
+            cd ..
+            git add neofoodclub_rs
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create PR
+        if: steps.update.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: update-neofoodclub-rs
+          branch-suffix: timestamp
+          delete-branch: true
+          title: "chore: update neofoodclub_rs submodule"
+          body: |
+            Updates neofoodclub_rs submodule to latest `main`.
+            - Previous: `${{ steps.update.outputs.old }}`
+            - New: `${{ steps.update.outputs.new }}`
+          commit-message: "chore: update neofoodclub_rs submodule"
+          labels: |
+            dependencies
+            automated
