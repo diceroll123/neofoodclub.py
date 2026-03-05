@@ -1,0 +1,61 @@
+name: Update neofoodclub_rs submodule
+
+on:
+  schedule:
+    # Run daily at 00:00 UTC
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-submodule:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update submodule
+        id: update
+        run: |
+          OLD_COMMIT=$(git -C neofoodclub_rs rev-parse HEAD)
+          git submodule update --remote neofoodclub_rs
+          NEW_COMMIT=$(git -C neofoodclub_rs rev-parse HEAD)
+          echo "old=$OLD_COMMIT" >> $GITHUB_OUTPUT
+          echo "new=$NEW_COMMIT" >> $GITHUB_OUTPUT
+          if [ "$OLD_COMMIT" != "$NEW_COMMIT" ]; then
+            git add neofoodclub_rs
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Push and create PR
+        if: steps.update.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OLD_COMMIT: ${{ steps.update.outputs.old }}
+          NEW_COMMIT: ${{ steps.update.outputs.new }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          BRANCH="update-neofoodclub-rs-$(date +%Y%m%d-%H%M%S)"
+          git checkout -b "$BRANCH"
+          git commit -m "chore: update neofoodclub_rs submodule"
+          git push origin "$BRANCH"
+          BASE=$(gh repo view --json defaultBranchRef -q .defaultBranchRef.name)
+          gh pr create \
+            --title "chore: update neofoodclub_rs submodule" \
+            --body "Updates neofoodclub_rs submodule to latest \`main\`.
+
+          - Previous: \`$OLD_COMMIT\`
+          - New: \`$NEW_COMMIT\`" \
+            --base "$BASE" \
+            --head "$BRANCH" \
+            --label "dependencies" \
+            --label "automated"
