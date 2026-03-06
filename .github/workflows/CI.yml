@@ -24,7 +24,7 @@ jobs:
         target: [x86_64, universal2-apple-darwin]
     steps:
       - &checkout-step
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
           token: ${{ github.token }}
