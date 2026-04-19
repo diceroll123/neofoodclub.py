@@ -28,7 +28,7 @@ jobs:
         with:
           submodules: recursive
           token: ${{ github.token }}
-      - uses: astral-sh/setup-uv@v7
+      - uses: astral-sh/setup-uv@v8
         with:
           enable-cache: false
           python-version: ${{ matrix.python-version }}
@@ -59,7 +59,7 @@ jobs:
           - target: powerpc64le-unknown-linux-gnu
     steps:
       - *checkout-step
-      - uses: astral-sh/setup-uv@v7
+      - uses: astral-sh/setup-uv@v8
         with:
           enable-cache: false
           python-version: ${{ matrix.python-version }}
@@ -90,7 +90,7 @@ jobs:
           - target: armv7-unknown-linux-musleabihf
     steps:
       - *checkout-step
-      - uses: astral-sh/setup-uv@v7
+      - uses: astral-sh/setup-uv@v8
         with:
           enable-cache: false
           python-version: ${{ matrix.python-version }}
@@ -119,7 +119,7 @@ jobs:
     if: github.event_name == 'release'
     steps:
       - name: "Install uv"
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v8
         with:
           enable-cache: false
       - uses: actions/download-artifact@v8
