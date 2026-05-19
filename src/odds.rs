@@ -40,7 +40,7 @@ impl Odds {
         self.inner
             .chances()
             .iter()
-            .map(|c| Chance::from(c.clone()))
+            .map(|c| Chance::from(*c))
             .collect()
     }
 }
