@@ -49,7 +49,8 @@ impl NeoFoodClub {
                 bet_amount,
                 convert_probability_model_int_to_enum(probability_model)?,
                 modifier.map(|m| m.inner),
-            ),
+            )
+            .map_err(|e| PyValueError::new_err(e.to_string()))?,
         })
     }
 
@@ -68,7 +69,8 @@ impl NeoFoodClub {
                 bet_amount,
                 convert_probability_model_int_to_enum(probability_model)?,
                 modifier.map(|m| m.inner),
-            ),
+            )
+            .map_err(|e| PyValueError::new_err(e.to_string()))?,
         })
     }
 
@@ -87,7 +89,8 @@ impl NeoFoodClub {
                 bet_amount,
                 convert_probability_model_int_to_enum(probability_model)?,
                 modifier.map(|m| m.inner),
-            ),
+            )
+            .map_err(|e| PyValueError::new_err(e.to_string()))?,
         })
     }
 
